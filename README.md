@@ -1,8 +1,10 @@
-Install all dependencies:
-`npm install`
+# widukind-spa
 
-Pack the JS bundle:
-`webpack`
+### Getting started
 
-Start the server:
-`npm start`
+1. Install all dependencies
+	..* `npm install`
+2. Pack the JS bundle
+	..* `webpack`
+3. Start the server
+	..* `npm start`
