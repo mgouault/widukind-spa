@@ -1,8 +1,8 @@
-Installs all dependencies
+Install all dependencies:
 `npm install`
 
-Packs the JS bundle
+Pack the JS bundle:
 `webpack`
 
-Start the server
+Start the server:
 `npm start`
