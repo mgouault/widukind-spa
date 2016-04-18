@@ -19,20 +19,26 @@ var appActions = {
     });
   },
   
-  dimensionsChange: function (event, dimensions) {
+  dimensionsChange: function (event, dimensions, dimensionsObjSelected) {
     var options = event.target.options;
     var dimensionsSelected = [];
-    var dimensionsObjSelected = [];
+    _.remove(dimensionsObjSelected, function (el) {
+      return !_.find(options, {'value': el.name});
+    });
     _.forEach(options, function (el) {
        if (el.selected) {
         var name = el.value;
         dimensionsSelected.push(name);
-        dimensionsObjSelected.push({
-          'name': name,
-          'value': _.get(_.find(dimensions, {'name': name}), 'value')
-        });
+        if (!_.find(dimensionsObjSelected, {'name': name})) {
+          dimensionsObjSelected.push({
+            'name': name,
+            'value': _.get(_.find(dimensions, {'name': name}), 'value')
+          });
+        }
       }
     });
+    
+    
     appDispatcher.dispatch({
       'actionType': appConstants.DIMENSIONS_CHANGE,
       'value1': dimensionsSelected,
@@ -49,7 +55,7 @@ var appActions = {
       }
     });
     var index = _.findIndex(dimensionsObjSelected, {'name': dimensionName});
-    if (index === -1) {
+    if (index < 0) {
       return;
     }
     dimensionsObjSelected[index].selected = values;
