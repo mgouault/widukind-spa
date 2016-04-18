@@ -3,7 +3,7 @@ var _ = require('lodash');
 var appDispatcher = require('./appDispatcher');
 var appConstants = require('./appConstants');
 
-var appActions = module.exports = {
+var appActions = {
 
 	providerChange: function (event) {
     appDispatcher.dispatch({
@@ -23,16 +23,16 @@ var appActions = module.exports = {
     var options = event.target.options;
     var dimensionsSelected = [];
     var dimensionsObjSelected = [];
-    for (var i = 0; i < options.length ; i++) {
-      if (options[i].selected) {
-        var name = options[i].value;
+    _.forEach(options, function (el) {
+       if (el.selected) {
+        var name = el.value;
         dimensionsSelected.push(name);
         dimensionsObjSelected.push({
           'name': name,
           'value': _.get(_.find(dimensions, {'name': name}), 'value')
         });
       }
-    }
+    });
     appDispatcher.dispatch({
       'actionType': appConstants.DIMENSIONS_CHANGE,
       'value1': dimensionsSelected,
@@ -40,21 +40,25 @@ var appActions = module.exports = {
     });
   },
   
-  dimensionsValueChange: function (event, dimension) {
+  dimensionValueChange: function (event, dimensionName, dimensionsObjSelected) {
     var options = event.target.options;
-    var dimensionsObjSelected = this.state.dimensionsObjSelected;
     var values = [];
-    for (var i = 0; i < options.length ; i++) {
-      if (options[i].selected) {
-        values.push(options[i].value);
+    _.forEach(options, function (el) {
+      if (el.selected) {
+        values.push(el.value);
       }
+    });
+    var index = _.findIndex(dimensionsObjSelected, {'name': dimensionName});
+    if (index === -1) {
+      return;
     }
-    var index = _.findIndex(dimensionsObjSelected, {'name': dimension});
     dimensionsObjSelected[index].selected = values;
     appDispatcher.dispatch({
-      'actionType': appConstants.DIMENSIONS_VALUES_CHANGE,
+      'actionType': appConstants.DIMENSION_VALUES_CHANGE,
       'value2': dimensionsObjSelected
     });
   }
   
 };
+
+module.exports = appActions;

@@ -93,7 +93,7 @@ var ProviderSelect = React.createClass({
   }
 });
 
-var ParamsBox = module.exports = React.createClass({
+var ParamsBox = React.createClass({
   render: function () {
     var toRender = [];
     var providers = this.props.data;
@@ -139,3 +139,5 @@ var ParamsBox = module.exports = React.createClass({
     );
   }
 });
+
+module.exports = ParamsBox;

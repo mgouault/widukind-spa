@@ -9,19 +9,19 @@ var CHANGE_EVENT = 'change';
 
 var _dataObj = {
 	'data': [],
-  'providerSelected': 'Select',
-  'datasetSelected': 'Select',
-  'dimensionsSelected': [],
-  'dimensionsObjSelected': []
+	'providerSelected': 'Select',
+	'datasetSelected': 'Select',
+	'dimensionsSelected': [],
+	'dimensionsObjSelected': []
 };
 
-var appStore = module.exports = _.assign({}, EventEmitter.prototype, {
+var appStore = _.assign({}, EventEmitter.prototype, {
 	
-  getDataObj: function () {
-    return _dataObj;
-  },
+	getDataObj: function () {
+		return _dataObj;
+	},
 
-	checkData: function (obj) {
+	checkData: function () {
 		function refreshData (url) {
 			var tmpData = {};
 			$.ajax({
@@ -40,25 +40,25 @@ var appStore = module.exports = _.assign({}, EventEmitter.prototype, {
 			});
 			return tmpData;
 		}
-		var clone = _.assign(_.clone(_dataObj), obj);
-		if (!clone.data || _.isEmpty(clone.data)) {
+		var data = _.clone(_dataObj.data);
+		if (!data || _.isEmpty(data)) {
 			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys');
-			clone.data = [];
+			data = [];
 			tmp.forEach(function (el, index) {
-				clone.data[index] = {
+				data[index] = {
 					'name': el,
 					'value': []
 				}
 			});
-			this.setState(clone);
+			_dataObj.data = data;
 			return;
 		}
-		var providerObj = _.find(clone.data, {'name': clone.providerSelected});
+		var providerObj = _.find(data, {'name': _dataObj.providerSelected});
 		if (!providerObj) {
 			return;
 		}
 		if (!providerObj.value || _.isEmpty(providerObj.value)) {
-			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+clone.providerSelected+'/datasets/keys');
+			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+_dataObj.providerSelected+'/datasets/keys');
 			providerObj.value = [];
 			tmp.forEach(function (el, index) {
 				providerObj.value[index] = {
@@ -66,15 +66,15 @@ var appStore = module.exports = _.assign({}, EventEmitter.prototype, {
 					'value': []
 				}
 			});
-			this.setState(clone);
+			_dataObj.data = data;
 			return;
 		}
-		var datasetObj = _.find(providerObj.value, {'name': clone.datasetSelected});
+		var datasetObj = _.find(providerObj.value, {'name': _dataObj.datasetSelected});
 		if (!datasetObj) {
 			return;
 		}
 		if (!datasetObj.value || _.isEmpty(datasetObj.value)) {
-			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+clone.datasetSelected+'/dimensions');
+			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+_dataObj.datasetSelected+'/dimensions');
 			datasetObj.value = [];
 			Object.keys(tmp).forEach(function (el, index, array) {
 				datasetObj.value[index] = {
@@ -82,55 +82,58 @@ var appStore = module.exports = _.assign({}, EventEmitter.prototype, {
 					'value': Object.keys(tmp[el])
 				}
 			});
-			this.setState(clone);
+			_dataObj.data = data;
 			return;
 		}
-		this.setState(obj);
 	},
 	
 	emitChange: function () {
-    this.emit(CHANGE_EVENT);
-  },
-  
-  addChangeListener: function(callback) {
-    this.on(CHANGE_EVENT, callback);
-  },
-  
-  removeChangeListener: function(callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  }
+		this.checkData();
+		this.emit(CHANGE_EVENT);
+	},
+	
+	addChangeListener: function(callback) {
+		this.on(CHANGE_EVENT, callback);
+	},
+	
+	removeChangeListener: function(callback) {
+		this.removeListener(CHANGE_EVENT, callback);
+	}
 	
 });
 
-
-appDispatcher.register(function(action) {
-  switch(action.actionType) {
-  	
-    case appConstants.PROVIDER_CHANGE:
+appDispatcher.register(function (action) {
+	switch (action.actionType) {
+		
+		case appConstants.PROVIDER_CHANGE:
 			_dataObj.providerSelected = action.value;
 			_dataObj.datasetSelected = 'Select';
 			_dataObj.dimensionsSelected = [];
 			_dataObj.dimensionsObjSelected = [];
-    	appStore.emitChange();
-      break;
+			appStore.emitChange();
+			break;
 
-    case appConstants.DATASET_CHANGE:
+		case appConstants.DATASET_CHANGE:
 			_dataObj.datasetSelected = action.value;
 			_dataObj.dimensionsSelected = [];
-    	_dataObj.dimensionsObjSelected = [];
-      appStore.emitChange();
-      break;
+			_dataObj.dimensionsObjSelected = [];
+			appStore.emitChange();
+			break;
 
-    case appConstants.DIMENSIONS_CHANGE:
-		  _dataObj.dimensionsSelected = action.value1;
-		  _dataObj.dimensionsObjSelected = action.value2;
-      appStore.emitChange();
-      break;
+		case appConstants.DIMENSIONS_CHANGE:
+			_dataObj.dimensionsSelected = action.value1;
+			_dataObj.dimensionsObjSelected = action.value2;
+			appStore.emitChange();
+			break;
 
-    case appConstants.DIMENSIONS_VALUES_CHANGE:
-		  _dataObj.dimensionsObjSelected = action.value2;
-      appStore.emitChange();
-      break;
+		case appConstants.DIMENSION_VALUES_CHANGE:
+			_dataObj.dimensionsObjSelected = action.value2;
+			appStore.emitChange();
+			break;
 
-  }
+	}
 });
+
+appStore.checkData();
+
+module.exports = appStore;

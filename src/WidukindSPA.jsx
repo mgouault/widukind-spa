@@ -5,7 +5,7 @@ var appStore = require('./appStore');
 var QueryBox = require('./QueryBox.jsx');
 var ParamsBox = require('./ParamsBox.jsx');
 
-var WidukindSPA = module.exports = React.createClass({
+var WidukindSPA = React.createClass({
   
   getState: function() {
     return appStore.getDataObj();
@@ -28,14 +28,18 @@ var WidukindSPA = module.exports = React.createClass({
   },
   
   render: function () {
-    var toRender = [];
-    if (this.state.datasetSelected && this.state.datasetSelected != 'Select') {
-      toRender.push(<QueryBox dataset={this.state.datasetSelected} values={this.state.dimensionsObjSelected} />);
-    }
+    var toRender = (this.state.datasetSelected && this.state.datasetSelected != 'Select');
     return (
       <div>
-        {toRender}
+        {toRender ? 
+          <QueryBox 
+            key="QueryBox" 
+            dataset={this.state.datasetSelected} 
+            values={this.state.dimensionsObjSelected} 
+          /> 
+        : ''}
         <ParamsBox 
+          key="ParamsBox" 
           data={this.state.data} 
           providerSelected={this.state.providerSelected} 
           datasetSelected={this.state.datasetSelected} 
@@ -47,3 +51,5 @@ var WidukindSPA = module.exports = React.createClass({
   }
   
 });
+
+module.exports = WidukindSPA;

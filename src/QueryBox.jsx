@@ -1,27 +1,22 @@
 var React = require('react');
 var _ = require('lodash');
 
-var QueryBox = module.exports = React.createClass({
+var QueryBox = React.createClass({
   render: function () {
     var url = '';
-    url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values';
+    url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10';
     var values = this.props.values;
-    var first = true;
-    for (var i = 0; i < values.length ; i++) {
-      var name = values[i].name;
-      var selected = values[i].selected;
+    _.forEach(values, function (el) {
+      var name = el.name;
+      var selected = el.selected;
       if (typeof selected !== 'undefined' && !_.isEmpty(selected)) {
-        if (first) {
-          url += '?';
-          first = false;
-        }
         var params = '';
-        for (var i = 0; i < selected.length ; i++) {
-          params += ((i > 0) ? '+' : '') + selected[i];
+        for (var j = 0; j < selected.length ; j++) {
+          params += ((j > 0) ? '+' : '') + selected[j];
         }
-        url += name + '=' + params;
+        url += '&' + name + '=' + params;
       }
-    }
+    });
     return (
       <div>
         {url}
@@ -29,3 +24,5 @@ var QueryBox = module.exports = React.createClass({
     );
   }
 });
+
+module.exports = QueryBox;

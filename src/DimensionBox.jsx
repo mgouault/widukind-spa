@@ -7,13 +7,18 @@ var DimensionConfig = React.createClass({
   getOptions: function () {
     var options = [];
     var values = this.props.dimensionsValues
-    for (var i = 0; i < values.length ; i++) {
-      options.push(<option key={values[i]} value={values[i]}>{values[i]}</option>);
-    }
+    _.forEach(values, function (el) {
+      options.push(
+        <option 
+          key={el} 
+          value={el}>
+            {el}
+        </option>);
+    });
     return options;
   },
   onUserInput: function (event) {
-    appActions.dimensionsValueChange(event, this.props.name);
+    appActions.dimensionValueChange(event, this.props.name, this.props.dimensionsObjSelected);
   },
   render: function () {
     if (!this.props.dimensionsValues) {
@@ -34,20 +39,21 @@ var DimensionConfig = React.createClass({
   }
 });
 
-var DimensionsBox = module.exports = React.createClass({
+var DimensionsBox = React.createClass({
   render: function () {
     var toRender = [];
     var dimensions = this.props.dimensionsObjSelected;
-    for (var i = 0; i < dimensions.length ; i++) {
+    _.forEach(dimensions, function (el) {
       toRender.push(
         <DimensionConfig 
-          key={dimensions[i].name} 
-          dimensionsValues={dimensions[i].value} 
-          name={dimensions[i].name} 
-          value={dimensions[i].selected} 
+          key={el.name} 
+          dimensionsValues={el.value} 
+          name={el.name} 
+          value={el.selected} 
+          dimensionsObjSelected={dimensions} 
         />
       );
-    }
+    });
     return (
       <div>
         {toRender}
@@ -55,3 +61,5 @@ var DimensionsBox = module.exports = React.createClass({
     );
   }
 });
+
+module.exports = DimensionsBox;
