@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 
+var appActions = require('./appActions');
 var DimensionsBox = require('./DimensionBox.jsx');
 
 var DimensionsSelect = React.createClass({
@@ -13,7 +14,7 @@ var DimensionsSelect = React.createClass({
     return options;
   },
   onUserInput: function (event) {
-    this.props.onUserInput(event, this.props.dimensions);
+    appActions.dimensionsChange(event, this.props.dimensions);
   },
   render: function () {
     if (!this.props.dimensions) {
@@ -54,7 +55,7 @@ var DatasetSelect = React.createClass({
     return (
       <div>
         Dataset:
-        <select onChange={this.props.onUserInput} value={this.props.value}>
+        <select onChange={appActions.datasetChange} value={this.props.value}>
           <option>Select</option>
           {options}
         </select>
@@ -83,7 +84,7 @@ var ProviderSelect = React.createClass({
     return (
       <div>
         Provider:
-        <select onChange={this.props.onUserInput} value={this.props.value}>
+        <select onChange={appActions.providerChange} value={this.props.value}>
           <option>Select</option>
           {options}
         </select>
@@ -97,14 +98,37 @@ var ParamsBox = module.exports = React.createClass({
     var toRender = [];
     var providers = this.props.data;
     if (providers) {
-      toRender.push(<ProviderSelect key="ProviderSelect" providers={providers} value={this.props.providerSelected} onUserInput={this.props.providerChange} />);
+      toRender.push(
+        <ProviderSelect 
+          key="ProviderSelect" 
+          providers={providers} 
+          value={this.props.providerSelected}  
+        />
+      );
       var providerObj = _.find(providers, {'name': this.props.providerSelected});
       if (providerObj && providerObj.value) {
-        toRender.push(<DatasetSelect key="DatasetSelect" datasets={providerObj.value} value={this.props.datasetSelected} onUserInput={this.props.datasetChange} />);
+        toRender.push(
+          <DatasetSelect 
+            key="DatasetSelect" 
+            datasets={providerObj.value} 
+            value={this.props.datasetSelected} 
+          />
+        );
         var datasetObj = _.find(providerObj.value, {'name': this.props.datasetSelected});
         if (datasetObj && datasetObj.value) {
-          toRender.push(<DimensionsSelect key="DimensionsSelect" dimensions={datasetObj.value} value={this.props.dimensionsSelected} onUserInput={this.props.dimensionsChange} />);
-          toRender.push(<DimensionsBox key="DimensionsBox" dimensionsObjSelected={this.props.dimensionsObjSelected} onUserInput={this.props.dimensionsValueChange} />);
+          toRender.push(
+            <DimensionsSelect 
+              key="DimensionsSelect" 
+              dimensions={datasetObj.value} 
+              value={this.props.dimensionsSelected} 
+            />
+          );
+          toRender.push(
+            <DimensionsBox 
+              key="DimensionsBox" 
+              dimensionsObjSelected={this.props.dimensionsObjSelected} 
+            />
+          );
         }
       }
     }

@@ -1,6 +1,8 @@
 var React = require('react');
 var _ = require('lodash');
 
+var appActions = require('./appActions');
+
 var DimensionConfig = React.createClass({
   getOptions: function () {
     var options = [];
@@ -11,7 +13,7 @@ var DimensionConfig = React.createClass({
     return options;
   },
   onUserInput: function (event) {
-    this.props.onUserInput(event, this.props.name);
+    appActions.dimensionsValueChange(event, this.props.name);
   },
   render: function () {
     if (!this.props.dimensionsValues) {
@@ -37,7 +39,14 @@ var DimensionsBox = module.exports = React.createClass({
     var toRender = [];
     var dimensions = this.props.dimensionsObjSelected;
     for (var i = 0; i < dimensions.length ; i++) {
-      toRender.push(<DimensionConfig key={dimensions[i].name} dimensionsValues={dimensions[i].value} name={dimensions[i].name} value={dimensions[i].selected} onUserInput={this.props.onUserInput}/>);
+      toRender.push(
+        <DimensionConfig 
+          key={dimensions[i].name} 
+          dimensionsValues={dimensions[i].value} 
+          name={dimensions[i].name} 
+          value={dimensions[i].selected} 
+        />
+      );
     }
     return (
       <div>
