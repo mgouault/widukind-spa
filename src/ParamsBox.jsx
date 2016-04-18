@@ -14,7 +14,7 @@ var DimensionsSelect = React.createClass({
     return options;
   },
   onUserInput: function (event) {
-    appActions.dimensionsChange(event, this.props.dimensions);
+    appActions.dimensionsChange(event, this.props.dimensions, this.props.dimensionsObjSelected);
   },
   render: function () {
     if (!this.props.dimensions) {
@@ -121,6 +121,7 @@ var ParamsBox = React.createClass({
               key="DimensionsSelect" 
               dimensions={datasetObj.value} 
               value={this.props.dimensionsSelected} 
+              dimensionsObjSelected={this.props.dimensionsObjSelected} 
             />
           );
           toRender.push(
