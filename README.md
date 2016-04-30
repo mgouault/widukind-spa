@@ -11,11 +11,15 @@
 
 #### Docker
 
+1. Clone this project
+  * `git clone https://github.com/mgouault/widukind-spa.git`
+  * `cd widukind-spa`
+
 1. Build image
-  * `docker build -q --tag="widukind-spa" .`
+  * `docker build -t widukind-spa .`
 
 2. Run a container
-  * `docker run -dP widukind-spa`
+  * `docker run -d --name spa -p 3000:3000 widukind-spa`
 
-3. Find the published port
-  * `docker ps -l`
+3. Open browser
+  * `http://YOUR_PUBLIC_IP:3000`
