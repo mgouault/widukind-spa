@@ -1,5 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
+import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
 var appActions = require('./appActions');
 
@@ -29,12 +30,12 @@ var DimensionConfig = React.createClass({
       return (<div></div>);
     }
     return (
-      <div>
-        Select {this.props.name}:
-        <select onChange={this.onUserInput} value={this.props.value} multiple={true}>
+      <FormGroup controlId="formControlsSelectMultipleDimensionsValues">
+        <ControlLabel>Select {this.props.name}:</ControlLabel>
+        <FormControl componentClass="select" onChange={this.onUserInput} value={this.props.value} multiple>
           {options}
-        </select>
-      </div>
+        </FormControl>
+      </FormGroup>
     );
   }
 });

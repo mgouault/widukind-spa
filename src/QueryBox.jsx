@@ -1,8 +1,11 @@
 var React = require('react');
 var _ = require('lodash');
+import { Button, Jumbotron } from 'react-bootstrap';
+
+var appActions = require('./appActions');
 
 var QueryBox = React.createClass({
-  render: function () {
+  makeUrl: function () {
     var url = '';
     url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10';
     var values = this.props.values;
@@ -17,9 +20,19 @@ var QueryBox = React.createClass({
         url += '&' + name + '=' + params;
       }
     });
+    return url;
+  },
+  render: function () {
+    var url = this.makeUrl();
+    var requestJSON = function () {
+      appActions.requestJSON(url);
+    };
     return (
       <div>
-        {url}
+        <pre>{url}</pre>
+        <Button onClick={requestJSON}>
+          Request JSON
+        </Button>
       </div>
     );
   }

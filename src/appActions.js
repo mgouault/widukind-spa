@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var axios = require('axios');
 
 var appDispatcher = require('./appDispatcher');
 var appConstants = require('./appConstants');
@@ -23,7 +24,7 @@ var appActions = {
     var options = event.target.options;
     var dimensionsSelected = [];
     _.remove(dimensionsObjSelected, function (el) {
-      return !_.find(options, {'value': el.name});
+      return !_.find(options, {'value': el.name, 'selected': true});
     });
     _.forEach(options, function (el) {
        if (el.selected) {
@@ -37,8 +38,6 @@ var appActions = {
         }
       }
     });
-    
-    
     appDispatcher.dispatch({
       'actionType': appConstants.DIMENSIONS_CHANGE,
       'value1': dimensionsSelected,
@@ -63,6 +62,24 @@ var appActions = {
       'actionType': appConstants.DIMENSION_VALUES_CHANGE,
       'value2': dimensionsObjSelected
     });
+  },
+
+  requestJSON: function (url) {
+    axios.get(url)
+      .then(function (received) {
+        received = received.data;
+        if (_.has(received, 'error')) {
+          console.error(url, received.error.toString());
+        } else {
+          appDispatcher.dispatch({
+            'actionType': appConstants.REQUEST_JSON,
+            'json': received.data
+          });
+        }
+      })
+      .catch(function (xhr, status, err) {
+        console.error(url, status, err.toString());
+      });
   }
   
 };

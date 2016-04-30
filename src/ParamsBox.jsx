@@ -1,5 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
+import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
 var appActions = require('./appActions');
 var DimensionsBox = require('./DimensionBox.jsx');
@@ -25,12 +26,12 @@ var DimensionsSelect = React.createClass({
       return (<div></div>);
     }
     return (
-      <div>
-        Dimensions:
-        <select onChange={this.onUserInput} value={this.props.value} multiple={true}>
+      <FormGroup controlId="formControlsSelectMultipleDimensions">
+        <ControlLabel>Dimensions:</ControlLabel>
+        <FormControl componentClass="select" onChange={this.onUserInput} value={this.props.value} multiple>
           {options}
-        </select>
-      </div>
+        </FormControl>
+      </FormGroup>
     );
   }
 });
@@ -53,13 +54,13 @@ var DatasetSelect = React.createClass({
       return (<div></div>);
     }
     return (
-      <div>
-        Dataset:
-        <select onChange={appActions.datasetChange} value={this.props.value}>
+      <FormGroup controlId="formControlsSelectDataset">
+        <ControlLabel>Dataset:</ControlLabel>
+        <FormControl componentClass="select" onChange={appActions.datasetChange} value={this.props.value}>
           <option>Select</option>
           {options}
-        </select>
-      </div>
+        </FormControl>
+      </FormGroup>
     );
   }
 });
@@ -82,13 +83,13 @@ var ProviderSelect = React.createClass({
       return (<div></div>);
     }
     return (
-      <div>
-        Provider:
-        <select onChange={appActions.providerChange} value={this.props.value}>
+      <FormGroup controlId="formControlsSelectProvider">
+        <ControlLabel>Provider:</ControlLabel>
+        <FormControl componentClass="select" onChange={appActions.providerChange} value={this.props.value}>
           <option>Select</option>
           {options}
-        </select>
-      </div>
+        </FormControl>
+      </FormGroup>
     );
   }
 });
@@ -126,7 +127,7 @@ var ParamsBox = React.createClass({
           );
           toRender.push(
             <DimensionsBox 
-              key="DimensionsBox" 
+              key="DimensionsBox"
               dimensionsObjSelected={this.props.dimensionsObjSelected} 
             />
           );

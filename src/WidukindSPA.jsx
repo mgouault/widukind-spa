@@ -1,52 +1,71 @@
 var React = require('react');
 var _ = require('lodash');
+import { Grid, Row, Col, Well } from 'react-bootstrap';
 
 var appStore = require('./appStore');
 var QueryBox = require('./QueryBox.jsx');
 var ParamsBox = require('./ParamsBox.jsx');
 
 var WidukindSPA = React.createClass({
-  
-  getState: function() {
-    return appStore.getDataObj();
+
+  getInitialState: function () {
+    return {};
   },
 
-  getInitialState: function() {
-    return this.getState();
+  getState: function (checkData) {
+    return appStore.getDataObj(checkData);
   },
-  
+
   _onChange: function() {
     this.setState(this.getState());
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
+    this.getState('checkData').then(function (data) {
+      this.setState(data);
+    }.bind(this));
     appStore.addChangeListener(this._onChange);
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount: function () {
     appStore.removeChangeListener(this._onChange);
   },
-  
+
+
   render: function () {
-    var toRender = (this.state.datasetSelected && this.state.datasetSelected != 'Select');
+    var data = JSON.stringify(this.state.json, undefined, 2);
     return (
-      <div>
-        {toRender ? 
-          <QueryBox 
-            key="QueryBox" 
-            dataset={this.state.datasetSelected} 
-            values={this.state.dimensionsObjSelected} 
-          /> 
-        : ''}
-        <ParamsBox 
-          key="ParamsBox" 
-          data={this.state.data} 
-          providerSelected={this.state.providerSelected} 
-          datasetSelected={this.state.datasetSelected} 
-          dimensionsSelected={this.state.dimensionsSelected} 
-          dimensionsObjSelected={this.state.dimensionsObjSelected} 
-        />
-      </div>
+      <Grid>
+        <Row>
+          <Col lg={4} md={4} sm={4} xs={4}>
+            <Well>
+            <QueryBox
+              key="QueryBox"
+              dataset={this.state.datasetSelected}
+              values={this.state.dimensionsObjSelected}
+              json={this.state.json}
+            />
+            </Well>
+            <Well>
+            <ParamsBox
+              key="ParamsBox"
+              data={this.state.data}
+              providerSelected={this.state.providerSelected}
+              datasetSelected={this.state.datasetSelected}
+              dimensionsSelected={this.state.dimensionsSelected}
+              dimensionsObjSelected={this.state.dimensionsObjSelected}
+            />
+            </Well>
+          </Col>
+          <Col lg={8} md={8} sm={8} xs={8}>
+            <Well>
+            <pre>
+              {data}
+            </pre>
+            </Well>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
   

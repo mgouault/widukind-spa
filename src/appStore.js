@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var $ = require('jquery');
+var axios = require('axios');
 var EventEmitter = require('events').EventEmitter;
 
 var appDispatcher = require('./appDispatcher');
@@ -8,6 +8,7 @@ var appConstants = require('./appConstants');
 var CHANGE_EVENT = 'change';
 
 var _dataObj = {
+	'json': {},
 	'data': [],
 	'providerSelected': 'Select',
 	'datasetSelected': 'Select',
@@ -16,90 +17,83 @@ var _dataObj = {
 };
 
 var appStore = _.assign({}, EventEmitter.prototype, {
-	
-	getDataObj: function () {
-		return _dataObj;
-	},
 
-	checkData: function () {
-		function refreshData (url) {
-			var tmpData = {};
-			$.ajax({
-				url: url,
-				async: false,
-				success: function (received) {
-					if (_.has(received, 'error')) {
-						console.error(url, received.error.toString());
-					} else {
-						tmpData = received.data;
-					}
-				},
-				error: function (xhr, status, err) {
-					console.error(url, status, err.toString());
-				}
-			});
-			return tmpData;
-		}
-		var data = _.clone(_dataObj.data);
-		if (!data || _.isEmpty(data)) {
-			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys');
-			data = [];
-			tmp.forEach(function (el, index) {
-				data[index] = {
-					'name': el,
-					'value': []
-				}
-			});
-			_dataObj.data = data;
-			return;
-		}
-		var providerObj = _.find(data, {'name': _dataObj.providerSelected});
-		if (!providerObj) {
-			return;
-		}
-		if (!providerObj.value || _.isEmpty(providerObj.value)) {
-			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+_dataObj.providerSelected+'/datasets/keys');
-			providerObj.value = [];
-			tmp.forEach(function (el, index) {
-				providerObj.value[index] = {
-					'name': el,
-					'value': []
-				}
-			});
-			_dataObj.data = data;
-			return;
-		}
-		var datasetObj = _.find(providerObj.value, {'name': _dataObj.datasetSelected});
-		if (!datasetObj) {
-			return;
-		}
-		if (!datasetObj.value || _.isEmpty(datasetObj.value)) {
-			var tmp = refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+_dataObj.datasetSelected+'/dimensions');
-			datasetObj.value = [];
-			Object.keys(tmp).forEach(function (el, index, array) {
-				datasetObj.value[index] = {
-					'name': el,
-					'value': Object.keys(tmp[el])
-				}
-			});
-			_dataObj.data = data;
-			return;
-		}
-	},
-	
-	emitChange: function () {
-		this.checkData();
-		this.emit(CHANGE_EVENT);
-	},
-	
-	addChangeListener: function(callback) {
-		this.on(CHANGE_EVENT, callback);
-	},
-	
-	removeChangeListener: function(callback) {
-		this.removeListener(CHANGE_EVENT, callback);
-	}
-	
+  getDataObj: function (checkData) {
+    if (checkData) {
+      return this.checkData().then(function (data) {
+        _dataObj.data = data;
+        return _dataObj;
+      });
+    } else {
+      return _dataObj;
+    }
+  },
+
+  emitChange: function () {
+    this.checkData().then(function (data) {
+      _dataObj.data = data;
+      this.emit(CHANGE_EVENT);
+    }.bind(this));
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  },
+
+  checkData: function () {
+    function refreshData (url) {
+      var tmpData = {};
+      return axios.get(url)
+        .then(function (received) {
+          received = received.data;
+          if (_.has(received, 'error')) {
+            console.error(url, received.error.toString());
+          } else {
+            tmpData = received.data;
+          }
+          return tmpData;
+        })
+        .catch(function (xhr, status, err) {
+          console.error(url, status, err.toString());
+          return tmpData;
+        });
+    }
+    var providers = _.clone(_.get(_dataObj, 'data', []));
+    var datasets = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value', []);
+    var dimensions = _.get(_.find(datasets, {'name': _dataObj.datasetSelected}), 'value', []);
+    if (_.isEmpty(providers)) {
+      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys')
+        .then(function (tmp) {
+          _.forEach(tmp, function (el, index) {
+            providers[index] = {'name': el, 'value': []}
+          });
+          return providers;
+        });
+    } else if (_.isEmpty(datasets)) {
+      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+_dataObj.providerSelected+'/datasets/keys')
+        .then(function (tmp) {
+          _.forEach(tmp, function (el, index) {
+            datasets[index] = {'name': el, 'value': []}
+          });
+          return providers;
+        });
+    } else if (_.isEmpty(dimensions)) {
+      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+_dataObj.datasetSelected+'/dimensions')
+        .then(function (tmp) {
+          _.forEach(Object.keys(tmp), function (el, index) {
+            dimensions[index] = {'name': el, 'value': Object.keys(tmp[el])}
+          });
+          return providers;
+        });
+    } else {
+      return Promise.resolve(providers);
+    }
+  }
+
 });
 
 appDispatcher.register(function (action) {
@@ -126,10 +120,15 @@ appDispatcher.register(function (action) {
 			appStore.emitChange();
 			break;
 
-		case appConstants.DIMENSION_VALUES_CHANGE:
-			_dataObj.dimensionsObjSelected = action.value2;
-			appStore.emitChange();
-			break;
+    case appConstants.DIMENSION_VALUES_CHANGE:
+      _dataObj.dimensionsObjSelected = action.value2;
+      appStore.emitChange();
+      break;
+
+    case appConstants.REQUEST_JSON:
+      _dataObj.json = action.json;
+      appStore.emitChange();
+      break;
 
 	}
 });
