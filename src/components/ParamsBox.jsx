@@ -2,7 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
-var appActions = require('./../actions/actions');
+var appActions = require('../actions/actions');
 
 var DimensionConfig = React.createClass({
   getOptions: function () {

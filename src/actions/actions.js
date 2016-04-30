@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var axios = require('axios');
 
-var appDispatcher = require('./../dispatcher/dispatcher');
+var appDispatcher = require('../dispatcher/dispatcher');
 var appConstants = require('./../constants/constants');
 
 var appActions = {

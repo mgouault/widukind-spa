@@ -2,7 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 import { Button } from 'react-bootstrap';
 
-var appActions = require('./../actions/actions');
+var appActions = require('../actions/actions');
 
 var QueryBox = React.createClass({
   makeUrl: function () {
