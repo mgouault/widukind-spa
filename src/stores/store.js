@@ -2,8 +2,8 @@ var _ = require('lodash');
 var axios = require('axios');
 var EventEmitter = require('events').EventEmitter;
 
-var appDispatcher = require('./appDispatcher');
-var appConstants = require('./appConstants');
+var appDispatcher = require('./../dispatcher/dispatcher');
+var appConstants = require('./../constants/constants');
 
 var CHANGE_EVENT = 'change';
 

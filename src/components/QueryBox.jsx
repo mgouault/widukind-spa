@@ -1,8 +1,8 @@
 var React = require('react');
 var _ = require('lodash');
-import { Button, Jumbotron } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
-var appActions = require('./appActions');
+var appActions = require('./../actions/actions');
 
 var QueryBox = React.createClass({
   makeUrl: function () {
