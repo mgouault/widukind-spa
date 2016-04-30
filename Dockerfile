@@ -1,19 +1,15 @@
-FROM debian
+FROM node:4
 
-WORKDIR /widukind-spa
+ENV PORT 3000
 
-RUN apt-get update && apt-get install -y curl \
-&& curl -sL https://deb.nodesource.com/setup_4.x | bash - \
-&& apt-get update && apt-get install -y \
-  nodejs \
-  git \
-  build-essential
+WORKDIR /src
 
-RUN git clone https://github.com/mgouault/widukind-spa.git . \
-&& npm install -g webpack \
-&& npm install \
-&& webpack
+ADD . /src/
 
-CMD ["node", "server.js"]
+RUN npm install -g webpack \
+    && npm install \
+    && webpack
 
 EXPOSE 3000
+
+CMD ["node", "server.js"]
