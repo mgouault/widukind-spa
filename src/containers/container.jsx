@@ -24,11 +24,8 @@ var WidukindSPA = React.createClass({
   },
 
   componentDidMount: function () {
-    this.getState('checkData').then(function (data) {
-      data.loading = _.remove(data.loading, 'providers');
-      this.setState(data);
-    }.bind(this));
     appStore.addChangeListener(this._onChange);
+    this.getState('checkData');
   },
 
   componentWillUnmount: function () {
@@ -53,7 +50,7 @@ var WidukindSPA = React.createClass({
             <Well>
             <ParamsBox
               key="ParamsBox"
-              data={this.state.data}
+              providers={this.props.providers}
               providerSelected={this.state.providerSelected}
               datasetSelected={this.state.datasetSelected}
               dimensionsSelected={this.state.dimensionsSelected}

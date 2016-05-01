@@ -8,7 +8,7 @@ var appActions = require('../actions/actions');
 var DimensionConfig = React.createClass({
   getOptions: function () {
     var options = [];
-    _.forEach(this.props.data, function (name) {
+    _.forEach(this.props.providers, function (name) {
       options.push(<option key={name} value={name}>{name}</option>);
     });
     return options;
@@ -17,7 +17,7 @@ var DimensionConfig = React.createClass({
     appActions.dimensionValueChange(event, this.props.name);
   },
   render: function () {
-    if (!this.props.data) {
+    if (!this.props.providers) {
       return (<div></div>);
     }
     var options = this.getOptions();
@@ -41,7 +41,7 @@ var DimensionConfig = React.createClass({
 var DimensionsBox = React.createClass({
   render: function () {
     var toRender = [];
-    _.forEach(this.props.data, function (el) {
+    _.forEach(this.props.providers, function (el) {
       toRender.push(
         <DimensionConfig
           key={el.name}
@@ -62,14 +62,14 @@ var DimensionsBox = React.createClass({
 var CustomSelect = React.createClass({
   getOptions: function () {
     var options = [];
-    _.forEach(this.props.data, function (el) {
+    _.forEach(this.props.providers, function (el) {
       var name = el.name;
       options.push(<option key={name} value={name}>{name}</option>);
     });
     return options;
   },
   render: function () {
-    if (!this.props.data) {
+    if (!this.props.providers) {
       return (<div></div>);
     }
     var options = this.getOptions();
@@ -93,7 +93,7 @@ var CustomSelect = React.createClass({
 var ParamsBox = React.createClass({
   render: function () {
     var toRender = [];
-    var providers = this.props.data;
+    var providers = this.props.providers;
     if (providers) {
       var loadingProviders = _.indexOf(this.props.loading, 'providers') > -1;
       toRender.push(

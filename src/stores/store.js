@@ -1,16 +1,16 @@
 var _ = require('lodash');
-var axios = require('axios');
 var EventEmitter = require('events').EventEmitter;
 
 var appDispatcher = require('../dispatcher/dispatcher');
 var appConstants = require('../constants/constants');
+var appActions = require('../actions/actions');
 
 var CHANGE_EVENT = 'change';
 
 var _dataObj = {
   'loading': [],
 	'json': {},
-	'data': [],
+	'providers': [],
 	'providerSelected': '',
 	'datasetSelected': '',
 	'dimensionsSelected': [],
@@ -23,23 +23,14 @@ var appStore = _.assign({}, EventEmitter.prototype, {
 
   getDataObj: function (checkData) {
     if (checkData) {
-      return this.checkData().then(function (data) {
-        _dataObj.data = data;
-        return _dataObj;
-      });
-    } else {
-      return _dataObj;
+      this.checkData()
     }
+    return _dataObj;
   },
 
-  emitChange: function (el) {
-    _dataObj.loading.push(el);
+  emitChange: function () {
     this.emit(CHANGE_EVENT);
-    this.checkData().then(function (data) {
-      _dataObj.data = data;
-      _dataObj.loading = _.remove(_dataObj.loading, el);
-      this.emit(CHANGE_EVENT); 
-    }.bind(this));
+    this.checkData();
   },
 
   addChangeListener: function (callback) {
@@ -51,60 +42,22 @@ var appStore = _.assign({}, EventEmitter.prototype, {
   },
 
   checkData: function () {
-    function refreshData(url) {
-      var tmpData = {};
-      return axios.get(url)
-        .then(function (received) {
-          received = received.data;
-          if (_.has(received, 'error')) {
-            console.error(url, received.error.toString());
-          } else {
-            tmpData = received.data;
-          }
-          return tmpData;
-        })
-        .catch(function (xhr, status, err) {
-          console.error(url, status, err.toString());
-          return tmpData;
-        });
-    }
-
-    var providers = _.clone(_.get(_dataObj, 'data', []));
-    var datasets = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value', []);
-    var dimensions = _.get(_.find(datasets, {'name': _dataObj.datasetSelected}), 'value', []);
+    var providers = _.clone(_dataObj.providers);
+    var providerObjValue = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value');
+    var datasetObjValue = _.get(_.find(providerObjValue, {'name': _dataObj.datasetSelected}), 'value');
     if (_.isEmpty(providers)) {
-      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys')
-        .then(function (tmp) {
-          _.forEach(tmp, function (el, index) {
-            providers[index] = {'name': el, 'value': []}
-          });
-          return providers;
-        });
-    } else if (_.isEmpty(datasets)) {
+      appActions.providersMissing();
+    } else if (_.isEmpty(providerObjValue)) {
       if (_dataObj.providerSelected === 'Select') {
-        return Promise.resolve(providers);
+        return;
       }
-      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _dataObj.providerSelected + '/datasets/keys')
-        .then(function (tmp) {
-          _.forEach(tmp, function (el, index) {
-            datasets[index] = {'name': el, 'value': []}
-          });
-          return providers;
-        });
-    } else if (_.isEmpty(dimensions)) {
+      appActions.datasetsMissing(_dataObj.providerSelected);
+    } else if (_.isEmpty(datasetObjValue)) {
       if (_dataObj.datasetSelected === 'Select') {
-        return Promise.resolve(providers);
+        return;
       }
-      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _dataObj.datasetSelected + '/dimensions')
-        .then(function (tmp) {
-          _.forEach(Object.keys(tmp), function (el, index) {
-            dimensions[index] = {'name': el, 'value': Object.keys(tmp[el])}
-          });
-          return providers;
-        });
-    } else {
-      return Promise.resolve(providers);
-    }
+      appActions.dimensionsMissing(_dataObj.datasetSelected);
+    } 
   }
 
 });
@@ -114,29 +67,43 @@ appDispatcher.register(function (action) {
 		
 		case appConstants.PROVIDER_CHANGE:
       _providerChange(action.value);
-			appStore.emitChange('datasets');
+			appStore.emitChange();
 			break;
 
 		case appConstants.DATASET_CHANGE:
       _datasetChange(action.value);
-			appStore.emitChange('dimensions');
+			appStore.emitChange();
 			break;
 
 		case appConstants.DIMENSIONS_CHANGE:
       _dimensionsChange(action.options);
-			appStore.emitChange('dimensionValues');
+			appStore.emitChange();
 			break;
 
     case appConstants.DIMENSION_VALUES_CHANGE:
       _dimensionValuesChange(action.options, action.dimensionName);
-      appStore.emitChange('none');
+      appStore.emitChange();
       break;
 
     case appConstants.REQUEST_JSON:
       _requestJSON(action.json);
-      appStore.emitChange('requestJSON');
+      appStore.emitChange();
       break;
 
+    case appConstants.PROVIDERS_MISSING:
+      _providersMissing(action.data);
+      appStore.emitChange();
+      break;
+
+    case appConstants.DATASETS_MISSING:
+      _datasetsMissing(action.data);
+      appStore.emitChange();
+      break;
+
+    case appConstants.DIMENSIONS_MISSING:
+      _dimensionsMissing(action.data);
+      appStore.emitChange();
+      break;
 	}
 });
 
@@ -145,7 +112,7 @@ function _providerChange (value) {
   _dataObj.datasetSelected = '';
   _dataObj.dimensionsSelected = [];
   _dataObj.dimensionsObjSelected = [];
-  _dataObj.providerObj = _.find(_dataObj.data, {'name': _dataObj.providerSelected});
+  _dataObj.providerObj = _.find(_dataObj.providers, {'name': _dataObj.providerSelected});
 }
 
 function _datasetChange (value) {
@@ -204,6 +171,33 @@ function _dimensionValuesChange (options, dimensionName) {
 
 function _requestJSON (json) {
   _dataObj.json = json;
+}
+
+function _providersMissing (data) {
+  var providers = [];
+  _.forEach(data, function (el, i) {
+    providers[i] = {'name': el, 'value': []}
+  });
+  _dataObj.providers = providers;
+}
+
+function _datasetsMissing (data) {
+  var providers = _.clone(_dataObj.providers);
+  var providerObj = _.find(providers, {'name': _dataObj.providerSelected});
+  _.forEach(data, function (el, index) {
+    providerObj[index] = {'name': el, 'value': []}
+  });
+  _dataObj.providers = providers;
+}
+
+function _dimensionsMissing (data) {
+  var providers = _.clone(_dataObj.providers);
+  var providerObjValue = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value');
+  var datasetObjValue = _.get(_.find(providerObjValue, {'name': _dataObj.datasetSelected}), 'value');
+  _.forEach(Object.keys(data), function (el, i) {
+    datasetObjValue[i] = {'name': el, 'value': Object.keys(data[el])}
+  });
+  _dataObj.providers = providers;
 }
 
 module.exports = appStore;
