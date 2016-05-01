@@ -1,5 +1,5 @@
 var React = require('react');
-import { Grid, Row, Col, Well, Fade } from 'react-bootstrap';
+import { Grid, Row, Col, Well } from 'react-bootstrap';
 var Loader = require('react-loader');
 var _ = require('lodash');
 
@@ -43,27 +43,26 @@ var WidukindSPA = React.createClass({
         <Row>
           <Col lg={4} md={4} sm={4} xs={4}>
             <Well>
-              <QueryBox
-                key="QueryBox"
-                dataset={this.state.datasetSelected}
-                values={this.state.dimensionsObjSelected}
-                json={this.state.json} 
-                loading={loadingJSON}
-              />
+            <QueryBox
+              key="QueryBox"
+              dataset={this.state.datasetSelected}
+              values={this.state.dimensionsObjSelected} 
+              loading={loadingJSON}
+            />
             </Well>
-            <Fade in={true} transitionAppear={true}>
-              <Well>
-              <ParamsBox
-                key="ParamsBox"
-                data={this.state.data}
-                providerSelected={this.state.providerSelected}
-                datasetSelected={this.state.datasetSelected}
-                dimensionsSelected={this.state.dimensionsSelected}
-                dimensionsObjSelected={this.state.dimensionsObjSelected}
-                loading={this.state.loading}
-              />
-              </Well>
-            </Fade>
+            <Well>
+            <ParamsBox
+              key="ParamsBox"
+              data={this.state.data}
+              providerSelected={this.state.providerSelected}
+              datasetSelected={this.state.datasetSelected}
+              dimensionsSelected={this.state.dimensionsSelected}
+              providerObj={this.state.providerObj}
+              datasetObj={this.state.datasetObj}
+              dimensionsObjSelected={this.state.dimensionsObjSelected}
+              loading={this.state.loading}
+            />
+            </Well>
           </Col>
           <Col lg={8} md={8} sm={8} xs={8}>
             <Well>

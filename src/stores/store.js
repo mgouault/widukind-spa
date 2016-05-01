@@ -11,9 +11,11 @@ var _dataObj = {
   'loading': [],
 	'json': {},
 	'data': [],
-	'providerSelected': 'Select',
-	'datasetSelected': 'Select',
+	'providerSelected': '',
+	'datasetSelected': '',
 	'dimensionsSelected': [],
+  'providerObj': {},
+  'datasetObj': {},
 	'dimensionsObjSelected': []
 };
 
@@ -49,7 +51,7 @@ var appStore = _.assign({}, EventEmitter.prototype, {
   },
 
   checkData: function () {
-    function refreshData (url) {
+    function refreshData(url) {
       var tmpData = {};
       return axios.get(url)
         .then(function (received) {
@@ -66,6 +68,7 @@ var appStore = _.assign({}, EventEmitter.prototype, {
           return tmpData;
         });
     }
+
     var providers = _.clone(_.get(_dataObj, 'data', []));
     var datasets = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value', []);
     var dimensions = _.get(_.find(datasets, {'name': _dataObj.datasetSelected}), 'value', []);
@@ -81,7 +84,7 @@ var appStore = _.assign({}, EventEmitter.prototype, {
       if (_dataObj.providerSelected === 'Select') {
         return Promise.resolve(providers);
       }
-      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+_dataObj.providerSelected+'/datasets/keys')
+      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _dataObj.providerSelected + '/datasets/keys')
         .then(function (tmp) {
           _.forEach(tmp, function (el, index) {
             datasets[index] = {'name': el, 'value': []}
@@ -92,7 +95,7 @@ var appStore = _.assign({}, EventEmitter.prototype, {
       if (_dataObj.datasetSelected === 'Select') {
         return Promise.resolve(providers);
       }
-      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+_dataObj.datasetSelected+'/dimensions')
+      return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _dataObj.datasetSelected + '/dimensions')
         .then(function (tmp) {
           _.forEach(Object.keys(tmp), function (el, index) {
             dimensions[index] = {'name': el, 'value': Object.keys(tmp[el])}
@@ -110,37 +113,97 @@ appDispatcher.register(function (action) {
 	switch (action.actionType) {
 		
 		case appConstants.PROVIDER_CHANGE:
-			_dataObj.providerSelected = action.value;
-			_dataObj.datasetSelected = 'Select';
-			_dataObj.dimensionsSelected = [];
-			_dataObj.dimensionsObjSelected = [];
+      _providerChange(action.value);
 			appStore.emitChange('datasets');
 			break;
 
 		case appConstants.DATASET_CHANGE:
-			_dataObj.datasetSelected = action.value;
-			_dataObj.dimensionsSelected = [];
-			_dataObj.dimensionsObjSelected = [];
+      _datasetChange(action.value);
 			appStore.emitChange('dimensions');
 			break;
 
 		case appConstants.DIMENSIONS_CHANGE:
-			_dataObj.dimensionsSelected = action.value1;
-			_dataObj.dimensionsObjSelected = action.value2;
+      _dimensionsChange(action.options);
 			appStore.emitChange('dimensionValues');
 			break;
 
     case appConstants.DIMENSION_VALUES_CHANGE:
-      _dataObj.dimensionsObjSelected = action.value2;
+      _dimensionValuesChange(action.options, action.dimensionName);
       appStore.emitChange('none');
       break;
 
     case appConstants.REQUEST_JSON:
-      _dataObj.json = action.json;
+      _requestJSON(action.json);
       appStore.emitChange('requestJSON');
       break;
 
 	}
 });
+
+function _providerChange (value) {
+  _dataObj.providerSelected = value;
+  _dataObj.datasetSelected = '';
+  _dataObj.dimensionsSelected = [];
+  _dataObj.dimensionsObjSelected = [];
+  _dataObj.providerObj = _.find(_dataObj.data, {'name': _dataObj.providerSelected});
+}
+
+function _datasetChange (value) {
+  _dataObj.datasetSelected = value;
+  _dataObj.dimensionsSelected = [];
+  _dataObj.dimensionsObjSelected = [];
+  _dataObj.datasetObj = _.find(_.get(_dataObj.providerObj, 'value'), {'name': _dataObj.datasetSelected});
+}
+
+function _dimensionsChange (options) {
+  var dimensionsSelected = [];
+  var dimensionsObjSelected = _dataObj.dimensionsObjSelected;
+  _.remove(dimensionsObjSelected, function (el) {
+    return !_.find(options, {'value': el.name, 'selected': true});
+  });
+  _.forEach(options, function (el) {
+    if (el.selected) {
+      var name = el.value;
+      dimensionsSelected.push(name);
+      if (!_.find(dimensionsObjSelected, {'name': name})) {
+        dimensionsObjSelected.push({
+          'name': name,
+          'value': _.get(_.find(_.get(_dataObj.datasetObj, 'value'), {'name': name}), 'value')
+        });
+      }
+    }
+  });
+  dimensionsSelected.sort();
+  dimensionsObjSelected.sort(function (a, b) {
+    if (a.name < b.name)
+      return -1;
+    else if (a.name > b.name)
+      return 1;
+    else
+      return 0;
+  });
+  _dataObj.dimensionsSelected = dimensionsSelected;
+  _dataObj.dimensionsObjSelected = dimensionsObjSelected;
+}
+
+function _dimensionValuesChange (options, dimensionName) {
+  var dimensionsObjSelected = _dataObj.dimensionsObjSelected;
+  var index = _.findIndex(dimensionsObjSelected, {'name': dimensionName});
+  if (index < 0) {
+    return;
+  }
+  var values = [];
+  _.forEach(options, function (el) {
+    if (el.selected) {
+      values.push(el.value);
+    }
+  });
+  dimensionsObjSelected[index].selected = values;
+  _dataObj.dimensionsObjSelected = dimensionsObjSelected;
+}
+
+function _requestJSON (json) {
+  _dataObj.json = json;
+}
 
 module.exports = appStore;
