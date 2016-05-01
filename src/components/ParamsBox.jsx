@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
+var Loader = require('react-loader');
 
 var appActions = require('../actions/actions');
 
@@ -27,15 +28,17 @@ var DimensionConfig = React.createClass({
     }
     var options = this.getOptions();
     if (_.isEmpty(options)) {
-      return (<div></div>);
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
     }
     return (
+      <Loader loaded={!this.props.loading}>
       <FormGroup controlId="formControlsSelectMultipleDimensionsValues">
         <ControlLabel>Select {this.props.name}:</ControlLabel>
         <FormControl componentClass="select" onChange={this.onUserInput} value={this.props.value} multiple>
           {options}
         </FormControl>
       </FormGroup>
+      </Loader>
     );
   }
 });
@@ -80,17 +83,20 @@ var DimensionsSelect = React.createClass({
       return (<div></div>);
     }
     var options = this.getOptions();
-    if (_.isEmpty(options)) {
-      return (<div></div>);
+    if (_.isEmpty(options) && !this.props.loading) {
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
+    } else {
+      return (
+        <Loader loaded={!this.props.loading}>
+          <FormGroup controlId="formControlsSelectMultipleDimensions">
+            <ControlLabel>Dimensions:</ControlLabel>
+            <FormControl componentClass="select" onChange={this.onUserInput} value={this.props.value} multiple>
+              {options}
+            </FormControl>
+          </FormGroup>
+        </Loader>
+      );
     }
-    return (
-      <FormGroup controlId="formControlsSelectMultipleDimensions">
-        <ControlLabel>Dimensions:</ControlLabel>
-        <FormControl componentClass="select" onChange={this.onUserInput} value={this.props.value} multiple>
-          {options}
-        </FormControl>
-      </FormGroup>
-    );
   }
 });
 
@@ -108,18 +114,21 @@ var DatasetSelect = React.createClass({
       return (<div></div>);
     }
     var options = this.getOptions();
-    if (_.isEmpty(options)) {
-      return (<div></div>);
+    if (_.isEmpty(options) && !this.props.loading) {
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
+    } else {
+      return (
+        <Loader loaded={!this.props.loading}>
+          <FormGroup controlId="formControlsSelectDataset">
+            <ControlLabel>Dataset:</ControlLabel>
+            <FormControl componentClass="select" onChange={appActions.datasetChange} value={this.props.value}>
+              <option>Select</option>
+              {options}
+            </FormControl>
+          </FormGroup>
+        </Loader>
+      );
     }
-    return (
-      <FormGroup controlId="formControlsSelectDataset">
-        <ControlLabel>Dataset:</ControlLabel>
-        <FormControl componentClass="select" onChange={appActions.datasetChange} value={this.props.value}>
-          <option>Select</option>
-          {options}
-        </FormControl>
-      </FormGroup>
-    );
   }
 });
 
@@ -137,18 +146,21 @@ var ProviderSelect = React.createClass({
       return (<div></div>);
     }
     var options = this.getOptions();
-    if (_.isEmpty(options)) {
-      return (<div></div>);
+    if (_.isEmpty(options) && !this.props.loading) {
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
+    } else {
+      return (
+        <Loader loaded={!this.props.loading}>
+          <FormGroup controlId="formControlsSelectProvider">
+            <ControlLabel>Provider:</ControlLabel>
+            <FormControl componentClass="select" onChange={appActions.providerChange} value={this.props.value}>
+              <option>Select</option>
+              {options}
+            </FormControl>
+          </FormGroup>
+        </Loader>
+      );
     }
-    return (
-      <FormGroup controlId="formControlsSelectProvider">
-        <ControlLabel>Provider:</ControlLabel>
-        <FormControl componentClass="select" onChange={appActions.providerChange} value={this.props.value}>
-          <option>Select</option>
-          {options}
-        </FormControl>
-      </FormGroup>
-    );
   }
 });
 
@@ -157,36 +169,42 @@ var ParamsBox = React.createClass({
     var toRender = [];
     var providers = this.props.data;
     if (providers) {
+      var loadingProviders = _.indexOf(this.props.loading, 'providers') > -1;
       toRender.push(
         <ProviderSelect 
           key="ProviderSelect" 
           providers={providers} 
-          value={this.props.providerSelected}  
+          value={this.props.providerSelected} 
+          loading={loadingProviders} 
         />
       );
       var providerObj = _.find(providers, {'name': this.props.providerSelected});
       if (providerObj && providerObj.value) {
+        var loadingDatasets = _.indexOf(this.props.loading, 'datasets') > -1;
         toRender.push(
           <DatasetSelect 
             key="DatasetSelect" 
             datasets={providerObj.value} 
-            value={this.props.datasetSelected} 
+            value={this.props.datasetSelected}
+            loading={loadingDatasets} 
           />
         );
         var datasetObj = _.find(providerObj.value, {'name': this.props.datasetSelected});
         if (datasetObj && datasetObj.value) {
+          var loadingDimensions = _.indexOf(this.props.loading, 'dimensions') > -1;
           toRender.push(
             <DimensionsSelect 
               key="DimensionsSelect" 
               dimensions={datasetObj.value} 
               value={this.props.dimensionsSelected} 
-              dimensionsObjSelected={this.props.dimensionsObjSelected} 
+              dimensionsObjSelected={this.props.dimensionsObjSelected}
+              loading={loadingDimensions} 
             />
           );
           toRender.push(
             <DimensionsBox 
               key="DimensionsBox"
-              dimensionsObjSelected={this.props.dimensionsObjSelected} 
+              dimensionsObjSelected={this.props.dimensionsObjSelected}
             />
           );
         }

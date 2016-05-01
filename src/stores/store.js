@@ -8,6 +8,7 @@ var appConstants = require('../constants/constants');
 var CHANGE_EVENT = 'change';
 
 var _dataObj = {
+  'loading': [],
 	'json': {},
 	'data': [],
 	'providerSelected': 'Select',
@@ -29,10 +30,13 @@ var appStore = _.assign({}, EventEmitter.prototype, {
     }
   },
 
-  emitChange: function () {
+  emitChange: function (el) {
+    _dataObj.loading.push(el);
+    this.emit(CHANGE_EVENT);
     this.checkData().then(function (data) {
       _dataObj.data = data;
-      this.emit(CHANGE_EVENT);
+      _dataObj.loading = _.remove(_dataObj.loading, el);
+      this.emit(CHANGE_EVENT); 
     }.bind(this));
   },
 
@@ -74,6 +78,9 @@ var appStore = _.assign({}, EventEmitter.prototype, {
           return providers;
         });
     } else if (_.isEmpty(datasets)) {
+      if (_dataObj.providerSelected === 'Select') {
+        return Promise.resolve(providers);
+      }
       return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/providers/'+_dataObj.providerSelected+'/datasets/keys')
         .then(function (tmp) {
           _.forEach(tmp, function (el, index) {
@@ -82,6 +89,9 @@ var appStore = _.assign({}, EventEmitter.prototype, {
           return providers;
         });
     } else if (_.isEmpty(dimensions)) {
+      if (_dataObj.datasetSelected === 'Select') {
+        return Promise.resolve(providers);
+      }
       return refreshData('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+_dataObj.datasetSelected+'/dimensions')
         .then(function (tmp) {
           _.forEach(Object.keys(tmp), function (el, index) {
@@ -104,35 +114,33 @@ appDispatcher.register(function (action) {
 			_dataObj.datasetSelected = 'Select';
 			_dataObj.dimensionsSelected = [];
 			_dataObj.dimensionsObjSelected = [];
-			appStore.emitChange();
+			appStore.emitChange('datasets');
 			break;
 
 		case appConstants.DATASET_CHANGE:
 			_dataObj.datasetSelected = action.value;
 			_dataObj.dimensionsSelected = [];
 			_dataObj.dimensionsObjSelected = [];
-			appStore.emitChange();
+			appStore.emitChange('dimensions');
 			break;
 
 		case appConstants.DIMENSIONS_CHANGE:
 			_dataObj.dimensionsSelected = action.value1;
 			_dataObj.dimensionsObjSelected = action.value2;
-			appStore.emitChange();
+			appStore.emitChange('dimensionValues');
 			break;
 
     case appConstants.DIMENSION_VALUES_CHANGE:
       _dataObj.dimensionsObjSelected = action.value2;
-      appStore.emitChange();
+      appStore.emitChange('none');
       break;
 
     case appConstants.REQUEST_JSON:
       _dataObj.json = action.json;
-      appStore.emitChange();
+      appStore.emitChange('requestJSON');
       break;
 
 	}
 });
-
-appStore.checkData();
 
 module.exports = appStore;

@@ -1,6 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 
 var appActions = require('../actions/actions');
 
@@ -27,10 +27,12 @@ var QueryBox = React.createClass({
     var requestJSON = function () {
       appActions.requestJSON(url);
     };
+    var datasetNotSelected = (!this.props.dataset || this.props.dataset === 'Select');
     return (
       <div>
-        <pre>{url}</pre>
-        <Button onClick={requestJSON}>
+        { datasetNotSelected ? <Alert key="datasetNotSelected" bsStyle="warning">Please select provider and dataset</Alert> :
+        <pre>{url}</pre>}
+        <Button onClick={requestJSON} disabled={this.props.loading || datasetNotSelected}>
           Request JSON
         </Button>
       </div>
