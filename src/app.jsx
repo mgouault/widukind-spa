@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var WidukindSPA = require('./WidukindSPA.jsx');
+var WidukindSPA = require('./containers/container.jsx');
 
 ReactDOM.render(
   <WidukindSPA />,

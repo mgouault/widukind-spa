@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var axios = require('axios');
 
-var appDispatcher = require('./appDispatcher');
-var appConstants = require('./appConstants');
+var appDispatcher = require('../dispatcher/dispatcher');
+var appConstants = require('./../constants/constants');
 
 var appActions = {
 
@@ -37,6 +37,15 @@ var appActions = {
           });
         }
       }
+    });
+    dimensionsSelected.sort();
+    dimensionsObjSelected.sort(function (a, b) {
+      if (a.name < b.name)
+        return -1;
+      else if (a.name > b.name)
+        return 1;
+      else
+        return 0;
     });
     appDispatcher.dispatch({
       'actionType': appConstants.DIMENSIONS_CHANGE,
