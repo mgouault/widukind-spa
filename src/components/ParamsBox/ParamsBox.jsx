@@ -1,7 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 
-var appActions = require('../../actions/actions');
+var actions = require('../../actions/actions');
 var CustomSelect = require('./CustomSelect.jsx');
 var DimensionsBox = require('./DimensionsBox/DimensionsBox.jsx');
 
@@ -12,15 +12,15 @@ var ParamsBox = React.createClass({
   render: function () {
     var toRender = [];
     var promisesAreFun = function (name, toReturn, multiple, data) {
-      if (!_.isEmpty(data)) {
-        var loading = _.indexOf(this.props.loading, name) > -1;
+      var loading = _.indexOf(this.props.loading, name) > -1;
+      if (!_.isEmpty(data) || loading) {
         toRender.push(
           <CustomSelect
             key={name + 'Select'}
             name={name}
             data={data}
             value={this.props[name + 'Selected']}
-            onChange={appActions[name + 'Change']}
+            onChange={actions[name + 'Change']}
             loading={loading}
             multiple={multiple}
           />

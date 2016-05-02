@@ -1,37 +1,37 @@
 var _ = require('lodash');
 var axios = require('axios');
 
-var appDispatcher = require('../dispatcher/dispatcher');
-var appConstants = require('./../constants/constants');
+var dispatcher = require('../dispatcher/dispatcher');
+var constants = require('./../constants/constants');
 
 
 
-var appActions = {
+var actions = {
 
 	providerChange: function (event) {
-    _dispatch(appConstants.PROVIDER_CHANGE)(event.target.value);
+    _dispatch(constants.PROVIDER_CHANGE)(event.target.value);
   },
   
   datasetChange: function (event) {
-    _dispatch(appConstants.DATASET_CHANGE)(event.target.value);
+    _dispatch(constants.DATASET_CHANGE)(event.target.value);
   },
   
   dimensionsChange: function (event) {
-    _dispatch(appConstants.DIMENSIONS_CHANGE)(event.target.options);
+    _dispatch(constants.DIMENSIONS_CHANGE)(event.target.options);
   },
   
   dimensionValueChange: function (event, dimensionName) {
-    _dispatch(appConstants.DIMENSION_VALUES_CHANGE)(event.target.options, dimensionName);
+    _dispatch(constants.DIMENSION_VALUES_CHANGE)(event.target.options, dimensionName);
   },
 
   requestJSON: function (url) {
     _apiCall(url)
-      .then(_dispatch(appConstants.REQUEST_JSON));
+      .then(_dispatch(constants.REQUEST_JSON));
   },
 
   providersMissing: function () {
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys')
-      .then(_dispatch(appConstants.PROVIDERS_MISSING));
+      .then(_dispatch(constants.PROVIDERS_MISSING));
   },
 
   datasetsMissing: function (providerSelected) {
@@ -39,7 +39,7 @@ var appActions = {
       return;
     }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + providerSelected + '/datasets/keys')
-      .then(_dispatch(appConstants.DATASETS_MISSING));
+      .then(_dispatch(constants.DATASETS_MISSING));
   },
   
   dimensionsMissing: function (datasetSelected) {
@@ -47,7 +47,7 @@ var appActions = {
       return;
     }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + datasetSelected + '/dimensions')
-      .then(_dispatch(appConstants.DIMENSIONS_MISSING));
+      .then(_dispatch(constants.DIMENSIONS_MISSING));
   }
   
 };
@@ -56,7 +56,7 @@ var appActions = {
 
 function _dispatch (constant) {
   return function (data, data2) {
-    appDispatcher.dispatch({
+    dispatcher.dispatch({
       'actionType': constant,
       'data': data,
       'data2': data2
@@ -79,4 +79,4 @@ function _apiCall (url) {
     });
 }
 
-module.exports = appActions;
+module.exports = actions;

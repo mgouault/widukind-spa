@@ -1,9 +1,7 @@
 var React = require('react');
 import { Grid, Row, Col, Well } from 'react-bootstrap';
-var Loader = require('react-loader');
-var _ = require('lodash');
 
-var appStore = require('../stores/store');
+var store = require('../stores/store');
 var QueryBox = require('../components/QueryBox/QueryBox.jsx');
 var ParamsBox = require('../components/ParamsBox/ParamsBox.jsx');
 
@@ -16,7 +14,7 @@ var WidukindSPA = React.createClass({
   },
 
   getState: function (checkData) {
-    return appStore.getDataObj(checkData);
+    return store.getDataObj(checkData);
   },
 
   _onChange: function() {
@@ -24,17 +22,16 @@ var WidukindSPA = React.createClass({
   },
 
   componentDidMount: function () {
-    appStore.addChangeListener(this._onChange);
+    store.addChangeListener(this._onChange);
     this.setState(this.getState());
   },
 
   componentWillUnmount: function () {
-    appStore.removeChangeListener(this._onChange);
+    store.removeChangeListener(this._onChange);
   },
 
   render: function () {
     var data = JSON.stringify(this.state.json, undefined, 2);
-    var loadingJSON = _.indexOf(this.state.loading, 'requestJSON') > -1;
     return (
       <Grid>
         <Row>
@@ -43,8 +40,7 @@ var WidukindSPA = React.createClass({
             <QueryBox
               key="QueryBox"
               dataset={this.state.datasetSelected}
-              values={this.state.dimensionsObjSelected} 
-              loading={loadingJSON}
+              values={this.state.dimensionsObjSelected}
             />
             </Well>
             <Well>
@@ -63,11 +59,9 @@ var WidukindSPA = React.createClass({
           </Col>
           <Col lg={8} md={8} sm={8} xs={8}>
             <Well>
-            <Loader loaded={!loadingJSON}>
-              <pre>
-                {data}
-              </pre>
-            </Loader>
+            <pre>
+              {data}
+            </pre>
             </Well>
           </Col>
         </Row>

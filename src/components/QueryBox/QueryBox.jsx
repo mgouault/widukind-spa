@@ -7,7 +7,7 @@ var QueryButton = require('./QueryButton.jsx');
 
 
 var QueryBox = React.createClass({
-  
+
   makeUrl: function () {
     var url = '';
     url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10';
@@ -31,7 +31,7 @@ var QueryBox = React.createClass({
     return (
       <div>
         <QueryURL url={url} />
-        <QueryButton url={url} loading={this.props.loading} />
+        <QueryButton url={url} />
       </div>
     );
   }
