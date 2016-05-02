@@ -4,61 +4,34 @@ var axios = require('axios');
 var appDispatcher = require('../dispatcher/dispatcher');
 var appConstants = require('./../constants/constants');
 
+
+
 var appActions = {
 
 	providerChange: function (event) {
-    appDispatcher.dispatch({
-      'actionType': appConstants.PROVIDER_CHANGE,
-      'value': event.target.value
-    });
+    _dispatch(appConstants.PROVIDER_CHANGE)(event.target.value);
   },
   
   datasetChange: function (event) {
-    appDispatcher.dispatch({
-      'actionType': appConstants.DATASET_CHANGE,
-      'value': event.target.value
-    });
+    _dispatch(appConstants.DATASET_CHANGE)(event.target.value);
   },
   
   dimensionsChange: function (event) {
-    appDispatcher.dispatch({
-      'actionType': appConstants.DIMENSIONS_CHANGE,
-      'options': event.target.options
-    });
+    _dispatch(appConstants.DIMENSIONS_CHANGE)(event.target.options);
   },
   
   dimensionValueChange: function (event, dimensionName) {
-    appDispatcher.dispatch({
-      'actionType': appConstants.DIMENSION_VALUES_CHANGE,
-      'options': event.target.options,
-      'dimensionName': dimensionName
-    });
+    _dispatch(appConstants.DIMENSION_VALUES_CHANGE)(event.target.options, dimensionName);
   },
 
   requestJSON: function (url) {
     _apiCall(url)
-      .then(function (data) {
-        appDispatcher.dispatch({
-          'actionType': appConstants.REQUEST_JSON,
-          'json': data
-        });
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+      .then(_dispatch(appConstants.REQUEST_JSON));
   },
 
   providersMissing: function () {
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys')
-      .then(function (data) {
-        appDispatcher.dispatch({
-          'actionType': appConstants.PROVIDERS_MISSING,
-          'data': data
-        });
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+      .then(_dispatch(appConstants.PROVIDERS_MISSING));
   },
 
   datasetsMissing: function (providerSelected) {
@@ -66,15 +39,7 @@ var appActions = {
       return;
     }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + providerSelected + '/datasets/keys')
-      .then(function (data) {
-        appDispatcher.dispatch({
-          'actionType': appConstants.DATASETS_MISSING,
-          'data': data
-        });
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+      .then(_dispatch(appConstants.DATASETS_MISSING));
   },
   
   dimensionsMissing: function (datasetSelected) {
@@ -82,18 +47,22 @@ var appActions = {
       return;
     }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + datasetSelected + '/dimensions')
-      .then(function (data) {
-        appDispatcher.dispatch({
-          'actionType': appConstants.DIMENSIONS_MISSING,
-          'data': data
-        });
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+      .then(_dispatch(appConstants.DIMENSIONS_MISSING));
   }
   
 };
+
+
+
+function _dispatch (constant) {
+  return function (data, data2) {
+    appDispatcher.dispatch({
+      'actionType': constant,
+      'data': data,
+      'data2': data2
+    });
+  }
+}
 
 function _apiCall (url) {
   return axios.get(url)
@@ -104,6 +73,9 @@ function _apiCall (url) {
         throw new Error(error.toString());
       }
       return received.data;
+    })
+    .catch(function (error) {
+      console.error(error);
     });
 }
 

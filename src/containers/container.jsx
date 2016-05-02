@@ -4,8 +4,10 @@ var Loader = require('react-loader');
 var _ = require('lodash');
 
 var appStore = require('../stores/store');
-var QueryBox = require('../components/QueryBox.jsx');
-var ParamsBox = require('../components/ParamsBox.jsx');
+var QueryBox = require('../components/QueryBox/QueryBox.jsx');
+var ParamsBox = require('../components/ParamsBox/ParamsBox.jsx');
+
+
 
 var WidukindSPA = React.createClass({
 

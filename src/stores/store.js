@@ -5,6 +5,8 @@ var appDispatcher = require('../dispatcher/dispatcher');
 var appConstants = require('../constants/constants');
 var appActions = require('../actions/actions');
 
+
+
 var CHANGE_EVENT = 'change';
 
 var _dataObj = {
@@ -18,6 +20,8 @@ var _dataObj = {
   'datasetObj': {},
 	'dimensionsObjSelected': []
 };
+
+
 
 var appStore = _.assign({}, EventEmitter.prototype, {
 
@@ -100,46 +104,52 @@ var appStore = _.assign({}, EventEmitter.prototype, {
 
 });
 
+
+
 appDispatcher.register(function (action) {
 	switch (action.actionType) {
 		
 		case appConstants.PROVIDER_CHANGE:
-      _providerChange(action.value);
+      _providerChange(action.data);
       appStore.emitChange();
       appStore.checkData();
 			break;
 
 		case appConstants.DATASET_CHANGE:
-      _datasetChange(action.value);
+      _datasetChange(action.data);
       appStore.emitChange();
       appStore.checkData();
 			break;
 
 		case appConstants.DIMENSIONS_CHANGE:
-      _dimensionsChange(action.options);
+      _dimensionsChange(action.data);
       appStore.emitChange();
       appStore.checkData();
 			break;
 
     case appConstants.DIMENSION_VALUES_CHANGE:
-      _dimensionValuesChange(action.options, action.dimensionName);
+      _dimensionValuesChange(action.data, action.data2);
       appStore.emitChange();
       appStore.checkData();
       break;
 
     case appConstants.REQUEST_JSON:
-      _requestJSON(action.json);
+      _requestJSON(action.data);
       appStore.emitChange();
       break;
 
     case appConstants.PROVIDERS_MISSING:
       _providersMissing(action.data);
+      _providerChange(_.get(_.head(appStore.getProviders()), 'name'));
       appStore.emitChange();
+      appStore.checkData();
       break;
 
     case appConstants.DATASETS_MISSING:
       _datasetsMissing(action.data);
+      _datasetChange(_.get(_.head(appStore.getProviderObjValue()), 'name'));
       appStore.emitChange();
+      appStore.checkData();
       break;
 
     case appConstants.DIMENSIONS_MISSING:
@@ -149,9 +159,10 @@ appDispatcher.register(function (action) {
 	}
 });
 
+
+
 function _providerChange (value) {
   _dataObj.providerSelected = value;
-  _dataObj.datasetSelected = '';
   _dataObj.dimensionsSelected = [];
   _dataObj.providerObj = _.find(appStore.getProviders(), {'name': _dataObj.providerSelected});
   _dataObj.datasetObj = {};
@@ -216,7 +227,7 @@ function _requestJSON (json) {
 
 function _providersMissing (data) {
   var providers = appStore.getProviders();
-  _.forEach(data, function (el, i) {
+  _.forEach(data, function (el) {
     providers.push({'name': el, 'value': []});
   });
 }

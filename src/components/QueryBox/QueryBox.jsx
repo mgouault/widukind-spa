@@ -1,10 +1,13 @@
 var React = require('react');
 var _ = require('lodash');
-import { Button } from 'react-bootstrap';
 
-var appActions = require('../actions/actions');
+var QueryURL = require('./QueryURL.jsx');
+var QueryButton = require('./QueryButton.jsx');
+
+
 
 var QueryBox = React.createClass({
+  
   makeUrl: function () {
     var url = '';
     url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10';
@@ -22,17 +25,13 @@ var QueryBox = React.createClass({
     });
     return url;
   },
+
   render: function () {
     var url = this.makeUrl();
-    var requestJSON = function () {
-      appActions.requestJSON(url);
-    };
     return (
       <div>
-        <pre>{url}</pre>
-        <Button onClick={requestJSON} disabled={this.props.loading}>
-          Request JSON
-        </Button>
+        <QueryURL url={url} />
+        <QueryButton url={url} loading={this.props.loading} />
       </div>
     );
   }
