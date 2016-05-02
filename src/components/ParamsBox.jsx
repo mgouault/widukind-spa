@@ -8,7 +8,7 @@ var appActions = require('../actions/actions');
 var DimensionConfig = React.createClass({
   getOptions: function () {
     var options = [];
-    _.forEach(this.props.providers, function (name) {
+    _.forEach(this.props.data, function (name) {
       options.push(<option key={name} value={name}>{name}</option>);
     });
     return options;
@@ -17,7 +17,7 @@ var DimensionConfig = React.createClass({
     appActions.dimensionValueChange(event, this.props.name);
   },
   render: function () {
-    if (!this.props.providers) {
+    if (!this.props.data) {
       return (<div></div>);
     }
     var options = this.getOptions();
@@ -41,7 +41,7 @@ var DimensionConfig = React.createClass({
 var DimensionsBox = React.createClass({
   render: function () {
     var toRender = [];
-    _.forEach(this.props.providers, function (el) {
+    _.forEach(this.props.data, function (el) {
       toRender.push(
         <DimensionConfig
           key={el.name}
@@ -62,14 +62,14 @@ var DimensionsBox = React.createClass({
 var CustomSelect = React.createClass({
   getOptions: function () {
     var options = [];
-    _.forEach(this.props.providers, function (el) {
+    _.forEach(this.props.data, function (el) {
       var name = el.name;
       options.push(<option key={name} value={name}>{name}</option>);
     });
     return options;
   },
   render: function () {
-    if (!this.props.providers) {
+    if (!this.props.data) {
       return (<div></div>);
     }
     var options = this.getOptions();
@@ -94,7 +94,7 @@ var ParamsBox = React.createClass({
   render: function () {
     var toRender = [];
     var providers = this.props.providers;
-    if (providers) {
+    if (!_.isEmpty(providers)) {
       var loadingProviders = _.indexOf(this.props.loading, 'providers') > -1;
       toRender.push(
         <CustomSelect
@@ -106,8 +106,8 @@ var ParamsBox = React.createClass({
           loading={loadingProviders} 
         />
       );
-      var providerObjValue = _.get(this.props.providerObj, 'value');
-      if (providerObjValue) {
+      var providerObjValue = _.get(this.props.providerObj, 'value', []);
+      if (!_.isEmpty(providerObjValue)) {
         var loadingDatasets = _.indexOf(this.props.loading, 'datasets') > -1;
         toRender.push(
           <CustomSelect
@@ -119,8 +119,8 @@ var ParamsBox = React.createClass({
             loading={loadingDatasets} 
           />
         );
-        var datasetObjValue = _.get(this.props.datasetObj, 'value');
-        if (datasetObjValue) {
+        var datasetObjValue = _.get(this.props.datasetObj, 'value', []);
+        if (!_.isEmpty(datasetObjValue)) {
           var loadingDimensions = _.indexOf(this.props.loading, 'dimensions') > -1;
           toRender.push(
             <CustomSelect 
@@ -134,7 +134,7 @@ var ParamsBox = React.createClass({
             />
           );
           var dimensionsObjSelected = this.props.dimensionsObjSelected;
-          if (dimensionsObjSelected) {
+          if (!_.isEmpty(dimensionsObjSelected)) {
             toRender.push(
               <DimensionsBox
                 key="DimensionsBox"

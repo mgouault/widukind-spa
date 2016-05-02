@@ -10,9 +10,7 @@ var ParamsBox = require('../components/ParamsBox.jsx');
 var WidukindSPA = React.createClass({
 
   getInitialState: function () {
-    var data = this.getState();
-    data.loading.push('providers');
-    return data;
+    return this.getState('checkData');
   },
 
   getState: function (checkData) {
@@ -25,7 +23,7 @@ var WidukindSPA = React.createClass({
 
   componentDidMount: function () {
     appStore.addChangeListener(this._onChange);
-    this.getState('checkData');
+    this.setState(this.getState());
   },
 
   componentWillUnmount: function () {
@@ -50,7 +48,7 @@ var WidukindSPA = React.createClass({
             <Well>
             <ParamsBox
               key="ParamsBox"
-              providers={this.props.providers}
+              providers={this.state.providers}
               providerSelected={this.state.providerSelected}
               datasetSelected={this.state.datasetSelected}
               dimensionsSelected={this.state.dimensionsSelected}

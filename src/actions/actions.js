@@ -62,6 +62,9 @@ var appActions = {
   },
 
   datasetsMissing: function (providerSelected) {
+    if (_.isEmpty(providerSelected)) {
+      return;
+    }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + providerSelected + '/datasets/keys')
       .then(function (data) {
         appDispatcher.dispatch({
@@ -75,6 +78,9 @@ var appActions = {
   },
   
   dimensionsMissing: function (datasetSelected) {
+    if (_.isEmpty(datasetSelected)) {
+      return;
+    }
     _apiCall('http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + datasetSelected + '/dimensions')
       .then(function (data) {
         appDispatcher.dispatch({
