@@ -46,8 +46,8 @@ var store = _.assign({}, EventEmitter.prototype, {
 
   checkData: function () {
     var providers = this.getProviders();
-    var providerObjValue = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value', []);
-    var datasetObjValue = _.get(_.find(providerObjValue, {'name': _dataObj.datasetSelected}), 'value', []);
+    var providerObjValue = _.get(_.find(providers, {'name': _dataObj.providerSelected}), 'value');
+    var datasetObjValue = _.get(_.find(providerObjValue, {'name': _dataObj.datasetSelected}), 'value');
     if (_.isEmpty(providers)) {
       _dataObj.loading.push('provider');
       this.emitChange();
@@ -172,21 +172,22 @@ dispatcher.register(function (action) {
 
 function _providerChange (value) {
   _dataObj.providerSelected = value;
-  _dataObj.dimensionsSelected = [];
   _dataObj.providerObj = _.find(store.getProviders(), {'name': _dataObj.providerSelected});
+  _dataObj.datasetSelected = '';
   _dataObj.datasetObj = {};
+  _dataObj.dimensionsSelected = [];
   _dataObj.dimensionsObjSelected = [];
+
 }
 
 function _datasetChange (value) {
   _dataObj.datasetSelected = value;
-  _dataObj.dimensionsSelected = [];
   _dataObj.datasetObj = _.find(store.getProviderObjValue(), {'name': _dataObj.datasetSelected});
+  _dataObj.dimensionsSelected = [];
   _dataObj.dimensionsObjSelected = [];
 }
 
 function _dimensionsChange (options) {
-  var dimensionsSelected = [];
   var dimensionsObjSelected = store.getDimensionsObjSelected();
   _.remove(dimensionsObjSelected, function (el) {
     return !_.find(options, {'value': el.name, 'selected': true});
@@ -194,7 +195,7 @@ function _dimensionsChange (options) {
   _.forEach(options, function (el) {
     if (el.selected) {
       var name = el.value;
-      dimensionsSelected.push(name);
+      _dataObj.dimensionsSelected.push(name);
       if (!_.find(dimensionsObjSelected, {'name': name})) {
         dimensionsObjSelected.push({
           'name': name,
@@ -203,7 +204,7 @@ function _dimensionsChange (options) {
       }
     }
   });
-  dimensionsSelected.sort();
+  _dataObj.dimensionsSelected.sort();
   dimensionsObjSelected.sort(function (a, b) {
     if (a.name < b.name)
       return -1;
@@ -212,7 +213,6 @@ function _dimensionsChange (options) {
     else
       return 0;
   });
-  _dataObj.dimensionsSelected = dimensionsSelected;
 }
 
 function _dimensionValuesChange (options, dimensionName) {
