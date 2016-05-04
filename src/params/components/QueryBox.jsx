@@ -32,6 +32,7 @@ var QueryBox = React.createClass({
     var requestJSON = function () {
       actions[constants.REQUEST_JSON](url);
     }.bind(this);
+    
     // loader:on if (dataset || values) not valid
     return (
       <Well>

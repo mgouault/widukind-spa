@@ -13,7 +13,7 @@ var ParamsBox = React.createClass({
     var toRender = [];
     
     var callbacksAreFun = function (name, toReturn, multiple, data) {
-      if (_.isEmpty(data)) {
+      if (_.isEmpty(data) && typeof data !== 'undefined') {
         return;
       }
       var value;
@@ -45,7 +45,7 @@ var ParamsBox = React.createClass({
           )
         )
       );
-
+    
     if (!_.isEmpty(data)) {
       toRender.push(
         <DimensionsBox
@@ -54,7 +54,7 @@ var ParamsBox = React.createClass({
         />
       );
     }
-    
+
     return (
       <div>
         {toRender}

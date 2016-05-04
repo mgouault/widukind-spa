@@ -34,6 +34,9 @@ actions[constants.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
 };
 
 actions[constants.REQUEST_JSON] = function (url) {
+  dispatcher.dispatch({
+    'actionType': constants.REQUEST_JSON
+  });
   apiCall(url).then(function (data) {
     dispatcher.dispatch({
       'actionType': constants.REQUEST_JSON,

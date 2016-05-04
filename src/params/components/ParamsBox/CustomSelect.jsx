@@ -29,6 +29,7 @@ var CustomSelect = React.createClass({
     var label = _.capitalize(name);
     var options = this.getOptions();
     var onChange =  'lama';
+
     switch (name) {
       case constants.PROVIDER:
         onChange = actions[constants.PROVIDER_CHANGE]; break;
@@ -39,7 +40,7 @@ var CustomSelect = React.createClass({
     }
 
     return (
-      <Loader loaded={!false}>
+      <Loader loaded={!(typeof this.props.data === 'undefined')}>
         <FormGroup controlId={"formControlsSelect" + name}>
           <ControlLabel>{label}:</ControlLabel>
           <FormControl

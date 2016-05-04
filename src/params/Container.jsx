@@ -2,6 +2,7 @@ var React = require('react');
 import { Well } from 'react-bootstrap';
 
 var store = require('./store');
+var constants = require('../constants');
 var QueryBox = require('./components/QueryBox.jsx');
 var ParamsBox = require('./components/ParamsBox/ParamsBox.jsx');
 
@@ -35,18 +36,12 @@ var container = React.createClass({
       <Well>
         <QueryBox
           key="QueryBox"
-          dataset={this.state.datasetSelected}
-          values={this.state.dimensionsObjSelected} 
+          dataset={this.state[constants.S_SELECTED_DATASET]}
+          values={this.state[constants.S_SELECTED_DIMENSIONS_VALUES]} 
         />
         <ParamsBox
           key="ParamsBox"
-          providers={this.state.providers}
-          providerSelected={this.state.providerSelected}
-          datasetSelected={this.state.datasetSelected}
-          dimensionsSelected={this.state.dimensionsSelected}
-          providerObj={this.state.providerObj}
-          datasetObj={this.state.datasetObj}
-          dimensionsObjSelected={this.state.dimensionsObjSelected}
+          obj={this.state}
         />
       </Well>
     );

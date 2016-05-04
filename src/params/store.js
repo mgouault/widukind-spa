@@ -40,7 +40,17 @@ store = _.assign(store, {
             case constants.DIMENSION:
               url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state[constants.S_SELECTED_DATASET] + '/dimensions'; break;
           }
+          switch (name) {
+            case constants.PROVIDER:
+              _state[constants.S_PROVIDERS] = undefined; break;
+            case constants.DATASET:
+              _state[constants.S_PROVIDER_OBJ].value = undefined; break;
+            case constants.DIMENSION:
+              _state[constants.S_DATASET_OBJ].value = undefined; break;
+          }
+          self.emitChange();
           return apiCall(url).then(function (data) {
+
             switch (name) {
               case constants.PROVIDER:
                 self.setProviders(data); break;
@@ -89,7 +99,7 @@ store = _.assign(store, {
 
   /* Store methods */
   getState: function () {
-    return _state; // todo use all getters ?
+    return _state;
   },
   emitChange: function () {
     self.emit(CHANGE_EVENT);

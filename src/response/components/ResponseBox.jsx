@@ -7,8 +7,8 @@ var Loader = require('react-loader');
 var ResponseBox = React.createClass({
   
   render: function () {
+    var loading = (typeof this.props.json === 'undefined');
     var json = JSON.stringify(this.props.json, null, 2);
-    var loading = false;
 
     return (
       <Well>
