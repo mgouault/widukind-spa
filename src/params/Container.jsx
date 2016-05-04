@@ -1,19 +1,20 @@
 var React = require('react');
 import { Well } from 'react-bootstrap';
 
-var store = require('../stores/paramsStore');
-var ParamsBox = require('../components/ParamsBox/ParamsBox.jsx');
+var store = require('./store');
+var QueryBox = require('./components/QueryBox.jsx');
+var ParamsBox = require('./components/ParamsBox/ParamsBox.jsx');
 
 
 
-var WidukindSPA = React.createClass({
+var container = React.createClass({
 
   getInitialState: function () {
-    return this.getState('checkData');
+    return this.getState();
   },
 
-  getState: function (checkData) {
-    return store.getDataObj(checkData);
+  getState: function () {
+    return store.getState();
   },
 
   _onChange: function() {
@@ -22,7 +23,6 @@ var WidukindSPA = React.createClass({
 
   componentDidMount: function () {
     store.addChangeListener(this._onChange);
-    this.setState(this.getState());
   },
 
   componentWillUnmount: function () {
@@ -32,6 +32,11 @@ var WidukindSPA = React.createClass({
   render: function () {
     return (
       <Well>
+        <QueryBox
+          key="QueryBox"
+          dataset={this.state.datasetSelected}
+          values={this.state.dimensionsObjSelected} 
+        />
         <ParamsBox
           key="ParamsBox"
           providers={this.state.providers}
@@ -41,7 +46,6 @@ var WidukindSPA = React.createClass({
           providerObj={this.state.providerObj}
           datasetObj={this.state.datasetObj}
           dimensionsObjSelected={this.state.dimensionsObjSelected}
-          loading={this.state.loading}
         />
       </Well>
     );
@@ -49,4 +53,4 @@ var WidukindSPA = React.createClass({
 
 });
 
-module.exports = WidukindSPA;
+module.exports = container;
