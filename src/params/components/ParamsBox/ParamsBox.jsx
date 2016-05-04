@@ -35,8 +35,8 @@ var ParamsBox = React.createClass({
           )
         )
       );
-    
-    if (_.isEmpty(data)) {
+
+    if (!_.isEmpty(data)) {
       toRender.push(
         <DimensionsBox
           key="DimensionsBox"

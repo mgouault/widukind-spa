@@ -22,68 +22,23 @@ var _state = {
 
 
 var store = _.assign({}, EventEmitter.prototype, {
-
   getState: function () {
     return _state; // todo use all getters ?
   },
-
   emitChange: function () {
-    this.emit(CHANGE_EVENT);
+    self.emit(CHANGE_EVENT);
   },
-
   addChangeListener: function (callback) {
-    this.on(CHANGE_EVENT, callback);
+    self.on(CHANGE_EVENT, callback);
   },
-
   removeChangeListener: function (callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  },
-  
-  getProviders: function () {
-    var providers = _.get(_state, 'providers');
-    if (!(providers instanceof Array)) {
-      _state.providers = [];
-    }
-    return _state.providers;
-  },
-  
-  getProviderObj: function () {
-    if (!(_.get(_state, 'providerObj') instanceof Object)) {
-      _state.providerObj = {};
-    }
-    return _state.providerObj;
-  },
-  
-  getProviderObjValue: function () {
-    var providerObj = this.getProviderObj();
-    if (!(_.get(providerObj, 'value') instanceof Array)) {
-      providerObj.value = [];
-    }
-    return providerObj.value;
-  },
-  
-  getDatasetObj: function () {
-    if (!(_.get(_state, 'datasetObj') instanceof Object)) {
-      _state.datasetObj = {};
-    }
-    return _state.datasetObj;
-  },
-  
-  getDatasetObjValue: function () {
-    var datasetObj = this.getDatasetObj();
-    if (!(_.get(datasetObj, 'value') instanceof Array)) {
-      datasetObj.value = [];
-    }
-    return datasetObj.value;
-  },
-  
-  getDimensionsObjSelected: function () {
-    if (!(_.get(_state, 'dimensionsObjSelected') instanceof Array)) {
-      _state.dimensionsObjSelected = [];
-    }
-    return _state.dimensionsObjSelected
-  },
-  
+    self.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+var self = store;
+var bar = {
+
   checkData: function () {
     var promisesAreFun = function (name, data) {
       return Promise.resolve()
@@ -95,10 +50,15 @@ var store = _.assign({}, EventEmitter.prototype, {
             var url = {
               'provider': 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys',
               'dataset': 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _state.providerSelected + '/datasets/keys',
-              'dimension': 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state.datasetSelected + '/dimensions'
+              'dimensions': 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state.datasetSelected + '/dimensions'
             };
             return apiCall(url[name]).then(function (data) {
-              toCall[name+'s'+'Missing'](data);
+              var foo = {
+                'provider': self.setProviders,
+                'dataset': self.setProviderObjValue,
+                'dimensions': self.setDatasetObjValue
+              };
+              foo[name](data);
             });
           }
         })
@@ -106,78 +66,135 @@ var store = _.assign({}, EventEmitter.prototype, {
           var value = _state[name + 'Selected'];
           if (_.isEmpty(value) && !(value instanceof Array)) {
             value = _.get(_.head(data), 'name');
-            toCall[name+'Change'](value);
+            var foo = {
+              'provider': self.setProviderSelected,
+              'dataset': self.setDatasetSelected
+            };
+            foo[name](value);
           }
         })
     };
 
     return Promise.resolve()
       .then(function () {
-        return promisesAreFun('provider', this.getProviders());
-      }.bind(this))
+        return promisesAreFun('provider', self.getProviders());
+      })
       .then(function () {
-        return promisesAreFun('dataset', this.getProviderObjValue());
-      }.bind(this))
+        return promisesAreFun('dataset', self.getProviderObjValue());
+      })
       .then(function () {
-        return promisesAreFun('dimension', this.getDatasetObjValue());
-      }.bind(this))
-      .then(store.emitChange.bind(this));
-  }
-
-});
+        return promisesAreFun('dimensions', self.getDatasetObjValue());
+      })
+      .then(self.emitChange);
+  },
 
 
-
-dispatcher.register(function (action) {
-  var data = action.data;
-
-	switch (action.actionType) {
-
-		case constants.PROVIDER_CHANGE:
-      toCall.providerChange(data);
-			break;
-
-		case constants.DATASET_CHANGE:
-      toCall.datasetChange(data);
-			break;
-
-		case constants.DIMENSION_CHANGE:
-      toCall.dimensionChange(data);
-			break;
-
-    case constants.DIMENSION_VALUES_CHANGE:
-      toCall.dimensionValueChange(data, action.data_);
-      break;
-
-    default:
-      return;
-	}
-
-  store.checkData();
-});
-
-
-
-var toCall = {// todo refactor in setters
-
-  providerChange: function (data) {
+  /* Providers */
+  getProviders: function () {
+    var providers = _.get(_state, 'providers');
+    if (!(providers instanceof Array)) {
+      providers = [];
+    }
+    return providers;
+  },
+  setProviders: function (data) {
+    var providers = self.getProviders();
+    _.forEach(data, function (el) {
+      providers.push({'name': el, 'value': []});
+    });
+  },
+  getProviderSelected: function () {
+    var providerSelected = _.get(_state, 'providerSelected');
+    if (!(typeof providerSelected === 'string')) {
+      providerSelected = '';
+    }
+    return providerSelected;
+  },
+  setProviderSelected: function (data) {
     _state.providerSelected = data;
-    _state.providerObj = _.find(store.getProviders(), {'name': _state.providerSelected});
+    self.setProviderObj();
     _state.datasetSelected = '';
     _state.datasetObj = {};
     _state.dimensionsSelected = [];
     _state.dimensionsObjSelected = [];
   },
+  getProviderObj: function () {
+    var providerObj = _.get(_state, 'providerObj');
+    if (!(providerObj instanceof Object)) {
+      providerObj = {};
+    }
+    return providerObj;
+  },
+  setProviderObj: function () {
+    _state.providerObj = _.find(self.getProviders(), {'name': self.getProviderSelected()});
+  },
+  /**/
 
-  datasetChange: function (data) {
+
+  /* Datasets */
+  getProviderObjValue: function () {
+    var providerObj = self.getProviderObj();
+    if (!(_.get(providerObj, 'value') instanceof Array)) {
+      providerObj.value = [];
+    }
+    return providerObj.value;
+  },
+  setProviderObjValue: function (data) {
+    var providerObjValue = self.getProviderObjValue();
+    _.forEach(data, function (el) {
+      providerObjValue.push({'name': el, 'value': []});
+    });
+  },
+  getDatasetSelected: function () {
+    var datasetSelected = _.get(_state, 'datasetSelected');
+    if (!(typeof datasetSelected === 'string')) {
+      datasetSelected = '';
+    }
+    return datasetSelected;
+  },
+  setDatasetSelected: function (data) {
     _state.datasetSelected = data;
-    _state.datasetObj = _.find(store.getProviderObjValue(), {'name': _state.datasetSelected});
+    self.setDatasetObj();
     _state.dimensionsSelected = [];
     _state.dimensionsObjSelected = [];
   },
+  getDatasetObj: function () {
+    var datasetObj = _.get(_state, 'datasetObj');
+    if (!(datasetObj instanceof Object)) {
+      datasetObj = {};
+    }
+    return datasetObj;
+  },
+  setDatasetObj: function () {
+    _state.datasetObj = _.find(self.getProviderObjValue(), {'name': self.getDatasetSelected()});
+  },
+  /**/
 
-  dimensionChange: function (data) {
-    var dimensionsObjSelected = store.getDimensionsObjSelected();
+
+  /* Dimensions */
+  getDatasetObjValue: function () {
+    var datasetObj = self.getDatasetObj();
+    if (!(_.get(datasetObj, 'value') instanceof Array)) {
+      datasetObj.value = [];
+    }
+    return datasetObj.value;
+  },
+  setDatasetObjValue: function (data) {
+    var datasetObjValue = self.getDatasetObjValue();
+    _.forEach(Object.keys(data), function (el) {
+      datasetObjValue.push({'name': el, 'value': Object.keys(data[el])});
+    });
+  },
+
+  getDimensionsSelected: function () {
+    var dimensionsSelected = _.get(_state, 'dimensionsSelected');
+    if (!(dimensionsSelected instanceof Array)) {
+      dimensionsSelected = [];
+    }
+    return dimensionsSelected;
+  },
+  setDimensionsSelected: function (data) {
+    var dimensionsObjSelected = self.getDimensionsObjSelected();
     _.remove(dimensionsObjSelected, function (el) {
       return !_.find(data, {'value': el.name, 'selected': true});
     });
@@ -188,7 +205,7 @@ var toCall = {// todo refactor in setters
         if (!_.find(dimensionsObjSelected, {'name': name})) {
           dimensionsObjSelected.push({
             'name': name,
-            'value': _.get(_.find(store.getDatasetObjValue(), {'name': name}), 'value')
+            'value': _.get(_.find(self.getDatasetObjValue(), {'name': name}), 'value')
           });
         }
       }
@@ -203,10 +220,16 @@ var toCall = {// todo refactor in setters
         return 0;
     });
   },
-
-  dimensionValueChange: function (data, dimensionName) {
-    var dimensionsObjSelected_ = store.getDimensionsObjSelected();
-    var index = _.findIndex(dimensionsObjSelected, {'name': dimensionName});
+  getDimensionsObjSelected: function () {
+    var dimensionsObjSelected = _.get(_state, 'dimensionsObjSelected');
+    if (!(dimensionsObjSelected instanceof Array)) {
+      dimensionsObjSelected = [];
+    }
+    return dimensionsObjSelected
+  },
+  setDimensionsObjSelected: function (data, dimensionName) {
+    var dimensionsObjSelected_ = self.getDimensionsObjSelected();
+    var index = _.findIndex(dimensionsObjSelected_, {'name': dimensionName});
     if (index < 0) {
       return;
     }
@@ -217,29 +240,40 @@ var toCall = {// todo refactor in setters
       }
     });
     dimensionsObjSelected_[index].selected = values;
-  },
-
-  providersMissing: function (data) {
-    var providers = store.getProviders();
-    _.forEach(data, function (el) {
-      providers.push({'name': el, 'value': []});
-    });
-  },
-
-  datasetsMissing: function (data) {
-    var providerObjValue = store.getProviderObjValue();
-    _.forEach(data, function (el) {
-      providerObjValue.push({'name': el, 'value': []});
-    });
-  },
-
-  dimensionsMissing: function (data) {
-    var datasetObjValue = store.getDatasetObjValue();
-    _.forEach(Object.keys(data), function (el) {
-      datasetObjValue.push({'name': el, 'value': Object.keys(data[el])});
-    });
   }
+  /**/
 
 };
+store = _.assign(store, bar);
+
+
+
+dispatcher.register(function (action) {
+  var data = action.data;
+
+	switch (action.actionType) {
+
+		case constants.PROVIDER_CHANGE:
+      store.setProviderSelected(data);
+			break;
+
+		case constants.DATASET_CHANGE:
+      store.setDatasetSelected(data);
+			break;
+
+		case constants.DIMENSION_CHANGE:
+      store.setDimensionsSelected(data);
+			break;
+
+    case constants.DIMENSION_VALUES_CHANGE:
+      store.setDimensionsObjSelected(data, action.data_);
+      break;
+
+    default:
+      return;
+	}
+
+  store.checkData();
+});
 
 module.exports = store;

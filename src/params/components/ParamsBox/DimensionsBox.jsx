@@ -48,7 +48,7 @@ var DimensionConfig = React.createClass({
 var DimensionsBox = React.createClass({
   
   render: function () {
-    if (!_.isEmpty(this.props.data)) {
+    if (_.isEmpty(this.props.data)) {
       return null;
     }
 
@@ -65,9 +65,9 @@ var DimensionsBox = React.createClass({
     });
     
     return (
-      <Well>
+      <div>
         {toRender}
-      </Well>
+      </div>
     );
   }
 });
