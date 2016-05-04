@@ -20,6 +20,13 @@ _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
 
 
 
+function getValidData (key, valid, value) {
+  if (!(valid)) {
+    _state[key] = value;
+  }
+  return _state[key];
+}
+
 var store = _.assign({}, EventEmitter.prototype);
 var self = store;
 store = _.assign(store, {
@@ -121,10 +128,7 @@ store = _.assign(store, {
   /* Getters-Setters */
     /* Providers */
   getProviders: function () {
-    if (!(_state[c.S_PROVIDERS] instanceof Array)) {
-      _state[c.S_PROVIDERS] = [];
-    }
-    return _state[c.S_PROVIDERS];
+    return getValidData(c.S_PROVIDERS, _state[c.S_PROVIDERS] instanceof Array, []);
   },
   setProviders: function (data) {
     self.getProviders();
@@ -133,24 +137,16 @@ store = _.assign(store, {
     });
   },
   getSelectedProvider: function () {
-    if (!(typeof _state[c.S_SELECTED_PROVIDER] === 'string')) {
-      _state[c.S_SELECTED_PROVIDER] = '';
-    }
-    return _state[c.S_SELECTED_PROVIDER];
+    return getValidData(c.S_SELECTED_PROVIDER, typeof _state[c.S_SELECTED_PROVIDER] === 'string', '');
   },
   setSelectedProvider: function (data) {
     _state[c.S_SELECTED_PROVIDER] = data;
     self.setProviderObj();
-    _state[c.S_SELECTED_DATASET] = '';
-    _state[c.S_DATASET_OBJ] = {};
-    _state[c.S_SELECTED_DIMENSIONS] = [];
-    _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
+    self.setSelectedDataset('');
+    self.setSelectedDimensions([]);
   },
   getProviderObj: function () {
-    if (!(typeof _state[c.S_PROVIDER_OBJ] === 'object')) {
-      _state[c.S_PROVIDER_OBJ] = {};
-    }
-    return _state[c.S_PROVIDER_OBJ];
+    return getValidData(c.S_PROVIDER_OBJ, typeof _state[c.S_PROVIDER_OBJ] === 'object', {});
   },
   setProviderObj: function () {
     _state[c.S_PROVIDER_OBJ] = _.find(self.getProviders(), {'name': self.getSelectedProvider()});
@@ -172,22 +168,15 @@ store = _.assign(store, {
     });
   },
   getSelectedDataset: function () {
-    if (!(typeof _state[c.S_SELECTED_DATASET] === 'string')) {
-      _state[c.S_SELECTED_DATASET] = '';
-    }
-    return _state[c.S_SELECTED_DATASET];
+    return getValidData(c.S_SELECTED_DATASET, typeof _state[c.S_SELECTED_DATASET] === 'string', '');
   },
   setSelectedDataset: function (data) {
     _state[c.S_SELECTED_DATASET] = data;
     self.setDatasetObj();
-    _state[c.S_SELECTED_DIMENSIONS] = [];
-    _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
+    self.setSelectedDimensions([]);
   },
   getDatasetObj: function () {
-    if (!(typeof _state[c.S_DATASET_OBJ] === 'object')) {
-      _state[c.S_DATASET_OBJ] = {};
-    }
-    return _state[c.S_DATASET_OBJ];
+    return getValidData(c.S_DATASET_OBJ, typeof _state[c.S_DATASET_OBJ] === 'object', {});
   },
   setDatasetObj: function () {
     _state[c.S_DATASET_OBJ] = _.find(self.getProviderObjValue(), {'name': self.getSelectedDataset()});
@@ -210,10 +199,7 @@ store = _.assign(store, {
   },
 
   getSelectedDimensions: function () {
-    if (!(_state[c.S_SELECTED_DIMENSIONS] instanceof Array)) {
-      _state[c.S_SELECTED_DIMENSIONS] = [];
-    }
-    return _state[c.S_SELECTED_DIMENSIONS];
+    return getValidData(c.S_SELECTED_DIMENSIONS, _state[c.S_SELECTED_DIMENSIONS] instanceof Array, []);
   },
   setSelectedDimensions: function (data) {
     self.getSelectedDimensions();
@@ -245,10 +231,7 @@ store = _.assign(store, {
     });
   },
   getSelectedDimensionsValues: function () {
-    if (!(_state[c.S_SELECTED_DIMENSIONS_VALUES] instanceof Array)) {
-      _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
-    }
-    return _state[c.S_SELECTED_DIMENSIONS_VALUES]
+    return getValidData(c.S_SELECTED_DIMENSIONS_VALUES, _state[c.S_SELECTED_DIMENSIONS_VALUES] instanceof Array, []);
   },
   setSelectedDimensionsValues: function (data, dimensionName) {
     self.getSelectedDimensionsValues();
@@ -268,6 +251,7 @@ store = _.assign(store, {
   /**/
 
 });
+
 
 
 
