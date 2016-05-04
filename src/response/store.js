@@ -2,7 +2,7 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
 var dispatcher = require('../dispatcher');
-var constants = require('../constants');
+var c = require('../constants');
 
 
 
@@ -41,7 +41,7 @@ dispatcher.register(function (action) {
   
   switch (action.actionType) {
     
-    case constants.REQUEST_JSON:
+    case c.REQUEST_JSON:
       _state.json = data;
       break;
     

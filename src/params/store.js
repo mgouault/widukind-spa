@@ -2,7 +2,7 @@ var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 
 var dispatcher = require('../dispatcher');
-var constants = require('../constants');
+var c = require('../constants');
 var apiCall = require('../apiCall');
 
 
@@ -10,13 +10,13 @@ var apiCall = require('../apiCall');
 var CHANGE_EVENT = 'change';
 
 var _state = {};
-_state[constants.S_PROVIDERS] = [];
-_state[constants.S_SELECTED_PROVIDER] = '';
-_state[constants.S_PROVIDER_OBJ] = {};
-_state[constants.S_SELECTED_DATASET] = '';
-_state[constants.S_DATASET_OBJ] = {};
-_state[constants.S_SELECTED_DIMENSIONS] = [];
-_state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
+_state[c.S_PROVIDERS] = [];
+_state[c.S_SELECTED_PROVIDER] = '';
+_state[c.S_PROVIDER_OBJ] = {};
+_state[c.S_SELECTED_DATASET] = '';
+_state[c.S_DATASET_OBJ] = {};
+_state[c.S_SELECTED_DIMENSIONS] = [];
+_state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
 
 
 
@@ -24,39 +24,39 @@ var store = _.assign({}, EventEmitter.prototype);
 var self = store;
 store = _.assign(store, {
 
+  /* CheckData */
   checkData: function () {
-    var promisesAreFun = function (name, data) {
+    var promisesAreFun = function (name, getData) {
       return Promise.resolve()
         .then(function () {
-          if (!_.isEmpty(data) || (name === constants.DATASET && _.isEmpty(_state[constants.S_SELECTED_PROVIDER])) || (name === constants.DIMENSION && _.isEmpty(_state[constants.S_SELECTED_DATASET]))) {
+          if (!_.isEmpty(getData()) || (name === c.DATASET && _.isEmpty(_state[c.S_SELECTED_PROVIDER])) || (name === c.DIMENSION && _.isEmpty(_state[c.S_SELECTED_DATASET]))) {
             return;
           }
           var url;
           switch (name) {
-            case constants.PROVIDER:
+            case c.PROVIDER:
               url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys'; break;
-            case constants.DATASET:
-              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _state[constants.S_SELECTED_PROVIDER] + '/datasets/keys'; break;
-            case constants.DIMENSION:
-              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state[constants.S_SELECTED_DATASET] + '/dimensions'; break;
+            case c.DATASET:
+              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + self.getSelectedProvider() + '/datasets/keys'; break;
+            case c.DIMENSION:
+              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + self.getSelectedDataset() + '/dimensions'; break;
           }
           switch (name) {
-            case constants.PROVIDER:
-              _state[constants.S_PROVIDERS] = undefined; break;
-            case constants.DATASET:
-              _state[constants.S_PROVIDER_OBJ].value = undefined; break;
-            case constants.DIMENSION:
-              _state[constants.S_DATASET_OBJ].value = undefined; break;
+            case c.PROVIDER:
+              _state[c.S_PROVIDERS] = undefined; break;
+            case c.DATASET:
+              _state[c.S_PROVIDER_OBJ].value = undefined; break;
+            case c.DIMENSION:
+              _state[c.S_DATASET_OBJ].value = undefined; break;
           }
           self.emitChange();
           return apiCall(url).then(function (data) {
-
             switch (name) {
-              case constants.PROVIDER:
+              case c.PROVIDER:
                 self.setProviders(data); break;
-              case constants.DATASET:
+              case c.DATASET:
                 self.setProviderObjValue(data); break;
-              case constants.DIMENSION:
+              case c.DIMENSION:
                 self.setDatasetObjValue(data); break;
             }
           });
@@ -64,38 +64,43 @@ store = _.assign(store, {
         .then(function () {
           var value;
           switch (name) {
-            case constants.PROVIDER:
-              value = _state[constants.S_SELECTED_PROVIDER]; break;
-            case constants.DATASET:
-              value = _state[constants.S_SELECTED_DATASET]; break;
-            case constants.DIMENSION:
-              value = _state[constants.S_SELECTED_DIMENSIONS]; break;
+            case c.PROVIDER:
+              value = self.getSelectedProvider(); break;
+            case c.DATASET:
+              value = self.getSelectedDataset(); break;
+            case c.DIMENSION:
+              value = self.getSelectedDimensions(); break;
           }
-          if (!_.isEmpty(value) || name === constants.DIMENSION) {
+          if (!_.isEmpty(value) || name === c.DIMENSION) {
             return;
           }
-          value = _.get(_.head(data), 'name');
+          value = _.get(_.head(getData()), 'name', '');
           switch (name) {
-            case constants.PROVIDER:
-              self.setProviderSelected(value); break;
-            case constants.DATASET:
-              self.setDatasetSelected(value); break;
+            case c.PROVIDER:
+              self.setSelectedProvider(value); break;
+            case c.DATASET:
+              self.setSelectedDataset(value); break;
           }
         })
     };
 
     return Promise.resolve()
       .then(function () {
-        return promisesAreFun(constants.PROVIDER, self.getProviders());
+        return promisesAreFun(c.PROVIDER, self.getProviders);
       })
       .then(function () {
-        return promisesAreFun(constants.DATASET, self.getProviderObjValue());
+        self.emitChange();
+        return promisesAreFun(c.DATASET, self.getProviderObjValue);
       })
       .then(function () {
-        return promisesAreFun(constants.DIMENSION, self.getDatasetObjValue());
+        self.emitChange();
+        return promisesAreFun(c.DIMENSION, self.getDatasetObjValue);
       })
       .then(self.emitChange);
   },
+  /**/
+
+
 
   /* Store methods */
   getState: function () {
@@ -112,131 +117,125 @@ store = _.assign(store, {
   },
   /**/
 
-  /* Providers */
+
+  /* Getters-Setters */
+    /* Providers */
   getProviders: function () {
-    var providers = _.get(_state, constants.S_PROVIDERS);
-    if (!(providers instanceof Array)) {
-      providers = [];
+    if (!(_state[c.S_PROVIDERS] instanceof Array)) {
+      _state[c.S_PROVIDERS] = [];
     }
-    return providers;
+    return _state[c.S_PROVIDERS];
   },
   setProviders: function (data) {
-    var providers = self.getProviders();
+    self.getProviders();
     _.forEach(data, function (el) {
-      providers.push({'name': el, 'value': []});
+      _state[c.S_PROVIDERS].push({'name': el, 'value': []});
     });
   },
-  getProviderSelected: function () {
-    var providerSelected = _.get(_state, constants.S_SELECTED_PROVIDER);
-    if (!(typeof providerSelected === 'string')) {
-      providerSelected = '';
+  getSelectedProvider: function () {
+    if (!(typeof _state[c.S_SELECTED_PROVIDER] === 'string')) {
+      _state[c.S_SELECTED_PROVIDER] = '';
     }
-    return providerSelected;
+    return _state[c.S_SELECTED_PROVIDER];
   },
-  setProviderSelected: function (data) {
-    _state[constants.S_SELECTED_PROVIDER] = data;
+  setSelectedProvider: function (data) {
+    _state[c.S_SELECTED_PROVIDER] = data;
     self.setProviderObj();
-    _state[constants.S_SELECTED_DATASET] = '';
-    _state[constants.S_DATASET_OBJ] = {};
-    _state[constants.S_SELECTED_DIMENSIONS] = [];
-    _state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
+    _state[c.S_SELECTED_DATASET] = '';
+    _state[c.S_DATASET_OBJ] = {};
+    _state[c.S_SELECTED_DIMENSIONS] = [];
+    _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
   },
   getProviderObj: function () {
-    var providerObj = _.get(_state, constants.S_PROVIDER_OBJ);
-    if (!(providerObj instanceof Object)) {
-      providerObj = {};
+    if (!(typeof _state[c.S_PROVIDER_OBJ] === 'object')) {
+      _state[c.S_PROVIDER_OBJ] = {};
     }
-    return providerObj;
+    return _state[c.S_PROVIDER_OBJ];
   },
   setProviderObj: function () {
-    _state[constants.S_PROVIDER_OBJ] = _.find(self.getProviders(), {'name': self.getProviderSelected()});
+    _state[c.S_PROVIDER_OBJ] = _.find(self.getProviders(), {'name': self.getSelectedProvider()});
   },
-  /**/
+    /**/
 
-
-  /* Datasets */
+    /* Datasets */
   getProviderObjValue: function () {
     var providerObjValue = self.getProviderObj().value;
     if (!(providerObjValue instanceof Array)) {
-      providerObjValue = [];
+      _state[c.S_PROVIDER_OBJ].value = [];
     }
-    return providerObjValue;
+    return _state[c.S_PROVIDER_OBJ].value;
   },
   setProviderObjValue: function (data) {
-    var providerObjValue = self.getProviderObjValue();
+    self.getProviderObjValue();
     _.forEach(data, function (el) {
-      providerObjValue.push({'name': el, 'value': []});
+      _state[c.S_PROVIDER_OBJ].value.push({'name': el, 'value': []});
     });
   },
-  getDatasetSelected: function () {
-    var datasetSelected = _.get(_state, constants.S_SELECTED_DATASET);
-    if (!(typeof datasetSelected === 'string')) {
-      datasetSelected = '';
+  getSelectedDataset: function () {
+    if (!(typeof _state[c.S_SELECTED_DATASET] === 'string')) {
+      _state[c.S_SELECTED_DATASET] = '';
     }
-    return datasetSelected;
+    return _state[c.S_SELECTED_DATASET];
   },
-  setDatasetSelected: function (data) {
-    _state[constants.S_SELECTED_DATASET] = data;
+  setSelectedDataset: function (data) {
+    _state[c.S_SELECTED_DATASET] = data;
     self.setDatasetObj();
-    _state[constants.S_SELECTED_DIMENSIONS] = [];
-    _state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
+    _state[c.S_SELECTED_DIMENSIONS] = [];
+    _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
   },
   getDatasetObj: function () {
-    var datasetObj = _.get(_state, constants.S_DATASET_OBJ);
-    if (!(datasetObj instanceof Object)) {
-      datasetObj = {};
+    if (!(typeof _state[c.S_DATASET_OBJ] === 'object')) {
+      _state[c.S_DATASET_OBJ] = {};
     }
-    return datasetObj;
+    return _state[c.S_DATASET_OBJ];
   },
   setDatasetObj: function () {
-    _state[constants.S_DATASET_OBJ] = _.find(self.getProviderObjValue(), {'name': self.getDatasetSelected()});
+    _state[c.S_DATASET_OBJ] = _.find(self.getProviderObjValue(), {'name': self.getSelectedDataset()});
   },
-  /**/
+    /**/
 
-
-  /* Dimensions */
+    /* Dimensions */
   getDatasetObjValue: function () {
     var datasetObjValue = self.getDatasetObj().value;
     if (!(datasetObjValue instanceof Array)) {
-      datasetObjValue = [];
+      _state[c.S_DATASET_OBJ].value = [];
     }
-    return datasetObjValue;
+    return _state[c.S_DATASET_OBJ].value;
   },
   setDatasetObjValue: function (data) {
-    var datasetObjValue = self.getDatasetObjValue();
+    self.getDatasetObjValue();
     _.forEach(Object.keys(data), function (el) {
-      datasetObjValue.push({'name': el, 'value': Object.keys(data[el])});
+      _state[c.S_DATASET_OBJ].value.push({'name': el, 'value': Object.keys(data[el])});
     });
   },
 
-  getDimensionsSelected: function () {
-    var dimensionsSelected = _.get(_state, constants.S_SELECTED_DIMENSIONS);
-    if (!(dimensionsSelected instanceof Array)) {
-      dimensionsSelected = [];
+  getSelectedDimensions: function () {
+    if (!(_state[c.S_SELECTED_DIMENSIONS] instanceof Array)) {
+      _state[c.S_SELECTED_DIMENSIONS] = [];
     }
-    return dimensionsSelected;
+    return _state[c.S_SELECTED_DIMENSIONS];
   },
-  setDimensionsSelected: function (data) {
-    var dimensionsSelected = self.getDimensionsSelected();
-    _.remove(dimensionsSelected);
-    var dimensionsObjSelected = self.getDimensionsObjSelected();
-    _.remove(dimensionsObjSelected, function (el) {
+  setSelectedDimensions: function (data) {
+    self.getSelectedDimensions();
+    _.remove(_state[c.S_SELECTED_DIMENSIONS]);
+    self.getSelectedDimensionsValues();
+    _.remove(_state[c.S_SELECTED_DIMENSIONS_VALUES], function (el) {
       return !_.find(data, {'value': el.name, 'selected': true});
     });
     _.forEach(data, function (el) {
       if (el.selected) {
         var name = el.value;
-        dimensionsSelected.push(name);
-        if (!_.find(dimensionsObjSelected, {'name': name})) {
-          dimensionsObjSelected.push({
+        _state[c.S_SELECTED_DIMENSIONS].push(name);
+        if (!_.find(_state[c.S_SELECTED_DIMENSIONS_VALUES], {'name': name})) {
+          _state[c.S_SELECTED_DIMENSIONS_VALUES].push({
             'name': name,
             'value': _.get(_.find(self.getDatasetObjValue(), {'name': name}), 'value')
           });
         }
       }
     });
-    dimensionsSelected.sort();
-    dimensionsObjSelected.sort(function (a, b) {
+    _state[c.S_SELECTED_DIMENSIONS].sort();
+    _state[c.S_SELECTED_DIMENSIONS_VALUES].sort(function (a, b) {
       if (a.name < b.name)
         return -1;
       else if (a.name > b.name)
@@ -245,16 +244,15 @@ store = _.assign(store, {
         return 0;
     });
   },
-  getDimensionsObjSelected: function () {
-    var dimensionsObjSelected = _.get(_state, constants.S_SELECTED_DIMENSIONS_VALUES);
-    if (!(dimensionsObjSelected instanceof Array)) {
-      dimensionsObjSelected = [];
+  getSelectedDimensionsValues: function () {
+    if (!(_state[c.S_SELECTED_DIMENSIONS_VALUES] instanceof Array)) {
+      _state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
     }
-    return dimensionsObjSelected
+    return _state[c.S_SELECTED_DIMENSIONS_VALUES]
   },
-  setDimensionsObjSelected: function (data, dimensionName) {
-    var dimensionsObjSelected_ = self.getDimensionsObjSelected();
-    var index = _.findIndex(dimensionsObjSelected_, {'name': dimensionName});
+  setSelectedDimensionsValues: function (data, dimensionName) {
+    self.getSelectedDimensionsValues();
+    var index = _.findIndex(_state[c.S_SELECTED_DIMENSIONS_VALUES], {'name': dimensionName});
     if (index < 0) {
       return;
     }
@@ -264,8 +262,9 @@ store = _.assign(store, {
         values.push(el.value);
       }
     });
-    dimensionsObjSelected_[index].selected = values;
+    _state[c.S_SELECTED_DIMENSIONS_VALUES][index].selected = values;
   }
+    /**/
   /**/
 
 });
@@ -277,20 +276,20 @@ dispatcher.register(function (action) {
 
 	switch (action.actionType) {
 
-		case constants.PROVIDER_CHANGE:
-      store.setProviderSelected(data);
+		case c.PROVIDER_CHANGE:
+      store.setSelectedProvider(data);
 			break;
 
-		case constants.DATASET_CHANGE:
-      store.setDatasetSelected(data);
+		case c.DATASET_CHANGE:
+      store.setSelectedDataset(data);
 			break;
 
-		case constants.DIMENSION_CHANGE:
-      store.setDimensionsSelected(data);
+		case c.DIMENSION_CHANGE:
+      store.setSelectedDimensions(data);
 			break;
 
-    case constants.DIMENSION_VALUES_CHANGE:
-      store.setDimensionsObjSelected(data, action.data_);
+    case c.DIMENSION_VALUES_CHANGE:
+      store.setSelectedDimensionsValues(data, action.data_);
       break;
 
     default:

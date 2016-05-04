@@ -1,7 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 
-var constants = require('../../../constants');
+var c = require('../../../constants');
 var CustomSelect = require('./CustomSelect.jsx');
 var DimensionsBox = require('./DimensionsBox.jsx');
 
@@ -18,12 +18,12 @@ var ParamsBox = React.createClass({
       }
       var value;
       switch (name) {
-        case constants.PROVIDER:
-          value = this.props.obj[constants.S_SELECTED_PROVIDER]; break;
-        case constants.DATASET:
-          value = this.props.obj[constants.S_SELECTED_DATASET]; break;
-        case constants.DIMENSION:
-          value = this.props.obj[constants.S_SELECTED_DIMENSIONS]; break;
+        case c.PROVIDER:
+          value = this.props.obj[c.S_SELECTED_PROVIDER]; break;
+        case c.DATASET:
+          value = this.props.obj[c.S_SELECTED_DATASET]; break;
+        case c.DIMENSION:
+          value = this.props.obj[c.S_SELECTED_DIMENSIONS]; break;
       }
       toRender.push(
         <CustomSelect
@@ -38,10 +38,10 @@ var ParamsBox = React.createClass({
     }.bind(this);
     
     var data =
-      callbacksAreFun(constants.DIMENSION, this.props.obj[constants.S_SELECTED_DIMENSIONS_VALUES], true,
-        callbacksAreFun(constants.DATASET, this.props.obj[constants.S_DATASET_OBJ].value, false,
-          callbacksAreFun(constants.PROVIDER, this.props.obj[constants.S_PROVIDER_OBJ].value, false,
-            this.props.obj[constants.S_PROVIDERS]
+      callbacksAreFun(c.DIMENSION, this.props.obj[c.S_SELECTED_DIMENSIONS_VALUES], true,
+        callbacksAreFun(c.DATASET, this.props.obj[c.S_DATASET_OBJ].value, false,
+          callbacksAreFun(c.PROVIDER, this.props.obj[c.S_PROVIDER_OBJ].value, false,
+            this.props.obj[c.S_PROVIDERS]
           )
         )
       );

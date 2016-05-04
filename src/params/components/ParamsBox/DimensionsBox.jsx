@@ -2,7 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 
-var constants = require('../../../constants');
+var c = require('../../../constants');
 var actions = require('../../../actions');
 
 
@@ -18,7 +18,7 @@ var DimensionConfig = React.createClass({
   },
 
   onUserInput: function (event) {
-    actions[constants.DIMENSION_VALUES_CHANGE](event, this.props.name);
+    actions[c.DIMENSION_VALUES_CHANGE](event, this.props.name);
   },
 
   render: function () {
