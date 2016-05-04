@@ -3,7 +3,6 @@ var EventEmitter = require('events').EventEmitter;
 
 var dispatcher = require('../dispatcher');
 var constants = require('../constants');
-var actions = require('../actions');
 var apiCall = require('../apiCall');
 
 
@@ -82,7 +81,7 @@ var store = _.assign({}, EventEmitter.prototype, {
     if (!(_.get(_state, 'dimensionsObjSelected') instanceof Array)) {
       _state.dimensionsObjSelected = [];
     }
-    return _state.dimensionsObjSelected;
+    return _state.dimensionsObjSelected
   },
   
   checkData: function () {
@@ -98,16 +97,15 @@ var store = _.assign({}, EventEmitter.prototype, {
               'dataset': 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _state.providerSelected + '/datasets/keys',
               'dimension': 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state.datasetSelected + '/dimensions'
             };
-            return apiCall(url[name])
-              .then(function (data) {
-                toCall[name+'s'+'Missing'](data);
-              });
+            return apiCall(url[name]).then(function (data) {
+              toCall[name+'s'+'Missing'](data);
+            });
           }
         })
         .then(function () {
           var value = _state[name + 'Selected'];
           if (_.isEmpty(value) && !(value instanceof Array)) {
-            value = _.get(_.head(data), 'value');
+            value = _.get(_.head(data), 'name');
             toCall[name+'Change'](value);
           }
         })
@@ -115,14 +113,15 @@ var store = _.assign({}, EventEmitter.prototype, {
 
     return Promise.resolve()
       .then(function () {
-        return promisesAreFun('provider', _state.providers);
-      })
+        return promisesAreFun('provider', this.getProviders());
+      }.bind(this))
       .then(function () {
-        return promisesAreFun('dataset', _state.providerObj.value);
-      })
+        return promisesAreFun('dataset', this.getProviderObjValue());
+      }.bind(this))
       .then(function () {
-        return promisesAreFun('dimension', _state.datasetObj.value);
-      });
+        return promisesAreFun('dimension', this.getDatasetObjValue());
+      }.bind(this))
+      .then(store.emitChange.bind(this));
   }
 
 });
@@ -131,9 +130,9 @@ var store = _.assign({}, EventEmitter.prototype, {
 
 dispatcher.register(function (action) {
   var data = action.data;
-  
+
 	switch (action.actionType) {
-		
+
 		case constants.PROVIDER_CHANGE:
       toCall.providerChange(data);
 			break;
@@ -154,12 +153,13 @@ dispatcher.register(function (action) {
       return;
 	}
 
-  store.checkData.then(store.emitChange);
+  store.checkData();
 });
 
 
 
 var toCall = {// todo refactor in setters
+
   providerChange: function (data) {
     _state.providerSelected = data;
     _state.providerObj = _.find(store.getProviders(), {'name': _state.providerSelected});
@@ -168,12 +168,14 @@ var toCall = {// todo refactor in setters
     _state.dimensionsSelected = [];
     _state.dimensionsObjSelected = [];
   },
+
   datasetChange: function (data) {
     _state.datasetSelected = data;
     _state.datasetObj = _.find(store.getProviderObjValue(), {'name': _state.datasetSelected});
     _state.dimensionsSelected = [];
     _state.dimensionsObjSelected = [];
   },
+
   dimensionChange: function (data) {
     var dimensionsObjSelected = store.getDimensionsObjSelected();
     _.remove(dimensionsObjSelected, function (el) {
@@ -201,6 +203,7 @@ var toCall = {// todo refactor in setters
         return 0;
     });
   },
+
   dimensionValueChange: function (data, dimensionName) {
     var dimensionsObjSelected_ = store.getDimensionsObjSelected();
     var index = _.findIndex(dimensionsObjSelected, {'name': dimensionName});
@@ -215,24 +218,28 @@ var toCall = {// todo refactor in setters
     });
     dimensionsObjSelected_[index].selected = values;
   },
+
   providersMissing: function (data) {
     var providers = store.getProviders();
     _.forEach(data, function (el) {
       providers.push({'name': el, 'value': []});
     });
   },
+
   datasetsMissing: function (data) {
     var providerObjValue = store.getProviderObjValue();
     _.forEach(data, function (el) {
       providerObjValue.push({'name': el, 'value': []});
     });
   },
+
   dimensionsMissing: function (data) {
     var datasetObjValue = store.getDatasetObjValue();
     _.forEach(Object.keys(data), function (el) {
       datasetObjValue.push({'name': el, 'value': Object.keys(data[el])});
     });
   }
+
 };
 
 module.exports = store;

@@ -3,6 +3,8 @@ var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 var Loader = require('react-loader');
 
+var actions = require('../../../actions');
+
 
 
 var CustomSelect = React.createClass({
@@ -25,6 +27,7 @@ var CustomSelect = React.createClass({
 
     var label = _.capitalize(name);
     var options = this.getOptions();
+    
     return (
       <Loader loaded={!false}>
         <FormGroup controlId={"formControlsSelect" + name}>

@@ -11,7 +11,7 @@ var ParamsBox = React.createClass({
   render: function () {
     var toRender = [];
     
-    var promisesAreFun = function (name, toReturn, multiple, data) {
+    var callbacksAreFun = function (name, toReturn, multiple, data) {
       if (_.isEmpty(data)) {
         return;
       }
@@ -28,9 +28,9 @@ var ParamsBox = React.createClass({
     }.bind(this);
     
     var data =
-      promisesAreFun('dimension', this.props.dimensionsObjSelected, true,
-        promisesAreFun('dataset', this.props.datasetObj.value, false,
-          promisesAreFun('provider', this.props.providerObj.value, false,
+      callbacksAreFun('dimension', this.props.dimensionsObjSelected, true,
+        callbacksAreFun('dataset', this.props.datasetObj.value, false,
+          callbacksAreFun('provider', this.props.providerObj.value, false,
             this.props.providers
           )
         )
