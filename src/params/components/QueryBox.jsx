@@ -2,6 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 import { Button, Well } from 'react-bootstrap';
 
+var constants = require('../../constants');
 var actions = require('../../actions');
 
 
@@ -29,7 +30,7 @@ var QueryBox = React.createClass({
   render: function () {
     var url = this.makeUrl();
     var requestJSON = function () {
-      actions.requestJSON(url);
+      actions[constants.REQUEST_JSON](url);
     }.bind(this);
     // loader:on if (dataset || values) not valid
     return (

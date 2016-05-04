@@ -9,19 +9,85 @@ var apiCall = require('../apiCall');
 
 var CHANGE_EVENT = 'change';
 
-var _state = {
-  'providers': [],
-	'providerSelected': '',
-  'providerObj': {},
-	'datasetSelected': '',
-  'datasetObj': {},
-	'dimensionsSelected': [],
-	'dimensionsObjSelected': []
-};
+var _state = {};
+_state[constants.S_PROVIDERS] = [];
+_state[constants.S_SELECTED_PROVIDER] = '';
+_state[constants.S_PROVIDER_OBJ] = {};
+_state[constants.S_SELECTED_DATASET] = '';
+_state[constants.S_DATASET_OBJ] = {};
+_state[constants.S_SELECTED_DIMENSIONS] = [];
+_state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
 
 
 
-var store = _.assign({}, EventEmitter.prototype, {
+var store = _.assign({}, EventEmitter.prototype);
+var self = store;
+store = _.assign(store, {
+
+  checkData: function () {
+    var promisesAreFun = function (name, data) {
+      return Promise.resolve()
+        .then(function () {
+          if (!_.isEmpty(data) || (name === constants.DATASET && _.isEmpty(_state[constants.S_SELECTED_PROVIDER])) || (name === constants.DIMENSION && _.isEmpty(_state[constants.S_SELECTED_DATASET]))) {
+            return;
+          }
+          var url;
+          switch (name) {
+            case constants.PROVIDER:
+              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys'; break;
+            case constants.DATASET:
+              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _state[constants.S_SELECTED_PROVIDER] + '/datasets/keys'; break;
+            case constants.DIMENSION:
+              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state[constants.S_SELECTED_DATASET] + '/dimensions'; break;
+          }
+          return apiCall(url).then(function (data) {
+            switch (name) {
+              case constants.PROVIDER:
+                self.setProviders(data); break;
+              case constants.DATASET:
+                self.setProviderObjValue(data); break;
+              case constants.DIMENSION:
+                self.setDatasetObjValue(data); break;
+            }
+          });
+        })
+        .then(function () {
+          var value;
+          switch (name) {
+            case constants.PROVIDER:
+              value = _state[constants.S_SELECTED_PROVIDER]; break;
+            case constants.DATASET:
+              value = _state[constants.S_SELECTED_DATASET]; break;
+            case constants.DIMENSION:
+              value = _state[constants.S_SELECTED_DIMENSIONS]; break;
+          }
+          if (!_.isEmpty(value) || name === constants.DIMENSION) {
+            return;
+          }
+          value = _.get(_.head(data), 'name');
+          switch (name) {
+            case constants.PROVIDER:
+              self.setProviderSelected(value); break;
+            case constants.DATASET:
+              self.setDatasetSelected(value); break;
+          }
+        })
+    };
+
+    return Promise.resolve()
+      .then(function () {
+        return promisesAreFun(constants.PROVIDER, self.getProviders());
+      })
+      .then(function () {
+        return promisesAreFun(constants.DATASET, self.getProviderObjValue());
+      })
+      .then(function () {
+        return promisesAreFun(constants.DIMENSION, self.getDatasetObjValue());
+      })
+      .then(self.emitChange);
+  },
+
+  /* Store methods */
   getState: function () {
     return _state; // todo use all getters ?
   },
@@ -33,65 +99,12 @@ var store = _.assign({}, EventEmitter.prototype, {
   },
   removeChangeListener: function (callback) {
     self.removeListener(CHANGE_EVENT, callback);
-  }
-});
-
-var self = store;
-var bar = {
-
-  checkData: function () {
-    var promisesAreFun = function (name, data) {
-      return Promise.resolve()
-        .then(function () {
-          if (_.isEmpty(data)) {
-            if ((name === 'dataset' && _.isEmpty(_state.providerSelected)) || (name === 'dimension' && _.isEmpty(_state.datasetSelected))) {
-              return;
-            }
-            var url = {
-              'provider': 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys',
-              'dataset': 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + _state.providerSelected + '/datasets/keys',
-              'dimensions': 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + _state.datasetSelected + '/dimensions'
-            };
-            return apiCall(url[name]).then(function (data) {
-              var foo = {
-                'provider': self.setProviders,
-                'dataset': self.setProviderObjValue,
-                'dimensions': self.setDatasetObjValue
-              };
-              foo[name](data);
-            });
-          }
-        })
-        .then(function () {
-          var value = _state[name + 'Selected'];
-          if (_.isEmpty(value) && !(value instanceof Array)) {
-            value = _.get(_.head(data), 'name');
-            var foo = {
-              'provider': self.setProviderSelected,
-              'dataset': self.setDatasetSelected
-            };
-            foo[name](value);
-          }
-        })
-    };
-
-    return Promise.resolve()
-      .then(function () {
-        return promisesAreFun('provider', self.getProviders());
-      })
-      .then(function () {
-        return promisesAreFun('dataset', self.getProviderObjValue());
-      })
-      .then(function () {
-        return promisesAreFun('dimensions', self.getDatasetObjValue());
-      })
-      .then(self.emitChange);
   },
-
+  /**/
 
   /* Providers */
   getProviders: function () {
-    var providers = _.get(_state, 'providers');
+    var providers = _.get(_state, constants.S_PROVIDERS);
     if (!(providers instanceof Array)) {
       providers = [];
     }
@@ -104,40 +117,40 @@ var bar = {
     });
   },
   getProviderSelected: function () {
-    var providerSelected = _.get(_state, 'providerSelected');
+    var providerSelected = _.get(_state, constants.S_SELECTED_PROVIDER);
     if (!(typeof providerSelected === 'string')) {
       providerSelected = '';
     }
     return providerSelected;
   },
   setProviderSelected: function (data) {
-    _state.providerSelected = data;
+    _state[constants.S_SELECTED_PROVIDER] = data;
     self.setProviderObj();
-    _state.datasetSelected = '';
-    _state.datasetObj = {};
-    _state.dimensionsSelected = [];
-    _state.dimensionsObjSelected = [];
+    _state[constants.S_SELECTED_DATASET] = '';
+    _state[constants.S_DATASET_OBJ] = {};
+    _state[constants.S_SELECTED_DIMENSIONS] = [];
+    _state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
   },
   getProviderObj: function () {
-    var providerObj = _.get(_state, 'providerObj');
+    var providerObj = _.get(_state, constants.S_PROVIDER_OBJ);
     if (!(providerObj instanceof Object)) {
       providerObj = {};
     }
     return providerObj;
   },
   setProviderObj: function () {
-    _state.providerObj = _.find(self.getProviders(), {'name': self.getProviderSelected()});
+    _state[constants.S_PROVIDER_OBJ] = _.find(self.getProviders(), {'name': self.getProviderSelected()});
   },
   /**/
 
 
   /* Datasets */
   getProviderObjValue: function () {
-    var providerObj = self.getProviderObj();
-    if (!(_.get(providerObj, 'value') instanceof Array)) {
-      providerObj.value = [];
+    var providerObjValue = self.getProviderObj().value;
+    if (!(providerObjValue instanceof Array)) {
+      providerObjValue = [];
     }
-    return providerObj.value;
+    return providerObjValue;
   },
   setProviderObjValue: function (data) {
     var providerObjValue = self.getProviderObjValue();
@@ -146,38 +159,38 @@ var bar = {
     });
   },
   getDatasetSelected: function () {
-    var datasetSelected = _.get(_state, 'datasetSelected');
+    var datasetSelected = _.get(_state, constants.S_SELECTED_DATASET);
     if (!(typeof datasetSelected === 'string')) {
       datasetSelected = '';
     }
     return datasetSelected;
   },
   setDatasetSelected: function (data) {
-    _state.datasetSelected = data;
+    _state[constants.S_SELECTED_DATASET] = data;
     self.setDatasetObj();
-    _state.dimensionsSelected = [];
-    _state.dimensionsObjSelected = [];
+    _state[constants.S_SELECTED_DIMENSIONS] = [];
+    _state[constants.S_SELECTED_DIMENSIONS_VALUES] = [];
   },
   getDatasetObj: function () {
-    var datasetObj = _.get(_state, 'datasetObj');
+    var datasetObj = _.get(_state, constants.S_DATASET_OBJ);
     if (!(datasetObj instanceof Object)) {
       datasetObj = {};
     }
     return datasetObj;
   },
   setDatasetObj: function () {
-    _state.datasetObj = _.find(self.getProviderObjValue(), {'name': self.getDatasetSelected()});
+    _state[constants.S_DATASET_OBJ] = _.find(self.getProviderObjValue(), {'name': self.getDatasetSelected()});
   },
   /**/
 
 
   /* Dimensions */
   getDatasetObjValue: function () {
-    var datasetObj = self.getDatasetObj();
-    if (!(_.get(datasetObj, 'value') instanceof Array)) {
-      datasetObj.value = [];
+    var datasetObjValue = self.getDatasetObj().value;
+    if (!(datasetObjValue instanceof Array)) {
+      datasetObjValue = [];
     }
-    return datasetObj.value;
+    return datasetObjValue;
   },
   setDatasetObjValue: function (data) {
     var datasetObjValue = self.getDatasetObjValue();
@@ -187,13 +200,15 @@ var bar = {
   },
 
   getDimensionsSelected: function () {
-    var dimensionsSelected = _.get(_state, 'dimensionsSelected');
+    var dimensionsSelected = _.get(_state, constants.S_SELECTED_DIMENSIONS);
     if (!(dimensionsSelected instanceof Array)) {
       dimensionsSelected = [];
     }
     return dimensionsSelected;
   },
   setDimensionsSelected: function (data) {
+    var dimensionsSelected = self.getDimensionsSelected();
+    _.remove(dimensionsSelected);
     var dimensionsObjSelected = self.getDimensionsObjSelected();
     _.remove(dimensionsObjSelected, function (el) {
       return !_.find(data, {'value': el.name, 'selected': true});
@@ -201,7 +216,7 @@ var bar = {
     _.forEach(data, function (el) {
       if (el.selected) {
         var name = el.value;
-        _state.dimensionsSelected.push(name);
+        dimensionsSelected.push(name);
         if (!_.find(dimensionsObjSelected, {'name': name})) {
           dimensionsObjSelected.push({
             'name': name,
@@ -210,7 +225,7 @@ var bar = {
         }
       }
     });
-    _state.dimensionsSelected.sort();
+    dimensionsSelected.sort();
     dimensionsObjSelected.sort(function (a, b) {
       if (a.name < b.name)
         return -1;
@@ -221,7 +236,7 @@ var bar = {
     });
   },
   getDimensionsObjSelected: function () {
-    var dimensionsObjSelected = _.get(_state, 'dimensionsObjSelected');
+    var dimensionsObjSelected = _.get(_state, constants.S_SELECTED_DIMENSIONS_VALUES);
     if (!(dimensionsObjSelected instanceof Array)) {
       dimensionsObjSelected = [];
     }
@@ -243,8 +258,7 @@ var bar = {
   }
   /**/
 
-};
-store = _.assign(store, bar);
+});
 
 
 

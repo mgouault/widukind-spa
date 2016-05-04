@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 
+var constants = require('../../../constants');
 var CustomSelect = require('./CustomSelect.jsx');
 var DimensionsBox = require('./DimensionsBox.jsx');
 
@@ -15,12 +16,21 @@ var ParamsBox = React.createClass({
       if (_.isEmpty(data)) {
         return;
       }
+      var value;
+      switch (name) {
+        case constants.PROVIDER:
+          value = this.props.obj[constants.S_SELECTED_PROVIDER]; break;
+        case constants.DATASET:
+          value = this.props.obj[constants.S_SELECTED_DATASET]; break;
+        case constants.DIMENSION:
+          value = this.props.obj[constants.S_SELECTED_DIMENSIONS]; break;
+      }
       toRender.push(
         <CustomSelect
           key={name + 'Select'}
           name={name}
           data={data}
-          value={this.props[name + 'Selected']}
+          value={value}
           multiple={multiple}
         />
       );
@@ -28,10 +38,10 @@ var ParamsBox = React.createClass({
     }.bind(this);
     
     var data =
-      callbacksAreFun('dimension', this.props.dimensionsObjSelected, true,
-        callbacksAreFun('dataset', this.props.datasetObj.value, false,
-          callbacksAreFun('provider', this.props.providerObj.value, false,
-            this.props.providers
+      callbacksAreFun(constants.DIMENSION, this.props.obj[constants.S_SELECTED_DIMENSIONS_VALUES], true,
+        callbacksAreFun(constants.DATASET, this.props.obj[constants.S_DATASET_OBJ].value, false,
+          callbacksAreFun(constants.PROVIDER, this.props.obj[constants.S_PROVIDER_OBJ].value, false,
+            this.props.obj[constants.S_PROVIDERS]
           )
         )
       );

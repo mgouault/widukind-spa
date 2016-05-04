@@ -2,43 +2,44 @@ var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 var apiCall = require('./apiCall');
 
+var actions = {};
 
-
-var actions = {
-
-	providerChange: function (event) {
-    _dispatch(constants.PROVIDER_CHANGE)(event.target.value);
-  },
-  
-  datasetChange: function (event) {
-    _dispatch(constants.DATASET_CHANGE)(event.target.value);
-  },
-  
-  dimensionChange: function (event) {
-    _dispatch(constants.DIMENSION_CHANGE)(event.target.options);
-  },
-  
-  dimensionValueChange: function (event, dimensionName) {
-    _dispatch(constants.DIMENSION_VALUES_CHANGE)(event.target.options, dimensionName);
-  },
-
-  requestJSON: function (url) {
-    apiCall(url)
-      .then(_dispatch(constants.REQUEST_JSON));
-  }
-  
+actions[constants.PROVIDER_CHANGE] = function (event) {
+  dispatcher.dispatch({
+    'actionType': constants.PROVIDER_CHANGE,
+    'data': event.target.value
+  });
 };
 
+actions[constants.DATASET_CHANGE] = function (event) {
+  dispatcher.dispatch({
+    'actionType': constants.DATASET_CHANGE,
+    'data': event.target.value
+  });
+};
 
+actions[constants.DIMENSION_CHANGE] = function (event) {
+  dispatcher.dispatch({
+    'actionType': constants.DIMENSION_CHANGE,
+    'data': event.target.options
+  });
+};
 
-function _dispatch (constant) {
-  return function (data, data_) {
+actions[constants.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
+  dispatcher.dispatch({
+    'actionType': constants.DIMENSION_VALUES_CHANGE,
+    'data': event.target.options,
+    'data_': dimensionName
+  });
+};
+
+actions[constants.REQUEST_JSON] = function (url) {
+  apiCall(url).then(function (data) {
     dispatcher.dispatch({
-      'actionType': constant,
-      'data': data,
-      'data_': data_
+      'actionType': constants.REQUEST_JSON,
+      'data': data
     });
-  }
-}
+  });
+};
 
 module.exports = actions;

@@ -3,6 +3,7 @@ var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 var Loader = require('react-loader');
 
+var constants = require('../../../constants');
 var actions = require('../../../actions');
 
 
@@ -27,14 +28,23 @@ var CustomSelect = React.createClass({
 
     var label = _.capitalize(name);
     var options = this.getOptions();
-    
+    var onChange =  'lama';
+    switch (name) {
+      case constants.PROVIDER:
+        onChange = actions[constants.PROVIDER_CHANGE]; break;
+      case constants.DATASET:
+        onChange = actions[constants.DATASET_CHANGE]; break;
+      case constants.DIMENSION:
+        onChange = actions[constants.DIMENSION_CHANGE]; break;
+    }
+
     return (
       <Loader loaded={!false}>
         <FormGroup controlId={"formControlsSelect" + name}>
           <ControlLabel>{label}:</ControlLabel>
           <FormControl
             componentClass="select"
-            onChange={actions[name+'Change']}
+            onChange={onChange}
             value={this.props.value}
             multiple={this.props.multiple}
           >
