@@ -11,38 +11,36 @@ var actions = require('../../../actions');
 var CustomSelect = React.createClass({
   
   getOptions: function () {
-    var options = [];
-    _.forEach(this.props.data, function (el) {
-      var name = el.name;
-      options.push(<option key={name} value={name}>{name}</option>);
+    return _.map(this.props.data, function (el) {
+      return (<option key={el.name} value={el.name}>{el.name}</option>);
     });
-    return options;
   },
 
   render: function () {
-    var name = this.props.name;
-    
     // if (invalidData && forever) {
     //   return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
     // }
-
-    var label = _.capitalize(name);
     var options = this.getOptions();
-    var onChange =  'lama';
-
-    switch (name) {
-      case c.PROVIDER:
-        onChange = actions[c.PROVIDER_CHANGE]; break;
-      case c.DATASET:
-        onChange = actions[c.DATASET_CHANGE]; break;
-      case c.DIMENSION:
-        onChange = actions[c.DIMENSION_CHANGE]; break;
+    var onChange, name;
+    switch (this.props.name) {
+      case c.S_PROVIDERS:
+        onChange = actions[c.PROVIDER_CHANGE];
+        name = 'Provider';
+        break;
+      case c.S_DATASETS:
+        onChange = actions[c.DATASET_CHANGE];
+        name = 'Dataset';
+        break;
+      case c.S_DIMENSIONS:
+        onChange = actions[c.DIMENSIONS_CHANGE];
+        name = 'Dimension';
+        break;
     }
 
     return (
       <Loader loaded={!(typeof this.props.data === 'undefined')}>
         <FormGroup controlId={"formControlsSelect" + name}>
-          <ControlLabel>{label}:</ControlLabel>
+          <ControlLabel>{name}:</ControlLabel>
           <FormControl
             componentClass="select"
             onChange={onChange}

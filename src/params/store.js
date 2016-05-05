@@ -9,20 +9,22 @@ var apiCall = require('../apiCall');
 
 var CHANGE_EVENT = 'change';
 
-var _state = {};
-_state[c.S_PROVIDERS] = [];
-_state[c.S_SELECTED_PROVIDER] = '';
-_state[c.S_PROVIDER_OBJ] = {};
-_state[c.S_SELECTED_DATASET] = '';
-_state[c.S_DATASET_OBJ] = {};
-_state[c.S_SELECTED_DIMENSIONS] = [];
-_state[c.S_SELECTED_DIMENSIONS_VALUES] = [];
+var _statePattern = {};
+_statePattern[c.S_PROVIDERS] = [];
+_statePattern[c.S_SELECTED_PROVIDER] = '';
+_statePattern[c.S_DATASETS] = [];
+_statePattern[c.S_SELECTED_DATASET] = '';
+_statePattern[c.S_DIMENSIONS] = [];
+_statePattern[c.S_SELECTED_DIMENSIONS] = [];
+
+var _state = _.clone(_statePattern);
 
 
 
-function getValidData (key, valid, value) {
-  if (!(valid)) {
-    _state[key] = value;
+function getValidData (key) {
+  if ((typeof _state[key] !== typeof _statePattern[key]) ||
+    ((_state[key] instanceof Array) !== (_statePattern[key] instanceof Array))) {
+    _state[key] = _statePattern[key];
   }
   return _state[key];
 }
@@ -33,80 +35,63 @@ store = _.assign(store, {
 
   /* CheckData */
   checkData: function () {
-    var promisesAreFun = function (name, getData) {
-      return Promise.resolve()
-        .then(function () {
-          if (!_.isEmpty(getData()) || (name === c.DATASET && _.isEmpty(_state[c.S_SELECTED_PROVIDER])) || (name === c.DIMENSION && _.isEmpty(_state[c.S_SELECTED_DATASET]))) {
-            return;
+    var promisesAreFun = function (key) {
+      return function () {
+        var url, getData, setData, getSelectedData, setSelectedData;
+        switch (key) {
+          case c.S_PROVIDERS:
+            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys';
+            getData = self.getProviders;
+            setData = self.setProviders;
+            getSelectedData = self.getSelectedProvider;
+            setSelectedData = self.setSelectedProvider;
+            break;
+          case c.S_DATASETS:
+            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + self.getSelectedProvider() + '/datasets/keys';
+            getData = self.getDatasets;
+            setData = self.setDatasets;
+            getSelectedData = self.getSelectedDataset;
+            setSelectedData = self.setSelectedDataset;
+            break;
+          case c.S_DIMENSIONS:
+            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + self.getSelectedDataset() + '/dimensions';
+            getData = self.getDimensions;
+            setData = self.setDimensions;
+            getSelectedData = self.getSelectedDimensions;
+            setSelectedData = self.setSelectedDimensions;
+            break;
+        }
+        /* Stops checkData if provider/dataset not selected */
+        if ((key === c.S_DATASETS && _.isEmpty(_state[c.S_SELECTED_PROVIDER]))
+          || (key === c.S_DIMENSIONS && _.isEmpty(_state[c.S_SELECTED_DATASET]))) {
+          throw null;
+        }
+        /* Set select default value if it's undefined */
+        var lel = function () {
+          var value = getSelectedData();
+          if (_.isEmpty(value) && key !== c.S_DIMENSIONS) {
+            value = _.get(_.head(getData()), 'name', '');
+            setSelectedData(value);
           }
-          var url;
-          switch (name) {
-            case c.PROVIDER:
-              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys'; break;
-            case c.DATASET:
-              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + self.getSelectedProvider() + '/datasets/keys'; break;
-            case c.DIMENSION:
-              url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + self.getSelectedDataset() + '/dimensions'; break;
-          }
-          switch (name) {
-            case c.PROVIDER:
-              _state[c.S_PROVIDERS] = undefined; break;
-            case c.DATASET:
-              _state[c.S_PROVIDER_OBJ].value = undefined; break;
-            case c.DIMENSION:
-              _state[c.S_DATASET_OBJ].value = undefined; break;
-          }
-          self.emitChange();
-          return apiCall(url).then(function (data) {
-            switch (name) {
-              case c.PROVIDER:
-                self.setProviders(data); break;
-              case c.DATASET:
-                self.setProviderObjValue(data); break;
-              case c.DIMENSION:
-                self.setDatasetObjValue(data); break;
-            }
-          });
-        })
-        .then(function () {
-          var value;
-          switch (name) {
-            case c.PROVIDER:
-              value = self.getSelectedProvider(); break;
-            case c.DATASET:
-              value = self.getSelectedDataset(); break;
-            case c.DIMENSION:
-              value = self.getSelectedDimensions(); break;
-          }
-          if (!_.isEmpty(value) || name === c.DIMENSION) {
-            return;
-          }
-          value = _.get(_.head(getData()), 'name', '');
-          switch (name) {
-            case c.PROVIDER:
-              self.setSelectedProvider(value); break;
-            case c.DATASET:
-              self.setSelectedDataset(value); break;
-          }
-        })
+        };
+        if (!_.isEmpty(getData())) {
+          lel();
+          return Promise.resolve();
+        }
+        /* Fetch missing data */
+        _state[key] = undefined; // Set 'loading state'
+        self.emitChange();
+        return apiCall(url)
+          .then(setData)
+          .then(lel);
+      }
     };
-
-    return Promise.resolve()
-      .then(function () {
-        return promisesAreFun(c.PROVIDER, self.getProviders);
-      })
-      .then(function () {
-        self.emitChange();
-        return promisesAreFun(c.DATASET, self.getProviderObjValue);
-      })
-      .then(function () {
-        self.emitChange();
-        return promisesAreFun(c.DIMENSION, self.getDatasetObjValue);
-      })
-      .then(self.emitChange);
+    return promisesAreFun(c.S_PROVIDERS)().then(self.emitChange)
+      .then(promisesAreFun(c.S_DATASETS)).then(self.emitChange)
+      .then(promisesAreFun(c.S_DIMENSIONS)).then(self.emitChange)
+      .catch(function () {});
   },
   /**/
-
 
 
   /* Store methods */
@@ -128,126 +113,61 @@ store = _.assign(store, {
   /* Getters-Setters */
     /* Providers */
   getProviders: function () {
-    return getValidData(c.S_PROVIDERS, _state[c.S_PROVIDERS] instanceof Array, []);
+    return getValidData(c.S_PROVIDERS);
   },
   setProviders: function (data) {
-    self.getProviders();
-    _.forEach(data, function (el) {
-      _state[c.S_PROVIDERS].push({'name': el, 'value': []});
+    _state[c.S_PROVIDERS] = _.map(data, function (el) {
+      return {'name': el, 'value': []};
     });
   },
   getSelectedProvider: function () {
-    return getValidData(c.S_SELECTED_PROVIDER, typeof _state[c.S_SELECTED_PROVIDER] === 'string', '');
+    return getValidData(c.S_SELECTED_PROVIDER);
   },
   setSelectedProvider: function (data) {
     _state[c.S_SELECTED_PROVIDER] = data;
-    self.setProviderObj();
+    self.setDatasets([]);
     self.setSelectedDataset('');
-    self.setSelectedDimensions([]);
   },
-  getProviderObj: function () {
-    return getValidData(c.S_PROVIDER_OBJ, typeof _state[c.S_PROVIDER_OBJ] === 'object', {});
-  },
-  setProviderObj: function () {
-    _state[c.S_PROVIDER_OBJ] = _.find(self.getProviders(), {'name': self.getSelectedProvider()});
-  },
-    /**/
-
     /* Datasets */
-  getProviderObjValue: function () {
-    var providerObjValue = self.getProviderObj().value;
-    if (!(providerObjValue instanceof Array)) {
-      _state[c.S_PROVIDER_OBJ].value = [];
-    }
-    return _state[c.S_PROVIDER_OBJ].value;
+  getDatasets: function () {
+    return getValidData(c.S_DATASETS);
   },
-  setProviderObjValue: function (data) {
-    self.getProviderObjValue();
-    _.forEach(data, function (el) {
-      _state[c.S_PROVIDER_OBJ].value.push({'name': el, 'value': []});
+  setDatasets: function (data) {
+    _state[c.S_DATASETS] = _.map(data, function (el) {
+      return {'name': el, 'value': []};
     });
   },
   getSelectedDataset: function () {
-    return getValidData(c.S_SELECTED_DATASET, typeof _state[c.S_SELECTED_DATASET] === 'string', '');
+    return getValidData(c.S_SELECTED_DATASET);
   },
   setSelectedDataset: function (data) {
     _state[c.S_SELECTED_DATASET] = data;
-    self.setDatasetObj();
+    self.setDimensions({});
     self.setSelectedDimensions([]);
   },
-  getDatasetObj: function () {
-    return getValidData(c.S_DATASET_OBJ, typeof _state[c.S_DATASET_OBJ] === 'object', {});
-  },
-  setDatasetObj: function () {
-    _state[c.S_DATASET_OBJ] = _.find(self.getProviderObjValue(), {'name': self.getSelectedDataset()});
-  },
-    /**/
-
     /* Dimensions */
-  getDatasetObjValue: function () {
-    var datasetObjValue = self.getDatasetObj().value;
-    if (!(datasetObjValue instanceof Array)) {
-      _state[c.S_DATASET_OBJ].value = [];
-    }
-    return _state[c.S_DATASET_OBJ].value;
+  getDimensions: function () {
+    return getValidData(c.S_DIMENSIONS);
   },
-  setDatasetObjValue: function (data) {
-    self.getDatasetObjValue();
-    _.forEach(Object.keys(data), function (el) {
-      _state[c.S_DATASET_OBJ].value.push({'name': el, 'value': Object.keys(data[el])});
+  setDimensions: function (data) {
+    _state[c.S_DIMENSIONS] = _.map(Object.keys(data), function (el) {
+      return {'name': el, 'value': Object.keys(data[el])};
     });
   },
 
   getSelectedDimensions: function () {
-    return getValidData(c.S_SELECTED_DIMENSIONS, _state[c.S_SELECTED_DIMENSIONS] instanceof Array, []);
+    return getValidData(c.S_SELECTED_DIMENSIONS);
   },
   setSelectedDimensions: function (data) {
-    self.getSelectedDimensions();
-    _.remove(_state[c.S_SELECTED_DIMENSIONS]);
-    self.getSelectedDimensionsValues();
-    _.remove(_state[c.S_SELECTED_DIMENSIONS_VALUES], function (el) {
-      return !_.find(data, {'value': el.name, 'selected': true});
+    _state[c.S_SELECTED_DIMENSIONS] = _.map(_.filter(data, 'selected'), function (el) {
+      var name = el.value;
+      return {
+        'name': name,
+        'value': _.get(_.find(self.getDimensions(), {'name': name}), 'value'),
+        'selected': _.get(_.find(self.getSelectedDimensions(), {'name': name}), 'selected')
+      };
     });
-    _.forEach(data, function (el) {
-      if (el.selected) {
-        var name = el.value;
-        _state[c.S_SELECTED_DIMENSIONS].push(name);
-        if (!_.find(_state[c.S_SELECTED_DIMENSIONS_VALUES], {'name': name})) {
-          _state[c.S_SELECTED_DIMENSIONS_VALUES].push({
-            'name': name,
-            'value': _.get(_.find(self.getDatasetObjValue(), {'name': name}), 'value')
-          });
-        }
-      }
-    });
-    _state[c.S_SELECTED_DIMENSIONS].sort();
-    _state[c.S_SELECTED_DIMENSIONS_VALUES].sort(function (a, b) {
-      if (a.name < b.name)
-        return -1;
-      else if (a.name > b.name)
-        return 1;
-      else
-        return 0;
-    });
-  },
-  getSelectedDimensionsValues: function () {
-    return getValidData(c.S_SELECTED_DIMENSIONS_VALUES, _state[c.S_SELECTED_DIMENSIONS_VALUES] instanceof Array, []);
-  },
-  setSelectedDimensionsValues: function (data, dimensionName) {
-    self.getSelectedDimensionsValues();
-    var index = _.findIndex(_state[c.S_SELECTED_DIMENSIONS_VALUES], {'name': dimensionName});
-    if (index < 0) {
-      return;
-    }
-    var values = [];
-    _.forEach(data, function (el) {
-      if (el.selected) {
-        values.push(el.value);
-      }
-    });
-    _state[c.S_SELECTED_DIMENSIONS_VALUES][index].selected = values;
   }
-    /**/
   /**/
 
 });
@@ -259,23 +179,24 @@ dispatcher.register(function (action) {
   var data = action.data;
 
 	switch (action.actionType) {
-
 		case c.PROVIDER_CHANGE:
       store.setSelectedProvider(data);
 			break;
-
 		case c.DATASET_CHANGE:
       store.setSelectedDataset(data);
 			break;
-
-		case c.DIMENSION_CHANGE:
+		case c.DIMENSIONS_CHANGE:
       store.setSelectedDimensions(data);
 			break;
-
     case c.DIMENSION_VALUES_CHANGE:
-      store.setSelectedDimensionsValues(data, action.data_);
+      _.set(
+        _.find(_state[c.S_SELECTED_DIMENSIONS], {'name': action.dimensionName}),
+        'selected',
+        _.map(_.filter(data, 'selected'), function (el) {
+          return el.value;
+        })
+      );
       break;
-
     default:
       return;
 	}

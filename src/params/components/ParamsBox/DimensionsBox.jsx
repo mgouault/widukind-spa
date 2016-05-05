@@ -10,11 +10,9 @@ var actions = require('../../../actions');
 var DimensionConfig = React.createClass({
 
   getOptions: function () {
-    var options = [];
-    _.forEach(this.props.data, function (name) {
-      options.push(<option key={name} value={name}>{name}</option>);
+    return _.map(this.props.data, function (el) {
+      return (<option key={el} value={el}>{el}</option>);
     });
-    return options;
   },
 
   onUserInput: function (event) {
@@ -22,17 +20,13 @@ var DimensionConfig = React.createClass({
   },
 
   render: function () {
-    var name = this.props.name;
-    
     // if (invalidData && forever) {
     //   return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
     // }
-
-    var label = _.capitalize(name);
     var options = this.getOptions();
     return (
       <FormGroup controlId={"formControlsSelectMultiple" + name}>
-        <ControlLabel>Select {label}:</ControlLabel>
+        <ControlLabel>Select {this.props.name}:</ControlLabel>
         <FormControl
           componentClass="select"
           onChange={this.onUserInput}
@@ -52,19 +46,14 @@ var DimensionsBox = React.createClass({
     if (_.isEmpty(this.props.data)) {
       return null;
     }
-
-    var toRender = [];
-    _.forEach(this.props.data, function (el) {
-      toRender.push(
-        <DimensionConfig
-          key={el.name}
-          data={el.value}
-          name={el.name}
-          value={el.selected} 
-        />
-      );
+    var toRender = _.map(this.props.data, function (el) {
+      return (<DimensionConfig
+        key={el.name}
+        data={el.value}
+        name={el.name}
+        value={el.selected}
+      />);
     });
-    
     return (
       <div>
         {toRender}

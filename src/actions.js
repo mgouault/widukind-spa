@@ -18,9 +18,9 @@ actions[c.DATASET_CHANGE] = function (event) {
   });
 };
 
-actions[c.DIMENSION_CHANGE] = function (event) {
+actions[c.DIMENSIONS_CHANGE] = function (event) {
   dispatcher.dispatch({
-    'actionType': c.DIMENSION_CHANGE,
+    'actionType': c.DIMENSIONS_CHANGE,
     'data': event.target.options
   });
 };
@@ -29,7 +29,7 @@ actions[c.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
   dispatcher.dispatch({
     'actionType': c.DIMENSION_VALUES_CHANGE,
     'data': event.target.options,
-    'data_': dimensionName
+    'dimensionName': dimensionName
   });
 };
 

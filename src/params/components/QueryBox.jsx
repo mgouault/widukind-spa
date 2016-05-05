@@ -10,21 +10,17 @@ var actions = require('../../actions');
 var QueryBox = React.createClass({
 
   makeUrl: function () {
-    var url = '';
-    url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10';
-    var values = this.props.values;
-    _.forEach(values, function (el) {
-      var name = el.name;
-      var selected = el.selected;
-      if (typeof selected !== 'undefined' && !_.isEmpty(selected)) {
-        var params = '';
-        for (var j = 0; j < selected.length ; j++) {
-          params += ((j > 0) ? '+' : '') + selected[j];
-        }
-        url += '&' + name + '=' + params;
+    var tmp = _.join(_.map(
+      _.filter(this.props.dimensions, function(el) {
+        return !_.isEmpty(el.selected);
+      }),
+      function (el) {
+        return el.name+'='+_.join(el.selected, '+');
       }
-    });
-    return url;
+    ), '&');
+    return 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10'
+      + (!_.isEmpty(tmp) ? '&': '')
+      + tmp;
   },
 
   render: function () {

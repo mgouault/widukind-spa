@@ -1,5 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
+import { Well } from 'react-bootstrap';
 
 var c = require('../../../constants');
 var CustomSelect = require('./CustomSelect.jsx');
@@ -11,54 +12,60 @@ var ParamsBox = React.createClass({
   
   render: function () {
     var toRender = [];
+    var state = this.props.obj;
     
-    var callbacksAreFun = function (name, toReturn, multiple, data) {
+    var callbacksAreFun = function (key, multiple, callback) {
+      var data = state[key];
       if (_.isEmpty(data) && typeof data !== 'undefined') {
         return;
       }
       var value;
-      switch (name) {
-        case c.PROVIDER:
-          value = this.props.obj[c.S_SELECTED_PROVIDER]; break;
-        case c.DATASET:
-          value = this.props.obj[c.S_SELECTED_DATASET]; break;
-        case c.DIMENSION:
-          value = this.props.obj[c.S_SELECTED_DIMENSIONS]; break;
+      switch (key) {
+        case c.S_PROVIDERS:
+          value = state[c.S_SELECTED_PROVIDER];
+          break;
+        case c.S_DATASETS:
+          value = state[c.S_SELECTED_DATASET];
+          break;
+        case c.S_DIMENSIONS:
+          value = _.map(state[c.S_SELECTED_DIMENSIONS], function (obj) {
+            return obj.name
+          });
+          break;
       }
       toRender.push(
         <CustomSelect
-          key={name + 'Select'}
-          name={name}
+          key={key + 'Select'}
+          name={key}
           data={data}
           value={value}
           multiple={multiple}
         />
       );
-      return toReturn;
-    }.bind(this);
+      callback();
+    };
     
-    var data =
-      callbacksAreFun(c.DIMENSION, this.props.obj[c.S_SELECTED_DIMENSIONS_VALUES], true,
-        callbacksAreFun(c.DATASET, this.props.obj[c.S_DATASET_OBJ].value, false,
-          callbacksAreFun(c.PROVIDER, this.props.obj[c.S_PROVIDER_OBJ].value, false,
-            this.props.obj[c.S_PROVIDERS]
-          )
-        )
-      );
-    
-    if (!_.isEmpty(data)) {
-      toRender.push(
-        <DimensionsBox
-          key="DimensionsBox"
-          data={data}
-        />
-      );
-    }
+    callbacksAreFun(c.S_PROVIDERS, false, function () {
+      callbacksAreFun(c.S_DATASETS, false, function () {
+        callbacksAreFun(c.S_DIMENSIONS, true, function () {
+          var data = state[c.S_SELECTED_DIMENSIONS];
+          if (_.isEmpty(data) && typeof data !== 'undefined') {
+            return;
+          }
+          toRender.push(
+            <DimensionsBox
+              key="DimensionsBox"
+              data={data}
+            />
+          );
+        });
+      });
+    });
 
     return (
-      <div>
+      <Well>
         {toRender}
-      </div>
+      </Well>
     );
   }
 });
