@@ -1,5 +1,8 @@
 # widukind-spa
 
+Taiga project - kanban board:
+https://tree.taiga.io/project/mgouault-widukind-spa/kanban
+
 #### Getting started
 
 1. Install all dependencies
