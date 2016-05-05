@@ -1,8 +1,10 @@
 var _ = require('lodash');
 var axios = require('axios');
 
-module.exports = function (url) {
-  return axios.get(url)
+module.exports = function (request) {
+  return axios.get('/data'+request.pathname, {
+      'params': request.query
+    })
     .then(function (received) {
       received = received.data;
       var error = _.get(received, 'error');

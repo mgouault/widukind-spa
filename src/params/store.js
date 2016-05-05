@@ -38,24 +38,33 @@ store = _.assign(store, {
   checkData: function () {
     var promisesAreFun = function (key) {
       return function () {
-        var url, getData, setData, getSelectedData, setSelectedData;
+        var request, getData, setData, getSelectedData, setSelectedData;
         switch (key) {
           case c.S_PROVIDERS:
-            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/keys';
+            request = {
+              'pathname': '/providers',
+              'query': {}
+            };
             getData = self.getProviders;
             setData = self.setProviders;
             getSelectedData = self.getSelectedProvider;
             setSelectedData = self.setSelectedProvider;
             break;
           case c.S_DATASETS:
-            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/providers/' + self.getSelectedProvider() + '/datasets/keys';
+            request = {
+              'pathname': '/datasets',
+              'query': {'provider': self.getSelectedProvider()}
+            };
             getData = self.getDatasets;
             setData = self.setDatasets;
             getSelectedData = self.getSelectedDataset;
             setSelectedData = self.setSelectedDataset;
             break;
           case c.S_DIMENSIONS:
-            url = 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/' + self.getSelectedDataset() + '/dimensions';
+            request = {
+              'pathname': '/dimensions',
+              'query': {'dataset': self.getSelectedDataset()}
+            };
             getData = self.getDimensions;
             setData = self.setDimensions;
             getSelectedData = self.getSelectedDimensions;
@@ -82,7 +91,7 @@ store = _.assign(store, {
         /* Fetch missing data */
         _state[key] = undefined; // Set 'loading state'
         self.emitChange();
-        return apiCall(url)
+        return apiCall(request)
           .then(setData)
           .then(lel);
       }
