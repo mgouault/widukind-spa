@@ -20,9 +20,9 @@ var DimensionConfig = React.createClass({
   },
 
   render: function () {
-    // if (invalidData && forever) {
-    //   return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
-    // }
+    if (_.isEmpty(this.props.data)) {
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
+    }
     var options = this.getOptions();
     return (
       <FormGroup controlId={"formControlsSelectMultiple" + name}>

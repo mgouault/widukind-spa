@@ -1,5 +1,4 @@
 var React = require('react');
-import { Well } from 'react-bootstrap';
 
 var store = require('./store');
 var c = require('../constants');
@@ -33,17 +32,18 @@ var container = React.createClass({
 
   render: function () {
     return (
-      <Well>
+      <div>
         <QueryBox
           key="QueryBox"
           dataset={this.state[c.S_SELECTED_DATASET]}
-          values={this.state[c.S_SELECTED_DIMENSIONS_VALUES]} 
+          dimensions={this.state[c.S_SELECTED_DIMENSIONS]}
+          validJSON={this.state['validJSON']}
         />
         <ParamsBox
           key="ParamsBox"
           obj={this.state}
         />
-      </Well>
+      </div>
     );
   }
 

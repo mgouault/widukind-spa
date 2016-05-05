@@ -16,7 +16,7 @@ var ParamsBox = React.createClass({
     
     var callbacksAreFun = function (key, multiple, callback) {
       var data = state[key];
-      if (_.isEmpty(data) && typeof data !== 'undefined') {
+      if (_.isEmpty(data) && typeof data !== 'undefined' && data !== null) {
         return;
       }
       var value;
@@ -39,7 +39,7 @@ var ParamsBox = React.createClass({
           name={key}
           data={data}
           value={value}
-          multiple={multiple}
+          multiple={multiple} 
         />
       );
       callback();

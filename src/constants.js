@@ -7,6 +7,7 @@ module.exports = keyMirror({
   S_SELECTED_DATASET: null,
   S_DIMENSIONS: null,
   S_SELECTED_DIMENSIONS: null,
+  S_JSON: null,
   
   PROVIDER_CHANGE: null,
   DATASET_CHANGE: null,

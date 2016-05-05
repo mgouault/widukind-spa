@@ -13,5 +13,6 @@ module.exports = function (url) {
     })
     .catch(function (error) {
       console.error(error);
+      return null;
     });
 };

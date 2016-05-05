@@ -16,6 +16,7 @@ _statePattern[c.S_DATASETS] = [];
 _statePattern[c.S_SELECTED_DATASET] = '';
 _statePattern[c.S_DIMENSIONS] = [];
 _statePattern[c.S_SELECTED_DIMENSIONS] = [];
+_statePattern['validJSON'] = true;
 
 var _state = _.clone(_statePattern);
 
@@ -116,6 +117,9 @@ store = _.assign(store, {
     return getValidData(c.S_PROVIDERS);
   },
   setProviders: function (data) {
+    if (data === null) {
+      return _state[c.S_PROVIDERS] = null;
+    }
     _state[c.S_PROVIDERS] = _.map(data, function (el) {
       return {'name': el, 'value': []};
     });
@@ -133,6 +137,9 @@ store = _.assign(store, {
     return getValidData(c.S_DATASETS);
   },
   setDatasets: function (data) {
+    if (data === null) {
+      return _state[c.S_DATASETS] = null;
+    }
     _state[c.S_DATASETS] = _.map(data, function (el) {
       return {'name': el, 'value': []};
     });
@@ -150,6 +157,9 @@ store = _.assign(store, {
     return getValidData(c.S_DIMENSIONS);
   },
   setDimensions: function (data) {
+    if (data === null) {
+      return _state[c.S_DIMENSIONS] = null;
+    }
     _state[c.S_DIMENSIONS] = _.map(Object.keys(data), function (el) {
       return {'name': el, 'value': Object.keys(data[el])};
     });
@@ -196,6 +206,9 @@ dispatcher.register(function (action) {
           return el.value;
         })
       );
+      break;
+    case c.REQUEST_JSON:
+      _state['validJSON'] = (typeof data !== 'undefined');
       break;
     default:
       return;

@@ -17,9 +17,9 @@ var CustomSelect = React.createClass({
   },
 
   render: function () {
-    // if (invalidData && forever) {
-    //   return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
-    // }
+    if (this.props.data === null) {
+      return (<Alert key="dataNotFound" bsStyle="danger">Error: data not found</Alert>);
+    }
     var options = this.getOptions();
     var onChange, name;
     switch (this.props.name) {
@@ -36,7 +36,6 @@ var CustomSelect = React.createClass({
         name = 'Dimension';
         break;
     }
-
     return (
       <Loader loaded={!(typeof this.props.data === 'undefined')}>
         <FormGroup controlId={"formControlsSelect" + name}>

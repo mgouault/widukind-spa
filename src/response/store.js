@@ -40,11 +40,9 @@ dispatcher.register(function (action) {
   var data = action.data;
   
   switch (action.actionType) {
-    
     case c.REQUEST_JSON:
       _state.json = data;
       break;
-    
     default:
       return;
   }
