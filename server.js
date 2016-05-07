@@ -20,7 +20,7 @@ app.use(function(req, res, next) {
 
 
 app.use('/data/:key', function (req, res, next) {
-  var URLObj = config.get('api.URLObj');
+  var URLObj = _.clone(config.get('api.URLObj'));
   switch (req.params.key) {
     case 'providers':
       URLObj.pathname += '/providers/keys'; break;
