@@ -9,7 +9,7 @@ var actions = require('../../actions');
 
 var QueryBox = React.createClass({
 
-  makeUrl: function () {
+  makeQuerystring: function () {
     var tmp = _.join(_.map(
       _.filter(this.props.dimensions, function(el) {
         return !_.isEmpty(el.selected);
@@ -18,21 +18,15 @@ var QueryBox = React.createClass({
         return el.name+'='+_.join(el.selected, '+');
       }
     ), '&');
-    return 'http://widukind-api-dev.cepremap.org/api/v1/json/datasets/'+this.props.dataset+'/values?limit=10'
-      + (!_.isEmpty(tmp) ? '&': '')
-      + tmp;
+    return (!_.isEmpty(tmp) ? '&': '') + tmp;
   },
 
   render: function () {
-    var url = this.makeUrl();
     var requestJSON = function () {
-      actions[c.REQUEST_JSON](url);
+      actions[c.REQUEST_JSON](this.props.dataset, this.makeQuerystring());
     }.bind(this);
     return (
       <Well>
-        <pre>
-          {url}
-        </pre>
         <Button onClick={requestJSON} disabled={!this.props.validJSON}>
           Request JSON
         </Button>
