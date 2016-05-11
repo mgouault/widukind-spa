@@ -3,7 +3,7 @@ var ReactDOM = require('react-dom');
 import { Grid, Row, Col } from 'react-bootstrap';
 
 var ParamsContainer = require('./params/Container.jsx');
-var ResponseContainer = require('./response/container.jsx');
+var ResponseContainer = require('./response/Container.jsx');
 
 
 
