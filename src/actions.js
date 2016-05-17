@@ -33,7 +33,7 @@ actions[c.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
   });
 };
 
-actions[c.REQUEST_JSON] = function (dataset, querystring) {
+actions[c.REQUEST_JSON] = function (dataset, controls) {
   dispatcher.dispatch({
     'actionType': c.REQUEST_JSON
   });
@@ -41,7 +41,7 @@ actions[c.REQUEST_JSON] = function (dataset, querystring) {
     'pathname': '/json',
     'query': {
       'dataset': dataset,
-      'querystring': querystring
+      'controls': controls
     }
   }).then(function (data) {
     dispatcher.dispatch({

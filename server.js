@@ -1,13 +1,26 @@
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
+var querystring = require('querystring');
 var rp = require('request-promise');
 var url = require('url');
 var config = require('config');
 var _ = require('lodash');
 
+var configURLObj = config.get('api.URLObj');
+var URLObj = {
+  'protocol': process.env['WIDUKIND_API_PROTOCOL'] || configURLObj['protocol'],
+  'host': process.env['WIDUKIND_API_HOST'] || configURLObj['host'],
+  'hostname': process.env['WIDUKIND_API_HOSTNAME'] || configURLObj['hostname'],
+  'port': process.env['WIDUKIND_API_PORT'] || configURLObj['port'],
+  'pathname': process.env['WIDUKIND_API_PATHNAME'] || configURLObj['pathname'],
+  'query': {
+    'limit': process.env['WIDUKIND_SPA_LIMIT'] || _.get(configURLObj, 'query.limit')
+  }
+};
+
 var app = express();
-app.set('port', (process.env.PORT || config.get('app.port')));
+app.set('port', (process.env['WIDUKIND_SPA_PORT'] || config.get('app.port')));
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -20,24 +33,40 @@ app.use(function(req, res, next) {
 
 
 app.use('/data/:key', function (req, res, next) {
-  var URLObj = _.clone(config.get('api.URLObj'));
+  function makeQuery (controls) {
+    var res = {};
+    _.forEach(controls, function (el) {
+      el = JSON.parse(el);
+      if (!_.isEmpty(el.selected)) {
+        var tmp = {};
+        tmp[el.name] = _.join(el.selected, '+');
+        _.assign(res, tmp);
+      }
+    });
+    return res;
+  }
+
+  var URL = _.clone(URLObj);
+  var pathname = URL['pathname'] || '';
   switch (req.params.key) {
     case 'providers':
-      URLObj.pathname += '/providers/keys'; break;
+      pathname += '/providers/keys'; break;
     case 'datasets':
-      URLObj.pathname += '/providers/'+req.query.provider+'/datasets/keys'; break;
+      pathname += '/providers/'+req.query['provider']+'/datasets/keys'; break;
     case 'dimensions':
-      URLObj.pathname += '/datasets/'+req.query.dataset+'/dimensions'; break;
+      pathname += '/datasets/'+req.query['dataset']+'/dimensions'; break;
     case 'json':
-      URLObj.pathname += '/datasets/'+req.query.dataset+'/values';
-      _.assign(URLObj.query, req.query.controls);
-      break;
+      pathname += '/datasets/'+req.query['dataset']+'/values';
+      _.assign(URL['query'], makeQuery(req.query['controls'])); break;
     default:
       var err = new Error();
       err.status = 400;
       return next(err);
   }
-  rp(url.format(URLObj))
+  URL['pathname'] = pathname;
+  URL['search'] = querystring.stringify(URL['query'], null, null, {'encodeURIComponent': querystring.unescape});
+
+  rp(url.format(URL))
     .then(function (response) {
       req.responseData = response;
       next();
