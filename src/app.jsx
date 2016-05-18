@@ -5,8 +5,6 @@ import { Col } from 'react-bootstrap';
 var ParamsContainer = require('./params/Container.jsx');
 var ResponseContainer = require('./response/Container.jsx');
 
-
-
 var WidukindSPA = React.createClass({
   
   render: function () {
