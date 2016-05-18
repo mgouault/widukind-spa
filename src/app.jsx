@@ -13,10 +13,43 @@ var WidukindSPA = React.createClass({
     return (
       <Grid>
         <Row>
-          <Col lg={4} md={4} sm={4} xs={4}>
+
+
+
+          <div class="container">
+
+            <div class="header clearfix">
+              <nav>
+                <ul class="nav nav-pills pull-right">
+                  <li role="presentation" class="active"><a href="#">Home</a></li>
+                  <li role="presentation"><a href="#">About</a></li>
+                </ul>
+              </nav>
+              <h3 class="text-muted">Project name</h3>
+            </div>
+
+            <footer class="footer">
+            </footer>
+
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <Col lg={4}>
             <ParamsContainer />
           </Col>
-          <Col lg={8} md={8} sm={8} xs={8}>
+          <Col lg={8}>
             <ResponseContainer />
           </Col>
         </Row>
