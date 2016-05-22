@@ -178,7 +178,7 @@ store = _.assign(store, {
     return getValidData(c.S_SELECTED_DIMENSIONS);
   },
   setSelectedDimensions: function (data) {
-    _state[c.S_SELECTED_DIMENSIONS] = _.map(_.filter(data, 'selected'), function (el) {
+    _state[c.S_SELECTED_DIMENSIONS] = _.map(data, function (el) {
       var name = el.value;
       return {
         'name': name,
@@ -199,10 +199,10 @@ dispatcher.register(function (action) {
 
 	switch (action.actionType) {
 		case c.PROVIDER_CHANGE:
-      store.setSelectedProvider(data);
+      store.setSelectedProvider(data.value);
 			break;
 		case c.DATASET_CHANGE:
-      store.setSelectedDataset(data);
+      store.setSelectedDataset(data.value);
 			break;
 		case c.DIMENSIONS_CHANGE:
       store.setSelectedDimensions(data);
@@ -211,9 +211,7 @@ dispatcher.register(function (action) {
       _.set(
         _.find(_state[c.S_SELECTED_DIMENSIONS], {'name': action.dimensionName}),
         'selected',
-        _.map(_.filter(data, 'selected'), function (el) {
-          return el.value;
-        })
+        _.map(data, function (el) { return el.value; })
       );
       break;
     case c.REQUEST_JSON:
