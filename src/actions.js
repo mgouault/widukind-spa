@@ -7,28 +7,28 @@ var actions = {};
 actions[c.PROVIDER_CHANGE] = function (event) {
   dispatcher.dispatch({
     'actionType': c.PROVIDER_CHANGE,
-    'data': event.target.value
+    'data': event
   });
 };
 
 actions[c.DATASET_CHANGE] = function (event) {
   dispatcher.dispatch({
     'actionType': c.DATASET_CHANGE,
-    'data': event.target.value
+    'data': event
   });
 };
 
 actions[c.DIMENSIONS_CHANGE] = function (event) {
   dispatcher.dispatch({
     'actionType': c.DIMENSIONS_CHANGE,
-    'data': event.target.options
+    'data': event
   });
 };
 
 actions[c.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
   dispatcher.dispatch({
     'actionType': c.DIMENSION_VALUES_CHANGE,
-    'data': event.target.options,
+    'data': event,
     'dimensionName': dimensionName
   });
 };

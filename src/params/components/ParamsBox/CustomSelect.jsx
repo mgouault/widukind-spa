@@ -2,6 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
 var Loader = require('react-loader');
+var Select = require('react-select');
 
 var c = require('../../../constants');
 var actions = require('../../../actions');
@@ -12,7 +13,7 @@ var CustomSelect = React.createClass({
   
   getOptions: function () {
     return _.map(this.props.data, function (el) {
-      return (<option key={el.name} value={el.name}>{el.name}</option>);
+      return ({ 'value':el.name, 'label':el.name });
     });
   },
 
@@ -37,19 +38,17 @@ var CustomSelect = React.createClass({
         break;
     }
     return (
-      <Loader loaded={!(typeof this.props.data === 'undefined')}>
-        <FormGroup controlId={"formControlsSelect" + name}>
-          <ControlLabel>{name}:</ControlLabel>
-          <FormControl
-            componentClass="select"
+      <div>
+        {name}:
+        <Loader loaded={!(typeof this.props.data === 'undefined')}>
+          <Select
             onChange={onChange}
             value={this.props.value}
-            multiple={this.props.multiple}
-          >
-            {options}
-          </FormControl>
-        </FormGroup>
-      </Loader>
+            multi={this.props.multiple}
+            options={options}
+          />
+        </Loader>
+      </div>
     );
   }
 });

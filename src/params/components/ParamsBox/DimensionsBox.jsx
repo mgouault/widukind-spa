@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 import { FormGroup, ControlLabel, FormControl, Alert } from 'react-bootstrap';
+var Select = require('react-select');
 
 var c = require('../../../constants');
 var actions = require('../../../actions');
@@ -11,7 +12,7 @@ var DimensionConfig = React.createClass({
 
   getOptions: function () {
     return _.map(this.props.data, function (el) {
-      return (<option key={el} value={el}>{el}</option>);
+      return ({ 'value':el, 'label':el });
     });
   },
 
@@ -25,17 +26,15 @@ var DimensionConfig = React.createClass({
     }
     var options = this.getOptions();
     return (
-      <FormGroup controlId={"formControlsSelectMultiple" + name}>
-        <ControlLabel>Select {this.props.name}:</ControlLabel>
-        <FormControl
-          componentClass="select"
+      <div>
+        Select {this.props.name}:
+        <Select
           onChange={this.onUserInput}
           value={this.props.value}
-          multiple
-        >
-          {options}
-        </FormControl>
-      </FormGroup>
+          multi
+          options={options}
+        />
+      </div>
     );
   }
 });
