@@ -1,7 +1,6 @@
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
-var querystring = require('querystring');
 var rp = require('request-promise');
 var url = require('url');
 var config = require('config');
@@ -64,9 +63,8 @@ app.use('/data/:key', function (req, res, next) {
       return next(err);
   }
   URL['pathname'] = pathname;
-  URL['search'] = querystring.stringify(URL['query'], null, null, {'encodeURIComponent': querystring.unescape});
 
-  rp(url.format(URL))
+  rp(unescape(url.format(URL)))
     .then(function (response) {
       req.responseData = response;
       next();
