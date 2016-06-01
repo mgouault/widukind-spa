@@ -5,6 +5,7 @@ var rp = require('request-promise');
 var url = require('url');
 var config = require('config');
 var _ = require('lodash');
+//var EventEmitter = require('events').EventEmitter;
 
 var configURLObj = config.get('api.URLObj');
 var URLObj = {
@@ -80,6 +81,15 @@ app.use(function (err, req, res, next) {
 
 
 
-app.listen(app.get('port'), function() {
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+io.on('connection', function (socket) {
+  socket.emit('urlChange', URLObj);
+  // listener.on('newUrl', function () {
+  //   socket.emit('urlChange', URLObj);
+  // })
+});
+
+server.listen(app.get('port'), function() {
   console.log('Server started: http://localhost:'+app.get('port')+'/');
 });

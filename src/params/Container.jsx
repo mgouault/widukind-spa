@@ -24,6 +24,7 @@ var container = React.createClass({
   componentDidMount: function () {
     store.addChangeListener(this._onChange);
     store.checkData();
+    store.connect();
   },
 
   componentWillUnmount: function () {
@@ -38,6 +39,7 @@ var container = React.createClass({
           dataset={this.state[c.S_SELECTED_DATASET]}
           dimensions={this.state[c.S_SELECTED_DIMENSIONS]}
           validJSON={this.state['validJSON']}
+          config={this.state['config']}
         />
         <ParamsBox
           key="ParamsBox"

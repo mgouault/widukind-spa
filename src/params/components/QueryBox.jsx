@@ -8,19 +8,10 @@ var actions = require('../../actions');
 
 
 
-var URLObj = {
-  'protocol': 'http',
-  'hostname': 'widukind-api-dev.cepremap.org',
-  'pathname': '/api/v1/json',
-  'query': {
-    'limit': 10
-  }
-};
-
 var QueryBox = React.createClass({
 
   makeUrl: function () {
-    var URL = _.clone(URLObj);
+    var URL = _.clone(this.props.config);
     URL['pathname'] += '/datasets/'+this.props.dataset+'/values';
     _.forEach(this.props.dimensions, function (el) {
       if (!_.isEmpty(el.selected)) {

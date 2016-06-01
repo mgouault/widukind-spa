@@ -3,7 +3,9 @@ var EventEmitter = require('events').EventEmitter;
 
 var dispatcher = require('../dispatcher');
 var c = require('../constants');
+var actions = require('../actions');
 var apiCall = require('../apiCall');
+/* global io */
 
 
 
@@ -17,6 +19,7 @@ _statePattern[c.S_SELECTED_DATASET] = '';
 _statePattern[c.S_DIMENSIONS] = [];
 _statePattern[c.S_SELECTED_DIMENSIONS] = [];
 _statePattern['validJSON'] = true;
+_statePattern['config'] = {};
 
 var _state = _.clone(_statePattern);
 
@@ -77,7 +80,7 @@ store = _.assign(store, {
           throw null;
         }
         /* Set select default value if it's undefined */
-        var lel = function () {
+        var setDefault = function () {
           var value = getSelectedData();
           if (_.isEmpty(value) && key !== c.S_DIMENSIONS) {
             value = _.get(_.head(getData()), 'name', '');
@@ -85,7 +88,7 @@ store = _.assign(store, {
           }
         };
         if (!_.isEmpty(getData())) {
-          lel();
+          setDefault();
           return Promise.resolve();
         }
         /* Fetch missing data */
@@ -93,7 +96,7 @@ store = _.assign(store, {
         self.emitChange();
         return apiCall(request)
           .then(setData)
-          .then(lel);
+          .then(setDefault);
       }
     };
     return promisesAreFun(c.S_PROVIDERS)().then(self.emitChange)
@@ -119,6 +122,12 @@ store = _.assign(store, {
   },
   /**/
 
+  connect: function () {
+    var socket = io();
+    socket.on('urlChange', function (data) {
+      actions[c.CONFIG_UPDATE](data);
+    });
+  },
 
   /* Getters-Setters */
     /* Providers */
@@ -196,32 +205,43 @@ store = _.assign(store, {
 
 dispatcher.register(function (action) {
   var data = action.data;
-
 	switch (action.actionType) {
+    
 		case c.PROVIDER_CHANGE:
       store.setSelectedProvider(data.value);
+      store.checkData();
 			break;
+    
 		case c.DATASET_CHANGE:
       store.setSelectedDataset(data.value);
+      store.checkData();
 			break;
+    
 		case c.DIMENSIONS_CHANGE:
       store.setSelectedDimensions(data);
+      store.checkData();
 			break;
+    
     case c.DIMENSION_VALUES_CHANGE:
       _.set(
         _.find(_state[c.S_SELECTED_DIMENSIONS], {'name': action.dimensionName}),
         'selected',
         _.map(data, function (el) { return el.value; })
       );
+      store.checkData();
       break;
+    
     case c.REQUEST_JSON:
       _state['validJSON'] = (typeof data !== 'undefined');
+      store.emitChange();
       break;
-    default:
-      return;
+    
+    case c.CONFIG_UPDATE:
+      _state['config'] = data;
+      store.emitChange();
+      break;
+    
 	}
-
-  store.checkData();
 });
 
 module.exports = store;

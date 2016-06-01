@@ -13,6 +13,7 @@ module.exports = keyMirror({
   DATASET_CHANGE: null,
   DIMENSIONS_CHANGE: null,
   DIMENSION_VALUES_CHANGE: null,
-  REQUEST_JSON: null
+  REQUEST_JSON: null,
+  CONFIG_UPDATE: null
 });
  
