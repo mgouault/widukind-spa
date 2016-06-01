@@ -2,8 +2,7 @@ var React = require('react');
 
 var store = require('./store');
 var c = require('../constants');
-var QueryBox = require('./components/QueryBox.jsx');
-var ParamsBox = require('./components/ParamsBox/ParamsBox.jsx');
+var UrlDisplay = require('./components/UrlDisplay.jsx');
 
 
 
@@ -23,7 +22,7 @@ var container = React.createClass({
 
   componentDidMount: function () {
     store.addChangeListener(this._onChange);
-    store.checkData();
+    store.connect();
   },
 
   componentWillUnmount: function () {
@@ -33,15 +32,11 @@ var container = React.createClass({
   render: function () {
     return (
       <div>
-        <QueryBox
-          key="QueryBox"
+        <UrlDisplay
+          key="UrlDisplay"
           dataset={this.state[c.S_SELECTED_DATASET]}
           dimensions={this.state[c.S_SELECTED_DIMENSIONS]}
-          validJSON={this.state['validJSON']}
-        />
-        <ParamsBox
-          key="ParamsBox"
-          obj={this.state}
+          config={this.state['config']}
         />
       </div>
     );

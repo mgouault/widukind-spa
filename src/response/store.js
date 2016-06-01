@@ -50,6 +50,4 @@ dispatcher.register(function (action) {
   store.emitChange();
 });
 
-
-
 module.exports = store;

@@ -5,7 +5,6 @@ var dispatcher = require('../dispatcher');
 var c = require('../constants');
 var actions = require('../actions');
 var apiCall = require('../apiCall');
-/* global io */
 
 
 
@@ -19,9 +18,8 @@ _statePattern[c.S_SELECTED_DATASET] = '';
 _statePattern[c.S_DIMENSIONS] = [];
 _statePattern[c.S_SELECTED_DIMENSIONS] = [];
 _statePattern['validJSON'] = true;
-_statePattern['config'] = {};
 
-var _state = _.clone(_statePattern);
+var _state = _.cloneDeep(_statePattern);
 
 
 
@@ -105,8 +103,7 @@ store = _.assign(store, {
       .catch(function () {});
   },
   /**/
-
-
+  
   /* Store methods */
   getState: function () {
     return _state;
@@ -121,14 +118,7 @@ store = _.assign(store, {
     self.removeListener(CHANGE_EVENT, callback);
   },
   /**/
-
-  connect: function () {
-    var socket = io();
-    socket.on('urlChange', function (data) {
-      actions[c.CONFIG_UPDATE](data);
-    });
-  },
-
+  
   /* Getters-Setters */
     /* Providers */
   getProviders: function () {
@@ -195,53 +185,47 @@ store = _.assign(store, {
         'selected': _.get(_.find(self.getSelectedDimensions(), {'name': name}), 'selected')
       };
     });
-  }
+  },
   /**/
 
+  dispatchToken: dispatcher.register(function (action) {
+    var data = action.data;
+    switch (action.actionType) {
+
+      case c.PROVIDER_CHANGE:
+        self.setSelectedProvider(data.value);
+        self.checkData();
+        break;
+
+      case c.DATASET_CHANGE:
+        self.setSelectedDataset(data.value);
+        self.checkData();
+        break;
+
+      case c.DIMENSIONS_CHANGE:
+        self.setSelectedDimensions(data);
+        self.checkData();
+        break;
+
+      case c.DIMENSION_VALUES_CHANGE:
+        _.set(
+          _.find(_state[c.S_SELECTED_DIMENSIONS], {'name': action.dimensionName}),
+          'selected',
+          _.map(data, function (el) { return el.value; })
+        );
+        self.checkData();
+        break;
+
+      case c.REQUEST_JSON:
+        _state['validJSON'] = (typeof data !== 'undefined');
+        self.emitChange();
+        break;
+
+    }
+  })
+
 });
 
 
-
-
-dispatcher.register(function (action) {
-  var data = action.data;
-	switch (action.actionType) {
-    
-		case c.PROVIDER_CHANGE:
-      store.setSelectedProvider(data.value);
-      store.checkData();
-			break;
-    
-		case c.DATASET_CHANGE:
-      store.setSelectedDataset(data.value);
-      store.checkData();
-			break;
-    
-		case c.DIMENSIONS_CHANGE:
-      store.setSelectedDimensions(data);
-      store.checkData();
-			break;
-    
-    case c.DIMENSION_VALUES_CHANGE:
-      _.set(
-        _.find(_state[c.S_SELECTED_DIMENSIONS], {'name': action.dimensionName}),
-        'selected',
-        _.map(data, function (el) { return el.value; })
-      );
-      store.checkData();
-      break;
-    
-    case c.REQUEST_JSON:
-      _state['validJSON'] = (typeof data !== 'undefined');
-      store.emitChange();
-      break;
-    
-    case c.CONFIG_UPDATE:
-      _state['config'] = data;
-      store.emitChange();
-      break;
-    
-	}
-});
 
 module.exports = store;

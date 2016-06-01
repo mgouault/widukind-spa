@@ -36,17 +36,17 @@ app.use('/data/:key', function (req, res, next) {
   function makeQuery (controls) {
     var res = {};
     _.forEach(controls, function (el) {
-      el = JSON.parse(el);
-      if (!_.isEmpty(el.selected)) {
-        var tmp = {};
-        tmp[el.name] = _.join(el.selected, '+');
-        _.assign(res, tmp);
+      var tmp = JSON.parse(el);
+      if (!_.isEmpty(tmp.selected)) {
+        var obj = {};
+        obj[tmp.name] = _.join(tmp.selected, '+');
+        _.assign(res, obj);
       }
     });
     return res;
   }
 
-  var URL = _.clone(URLObj);
+  var URL = _.cloneDeep(URLObj);
   var pathname = URL['pathname'] || '';
   switch (req.params.key) {
     case 'providers':
@@ -57,7 +57,8 @@ app.use('/data/:key', function (req, res, next) {
       pathname += '/datasets/'+req.query['dataset']+'/dimensions'; break;
     case 'json':
       pathname += '/datasets/'+req.query['dataset']+'/values';
-      _.assign(URL['query'], makeQuery(req.query['controls'])); break;
+      _.assign(URL['query'], makeQuery(req.query['controls']));
+      break;
     default:
       var err = new Error();
       err.status = 400;
@@ -78,7 +79,6 @@ app.use('/data/:key', function (req, res, next) {
 app.use(function (err, req, res, next) {
   res.status(err.status).json(err);
 });
-
 
 
 var server = require('http').Server(app);
