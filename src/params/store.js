@@ -169,7 +169,11 @@ store = _.assign(store, {
       return _state[c.S_DIMENSIONS] = null;
     }
     _state[c.S_DIMENSIONS] = _.map(Object.keys(data), function (el) {
-      return {'name': el, 'value': Object.keys(data[el])};
+      var value = Object.keys(data[el]);
+      if (el === 'frequency') {
+        value = _.map(value, _.upperCase);
+      }
+      return {'name': el, 'value': value};
     });
   },
 
