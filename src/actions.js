@@ -51,4 +51,11 @@ actions[c.REQUEST_JSON] = function (dataset, controls) {
   });
 };
 
+actions[c.CONFIG_UPDATE] = function (config) {
+  dispatcher.dispatch({
+    'actionType': c.CONFIG_UPDATE,
+    'data': config
+  });
+};
+
 module.exports = actions;
