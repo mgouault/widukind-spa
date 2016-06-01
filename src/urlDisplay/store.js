@@ -12,8 +12,8 @@ var ParamsStore = require('../params/store');
 var CHANGE_EVENT = 'change';
 
 var _statePattern = {};
-_statePattern[c.S_DATASETS] = [];
-_statePattern[c.S_DIMENSIONS] = [];
+_statePattern[c.S_SELECTED_DATASET] = '';
+_statePattern[c.S_SELECTED_DIMENSIONS] = [];
 _statePattern['config'] = {};
 
 var _state = _.cloneDeep(_statePattern);
@@ -39,28 +39,29 @@ store = _.assign(store, {
   },
   /**/
 
-  connect: function () {
+  init: function () {
+    ParamsStore.addChangeListener(self.updateState);
+
     var socket = io();
     socket.on('urlChange', function (data) {
       actions[c.CONFIG_UPDATE](data);
     });
   },
 
+  updateState: function () {
+    var paramsState = ParamsStore.getState();
+    _state['S_SELECTED_DATASET'] = paramsState['S_SELECTED_DATASET'];
+    _state['S_SELECTED_DIMENSIONS'] = paramsState['S_SELECTED_DIMENSIONS'];
+    self.emitChange();
+  },
+
   dispatchToken: dispatcher.register(function (action) {
     var data = action.data;
     switch (action.actionType) {
 
-      case c.PROVIDER_CHANGE || c.DATASET_CHANGE || c.DIMENSIONS_CHANGE || c.DIMENSION_VALUES_CHANGE:
-        dispatcher.waitFor([ParamsStore.dispatchToken]);
-        var paramsState = ParamsStore.getState();
-        _state['S_DATASETS'] = paramsState['S_DATASETS'];
-        _state['S_DIMENSIONS'] = paramsState['S_DIMENSIONS'];
-        store.emitChange();
-        break;
-
       case c.CONFIG_UPDATE:
         _state['config'] = data;
-        store.emitChange();
+        self.emitChange();
         break;
 
     }
