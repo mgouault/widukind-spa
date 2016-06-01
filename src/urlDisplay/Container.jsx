@@ -22,7 +22,7 @@ var container = React.createClass({
 
   componentDidMount: function () {
     store.addChangeListener(this._onChange);
-    store.connect();
+    store.init();
   },
 
   componentWillUnmount: function () {
