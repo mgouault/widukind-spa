@@ -39,6 +39,13 @@ store = _.assign(store, {
   },
   /**/
 
+  updateState: function () {
+    var paramsState = ParamsStore.getState();
+    _state['S_SELECTED_DATASET'] = paramsState['S_SELECTED_DATASET'];
+    _state['S_SELECTED_DIMENSIONS'] = paramsState['S_SELECTED_DIMENSIONS'];
+    self.emitChange();
+  },
+
   init: function () {
     ParamsStore.addChangeListener(self.updateState);
 
@@ -48,22 +55,13 @@ store = _.assign(store, {
     });
   },
 
-  updateState: function () {
-    var paramsState = ParamsStore.getState();
-    _state['S_SELECTED_DATASET'] = paramsState['S_SELECTED_DATASET'];
-    _state['S_SELECTED_DIMENSIONS'] = paramsState['S_SELECTED_DIMENSIONS'];
-    self.emitChange();
-  },
-
   dispatchToken: dispatcher.register(function (action) {
     var data = action.data;
     switch (action.actionType) {
-
       case c.CONFIG_UPDATE:
         _state['config'] = data;
         self.emitChange();
         break;
-
     }
   })
   

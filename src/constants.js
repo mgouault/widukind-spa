@@ -7,13 +7,16 @@ module.exports = keyMirror({
   S_SELECTED_DATASET: null,
   S_DIMENSIONS: null,
   S_SELECTED_DIMENSIONS: null,
-  S_JSON: null,
+  S_SERIES: null,
+  S_LOG: null,
+  S_LOG_DISPLAYED: null,
   
   PROVIDER_CHANGE: null,
   DATASET_CHANGE: null,
   DIMENSIONS_CHANGE: null,
   DIMENSION_VALUES_CHANGE: null,
-  REQUEST_JSON: null,
-  CONFIG_UPDATE: null
+  REQUEST_SERIES: null,
+  CONFIG_UPDATE: null,
+  DISPLAY_LOG: null
 });
  

@@ -1,6 +1,5 @@
 var dispatcher = require('./dispatcher');
 var c = require('./constants');
-var apiCall = require('./apiCall');
 
 var actions = {};
 
@@ -33,28 +32,16 @@ actions[c.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
   });
 };
 
-actions[c.REQUEST_JSON] = function (dataset, controls) {
-  dispatcher.dispatch({
-    'actionType': c.REQUEST_JSON
-  });
-  apiCall({
-    'pathname': '/json',
-    'query': {
-      'dataset': dataset,
-      'controls': controls
-    }
-  }).then(function (data) {
-    dispatcher.dispatch({
-      'actionType': c.REQUEST_JSON,
-      'data': data
-    });
-  });
-};
-
 actions[c.CONFIG_UPDATE] = function (config) {
   dispatcher.dispatch({
     'actionType': c.CONFIG_UPDATE,
     'data': config
+  });
+};
+
+actions[c.DISPLAY_LOG] = function () {
+  dispatcher.dispatch({
+    'actionType': c.DISPLAY_LOG
   });
 };
 

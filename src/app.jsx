@@ -2,9 +2,9 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 import { Col } from 'react-bootstrap';
 
-var UrlDisplayContainer = require('./urlDisplay/Container.jsx');
 var ParamsContainer = require('./params/Container.jsx');
 var ResponseContainer = require('./response/Container.jsx');
+var UrlDisplayContainer = require('./urlDisplay/Container.jsx');
 
 
 
@@ -12,7 +12,7 @@ var WidukindSPA = React.createClass({
   
   render: function () {
     return (
-      <div className="container">
+      <div className="container-fluid">
         
         <div className="header clearfix">
           <nav>

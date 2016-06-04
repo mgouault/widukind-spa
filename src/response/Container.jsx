@@ -1,10 +1,10 @@
 var React = require('react');
-var _ = require('lodash');
-var {Dygraph} = require('react-dygraphs');
-var moment = require('moment');
 
 var store = require('./store');
-var ResponseBox = require('./components/ResponseBox.jsx');
+var c = require('../constants');
+var Graph = require('./components/Graph.jsx');
+var Table = require('./components/Table.jsx');
+var LogBox = require('./components/LogBox.jsx');
 
 
 
@@ -24,6 +24,7 @@ var container = React.createClass({
 
   componentDidMount: function () {
     store.addChangeListener(this._onChange);
+    store.init();
   },
 
   componentWillUnmount: function () {
@@ -31,46 +32,17 @@ var container = React.createClass({
   },
 
   render: function () {
-    var toRender = [];
-    var series = this.state.json;
-    if (series) {
-      var data = {};
-      _.forEach(series, function (serie) {
-        _.forEach(serie.values, function (value) {
-          var key = moment(value.period).toISOString();
-          if (!key) {
-            return;
-          }
-          if (!data[key]) {
-            data[key] = [];
-          }
-          data[key].push(value.value);
-        });
-      });
-
-      var graphData = _.map(Object.keys(data), function (key_) {
-        var tmp = [];
-        tmp.push(moment(key_));
-        _.forEach(data[key_], function (el) {
-          tmp.push(parseFloat(el));
-        });
-        return tmp;
-      });
-
-      if (!_.isEmpty(graphData) && !_.isEmpty(_.head(graphData))) {
-        toRender.push(
-          <Dygraph
-            key="dygraph"
-            data={graphData}
-          />
-        );
-      }
-    }
     return (
       <div>
-        {toRender}
-        <ResponseBox
-          json={series}
+        {/*<Graph
+          series={this.state[c.S_SERIES]}
+        />*/}
+        <Table
+          series={this.state[c.S_SERIES]}
+        />
+        <LogBox
+          log={this.state[c.S_LOG]}
+          displayed={this.state[c.S_LOG_DISPLAYED]}
         />
       </div>
     );

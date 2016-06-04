@@ -17,7 +17,7 @@ _statePattern[c.S_DATASETS] = [];
 _statePattern[c.S_SELECTED_DATASET] = '';
 _statePattern[c.S_DIMENSIONS] = [];
 _statePattern[c.S_SELECTED_DIMENSIONS] = [];
-_statePattern['validJSON'] = true;
+_statePattern[c.S_SERIES] = [];
 
 var _state = _.cloneDeep(_statePattern);
 
@@ -100,10 +100,27 @@ store = _.assign(store, {
     return promisesAreFun(c.S_PROVIDERS)().then(self.emitChange)
       .then(promisesAreFun(c.S_DATASETS)).then(self.emitChange)
       .then(promisesAreFun(c.S_DIMENSIONS)).then(self.emitChange)
+      .then(self.requestSeries).then(self.emitChange)
       .catch(function () {});
   },
   /**/
-  
+
+  requestSeries: function () {
+    var dataset = _state[c.S_SELECTED_DATASET];
+    if (!dataset) {
+      return Promise.resolve();
+    }
+    return apiCall({
+      'pathname': '/series',
+      'query': {
+        'dataset': dataset,
+        'controls': _state[c.S_DIMENSIONS]
+      }
+    }).then(function (data) {
+      _state[c.S_SERIES] = data;
+    });
+  },
+
   /* Store methods */
   getState: function () {
     return _state;
@@ -218,11 +235,6 @@ store = _.assign(store, {
           _.map(data, function (el) { return el.value; })
         );
         self.checkData();
-        break;
-
-      case c.REQUEST_JSON:
-        _state['validJSON'] = (typeof data !== 'undefined');
-        self.emitChange();
         break;
 
     }
