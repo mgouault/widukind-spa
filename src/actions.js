@@ -45,4 +45,11 @@ actions[c.DISPLAY_LOG] = function () {
   });
 };
 
+actions[c.SELECT_ROW] = function (key) {
+  dispatcher.dispatch({
+    'actionType': c.SELECT_ROW,
+    'data': key
+  });
+};
+
 module.exports = actions;

@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 var dispatcher = require('../dispatcher');
 var c = require('../constants');
 var ParamsStore = require('../params/store');
+var apiCall = require('../apiCall');
 
 
 
@@ -32,7 +33,7 @@ store = _.assign(store, {
   addChangeListener: function (callback) {
     self.on(CHANGE_EVENT, callback);
   },
-  removeChangeListener: function (callback) {
+  removeChangeListener: function (callback) {``
     self.removeListener(CHANGE_EVENT, callback);
   },
   /**/
@@ -47,20 +48,47 @@ store = _.assign(store, {
     }
     self.emitChange();
   },
-  
+
   init: function () {
     ParamsStore.addChangeListener(self.updateState);
   },
 
+  selectSerie: function (index) {
+    var serie = _state[c.S_SERIES][index];
+    serie['checked'] = !serie['checked'];
+    return Promise.resolve()
+      .then(function () {
+        if (serie['checked'] && !serie['values']) {
+          return apiCall({
+            'pathname': '/values',
+            'query': {'slug': serie['slug']}
+          });
+        }
+      })
+      .then(function (result) {
+        if (result) {
+          serie['values'] = result.values;
+        }
+        _state[c.S_SERIES][index] = serie;
+      });
+  },
+
   dispatchToken: dispatcher.register(function (action) {
     switch (action.actionType) {
+
       case c.DISPLAY_LOG:
         _state[c.S_LOG_DISPLAYED] = !_state[c.S_LOG_DISPLAYED];
         self.emitChange();
         break;
+
+      case c.SELECT_ROW:
+        var index = _.findIndex(_state[c.S_SERIES], {'key': action.data});
+        self.selectSerie(index).then(self.emitChange);
+        break;
+
     }
   })
-  
+
 });
 
 module.exports = store;

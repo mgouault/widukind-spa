@@ -59,6 +59,8 @@ app.use('/data/:key', function (req, res, next) {
       pathname += '/datasets/'+req.query['dataset']+'/series';
       _.assign(URL['query'], makeQuery(req.query['controls']));
       break;
+    case 'values':
+      pathname += '/series/'+req.query['slug']; break;
     default:
       var err = new Error();
       err.status = 400;
@@ -66,9 +68,7 @@ app.use('/data/:key', function (req, res, next) {
   }
   URL['pathname'] = pathname;
 
-  var tmp = unescape(url.format(URL));
-console.log(tmp);
-  rp(tmp)
+  rp(unescape(url.format(URL)))
     .then(function (response) {
       req.responseData = response;
       next();

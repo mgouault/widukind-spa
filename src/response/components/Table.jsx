@@ -1,18 +1,28 @@
 var React = require('react');
 var _ = require('lodash');
-import { Well, Table } from 'react-bootstrap';
+import { Well, Table, Checkbox } from 'react-bootstrap';
 var Loader = require('react-loader');
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+
+var c = require('../../constants');
+var actions = require('../../actions');
 
 
 
 var container = React.createClass({
 
+  onSelect: function (row, isSelected) {
+    actions[c.SELECT_ROW](row['key']);
+  },
+
   render: function () {
-    var toRender = [];
-    var validSeries = !_.isEmpty(this.props.series);
+    var data = [];
+    var selected = [];
+    var series = this.props.series;
+    var validSeries = !_.isEmpty(series);
 
     if (validSeries) {
-      toRender = _.map(this.props.series, function (el) {
+      data = _.map(series, function (el) {
         var freq = el['frequency'];
         switch (el['frequency']) {
           case 'A':
@@ -22,39 +32,48 @@ var container = React.createClass({
           case 'M':
             freq = 'Monthly'; break;
         }
-        return (
-          <tr key={el['key']}>
-            <td>{el['provider_name']}</td>
-            <td>{el['dataset_code']}</td>
-            <td>{el['key']}</td>
-            <td>{el['name']}</td>
-            <td>{freq}</td>
-            <td>{el['start_date']}</td>
-            <td>{el['end_date']}</td>
-          </tr>
-        );
+        if (el['checked']) {
+          selected.push(el['key']);
+        }
+        return ({
+          'provider': el['provider_name'],
+          'dataset': el['dataset_code'],
+          'key': el['key'],
+          'name': el['name'],
+          'freq': freq,
+          'startDate': el['start_date'],
+          'endDate': el['end_date']
+        });
       });
     }
-    
+
+    var selectRow = {
+      mode: "checkbox",
+      clickToSelect: true,
+      selected: selected,
+      onSelect: this.onSelect
+    };
+
     return (
       <Well>
         <Loader loaded={validSeries}>
-          <Table striped bordered condensed hover>
-            <thead>
-              <tr>
-                <th>Provider</th>
-                <th>Dataset</th>
-                <th>Key</th>
-                <th>Name</th>
-                <th>Freq</th>
-                <th>Start date</th>
-                <th>End date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {toRender}
-            </tbody>
-          </Table>
+          <BootstrapTable
+            data={data}
+            bordered={true}
+            striped={true}
+            hover={true}
+            condensed={true}
+            pagination={true}
+            selectRow={selectRow}
+          >
+            <TableHeaderColumn dataField="provider">Provider</TableHeaderColumn>
+            <TableHeaderColumn dataField="dataset">Dataset</TableHeaderColumn>
+            <TableHeaderColumn isKey={true} dataField="key">Key</TableHeaderColumn>
+            <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
+            <TableHeaderColumn dataField="freq">Freq</TableHeaderColumn>
+            <TableHeaderColumn dataField="startDate">Start date</TableHeaderColumn>
+            <TableHeaderColumn dataField="endDate">End date</TableHeaderColumn>
+          </BootstrapTable>
         </Loader>
       </Well>
     );

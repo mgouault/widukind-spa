@@ -34,9 +34,9 @@ var container = React.createClass({
   render: function () {
     return (
       <div>
-        {/*<Graph
+        <Graph
           series={this.state[c.S_SERIES]}
-        />*/}
+        />
         <Table
           series={this.state[c.S_SERIES]}
         />
