@@ -10,21 +10,23 @@ var container = React.createClass({
 
   render: function () {
     var series = this.props.series;
-    var graphData = [[0, 0], [1, 1]];
+    var graphData = [];
 
     if (series && !_.isEmpty(series)) {
       var data = {};
       _.forEach(series, function (serie) {
-        _.forEach(serie['values'], function (value) {
-          var key = moment(value.period).toISOString();
-          if (!key) {
-            return;
-          }
-          if (!data[key]) {
-            data[key] = [];
-          }
-          data[key].push(value.value);
-        });
+        if (serie['checked']) {
+          _.forEach(serie['values'], function (value) {
+            var key = moment(value.period).toISOString();
+            if (!key) {
+              return;
+            }
+            if (!data[key]) {
+              data[key] = [];
+            }
+            data[key].push(value.value);
+          });
+        }
       });
       if (!_.isEmpty(data)) {
         graphData = _.map(Object.keys(data), function (key_) {
@@ -37,7 +39,11 @@ var container = React.createClass({
         });
       }
     }
-    
+
+    if (_.isEmpty(graphData)) {
+      return (<div>Graph</div>);
+    }
+
     return (
       <Dygraph
         key="dygraph"
