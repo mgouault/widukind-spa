@@ -5,7 +5,6 @@ var Loader = require('react-loader');
 var Select = require('react-select');
 
 var c = require('../../constants');
-var actions = require('../../actions');
 
 
 
@@ -22,7 +21,7 @@ var CustomSelect = React.createClass({
 
     if (!data || _.isEmpty(data)) {
       this.props.onMissing();
-      return;
+      return (<div></div>);
     }
 
     var options = this.getOptions();

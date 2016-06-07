@@ -1,6 +1,6 @@
 var keyMirror = require('keymirror');
 
-module.exports = keyMirror({
+var constants = keyMirror({
   providers: null,
   selectedProvider: null,
   datasets: null,
@@ -24,3 +24,5 @@ module.exports = keyMirror({
   displayLog: null,
   selectRow: null
 });
+
+module.exports = constants;

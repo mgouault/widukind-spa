@@ -17,7 +17,7 @@ var DimensionConfig = React.createClass({
   },
 
   onUserInput: function (event) {
-    actions[c.dimensionValuesChange](event, this.props.name);
+    actions[c.changeDimensionValues](event, this.props.name);
   },
 
   render: function () {
@@ -43,7 +43,7 @@ var DimensionsBox = React.createClass({
     var data = this.props.data;
 
     if (!data || _.isEmpty(data)) {
-      return;
+      return (<div></div>);
     }
 
     var toRender = _.map(data, function (el) {

@@ -1,4 +1,5 @@
 var React = require('react');
+var Reflux = require('reflux');
 
 var store = require('./store');
 var ParamsBox = require('./components/ParamsBox.jsx');
@@ -6,15 +7,14 @@ var ParamsBox = require('./components/ParamsBox.jsx');
 
 
 var container = React.createClass({
-  mixins: [Reflux.connect(store, 'selected')],
+  mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
-    store.checkData();
     return (
       <div>
         <ParamsBox
           key="ParamsBox"
-          selected={this.state.selected}
+          storeState={this.state.storeState}
         />
       </div>
     );
