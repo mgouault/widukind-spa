@@ -15,7 +15,7 @@ var LogBox = React.createClass({
     
     return (
       <Well>
-        <Button onClick={actions[c.DISPLAY_LOG]}>
+        <Button onClick={actions[c.displayLog]}>
           Show/Hide log
         </Button>
         <div hidden={!this.props.displayed}>

@@ -1,55 +1,16 @@
-var dispatcher = require('./dispatcher');
+var Reflux = require('reflux');
 var c = require('./constants');
 
-var actions = {};
-
-actions[c.PROVIDER_CHANGE] = function (event) {
-  dispatcher.dispatch({
-    'actionType': c.PROVIDER_CHANGE,
-    'data': event
-  });
-};
-
-actions[c.DATASET_CHANGE] = function (event) {
-  dispatcher.dispatch({
-    'actionType': c.DATASET_CHANGE,
-    'data': event
-  });
-};
-
-actions[c.DIMENSIONS_CHANGE] = function (event) {
-  dispatcher.dispatch({
-    'actionType': c.DIMENSIONS_CHANGE,
-    'data': event
-  });
-};
-
-actions[c.DIMENSION_VALUES_CHANGE] = function (event, dimensionName) {
-  dispatcher.dispatch({
-    'actionType': c.DIMENSION_VALUES_CHANGE,
-    'data': event,
-    'dimensionName': dimensionName
-  });
-};
-
-actions[c.CONFIG_UPDATE] = function (config) {
-  dispatcher.dispatch({
-    'actionType': c.CONFIG_UPDATE,
-    'data': config
-  });
-};
-
-actions[c.DISPLAY_LOG] = function () {
-  dispatcher.dispatch({
-    'actionType': c.DISPLAY_LOG
-  });
-};
-
-actions[c.SELECT_ROW] = function (key) {
-  dispatcher.dispatch({
-    'actionType': c.SELECT_ROW,
-    'data': key
-  });
-};
-
-module.exports = actions;
+module.exports = Reflux.createActions([
+  c.providersMissing,
+  c.datasetsMissing,
+  c.dimensionsMissing,
+  c.changeProvider,
+  c.changeDataset,
+  c.changeDimensions,
+  c.changeDimensionValues,
+  c.requestSeries,
+  c.updateConfig,
+  c.displayLog,
+  c.selectRow
+]);

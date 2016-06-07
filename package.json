@@ -28,6 +28,7 @@
     "react-dygraphs": "0.0.1",
     "react-loader": "^2.4.0",
     "react-select": "^1.0.0-beta13",
+    "reflux": "^0.4.1",
     "request-promise": "^3.0.0",
     "socket.io": "^1.4.6"
   }

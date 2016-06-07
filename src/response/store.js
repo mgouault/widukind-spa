@@ -11,9 +11,9 @@ var apiCall = require('../apiCall');
 var CHANGE_EVENT = 'change';
 
 var _statePattern = {};
-_statePattern[c.S_SERIES] = [];
-_statePattern[c.S_LOG] = [];
-_statePattern[c.S_LOG_DISPLAYED] = false;
+_statePattern[c.series] = [];
+_statePattern[c.log] = [];
+_statePattern[c.logDisplayed] = false;
 
 var _state = _.cloneDeep(_statePattern);
 
@@ -40,11 +40,11 @@ store = _.assign(store, {
 
   updateState: function () {
     var paramsState = ParamsStore.getState();
-    _state['S_SERIES'] = paramsState['S_SERIES'];
-    if (!_.isEmpty(paramsState['S_SERIES'])) {
-      _state['S_LOG'] = JSON.stringify(paramsState['S_SERIES'], null, 2)
+    _state[c.series] = paramsState[c.series];
+    if (!_.isEmpty(paramsState[c.series])) {
+      _state[c.log] = JSON.stringify(paramsState[c.series], null, 2)
         + '\n -------------------- \n'
-        + _state['S_LOG'];
+        + _state[c.log];
     }
     self.emitChange();
   },
@@ -54,7 +54,7 @@ store = _.assign(store, {
   },
 
   selectSerie: function (index) {
-    var serie = _state[c.S_SERIES][index];
+    var serie = _state[c.series][index];
     serie['checked'] = !serie['checked'];
     return Promise.resolve()
       .then(function () {
@@ -69,20 +69,20 @@ store = _.assign(store, {
         if (result) {
           serie['values'] = result.values;
         }
-        _state[c.S_SERIES][index] = serie;
+        _state[c.series][index] = serie;
       });
   },
 
   dispatchToken: dispatcher.register(function (action) {
     switch (action.actionType) {
 
-      case c.DISPLAY_LOG:
-        _state[c.S_LOG_DISPLAYED] = !_state[c.S_LOG_DISPLAYED];
+      case c.displayLog:
+        _state[c.logDisplayed] = !_state[c.logDisplayed];
         self.emitChange();
         break;
 
-      case c.SELECT_ROW:
-        var index = _.findIndex(_state[c.S_SERIES], {'key': action.data});
+      case c.selectRow:
+        var index = _.findIndex(_state[c.series], {'key': action.data});
         self.selectSerie(index).then(self.emitChange);
         break;
 

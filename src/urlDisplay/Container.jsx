@@ -34,9 +34,9 @@ var container = React.createClass({
       <div>
         <UrlDisplay
           key="UrlDisplay"
-          dataset={this.state[c.S_SELECTED_DATASET]}
-          dimensions={this.state[c.S_SELECTED_DIMENSIONS]}
-          config={this.state['config']}
+          dataset={this.state[c.selectedDataset]}
+          dimensions={this.state[c.selectedDimensions]}
+          config={this.state[c.config]}
         />
       </div>
     );

@@ -35,14 +35,14 @@ var container = React.createClass({
     return (
       <div>
         <Graph
-          series={this.state[c.S_SERIES]}
+          series={this.state[c.series]}
         />
         <Table
-          series={this.state[c.S_SERIES]}
+          series={this.state[c.series]}
         />
         <LogBox
-          log={this.state[c.S_LOG]}
-          displayed={this.state[c.S_LOG_DISPLAYED]}
+          log={this.state[c.log]}
+          displayed={this.state[c.logDisplayed]}
         />
       </div>
     );

@@ -12,7 +12,7 @@ var actions = require('../../actions');
 var container = React.createClass({
 
   onSelect: function (row, isSelected) {
-    actions[c.SELECT_ROW](row['key']);
+    actions[c.selectRow](row['key']);
   },
 
   render: function () {

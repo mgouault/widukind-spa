@@ -12,9 +12,9 @@ var ParamsStore = require('../params/store');
 var CHANGE_EVENT = 'change';
 
 var _statePattern = {};
-_statePattern[c.S_SELECTED_DATASET] = '';
-_statePattern[c.S_SELECTED_DIMENSIONS] = [];
-_statePattern['config'] = {};
+_statePattern[c.selectedDataset] = '';
+_statePattern[c.selectedDimensions] = [];
+_statePattern[c.config] = {};
 
 var _state = _.cloneDeep(_statePattern);
 
@@ -41,8 +41,8 @@ store = _.assign(store, {
 
   updateState: function () {
     var paramsState = ParamsStore.getState();
-    _state['S_SELECTED_DATASET'] = paramsState['S_SELECTED_DATASET'];
-    _state['S_SELECTED_DIMENSIONS'] = paramsState['S_SELECTED_DIMENSIONS'];
+    _state[c.selectedDataset] = paramsState[c.selectedDataset];
+    _state[c.selectedDimensions] = paramsState[c.selectedDimensions];
     self.emitChange();
   },
 
@@ -51,20 +51,20 @@ store = _.assign(store, {
 
     var socket = io();
     socket.on('urlChange', function (data) {
-      actions[c.CONFIG_UPDATE](data);
+      actions[c.configUpdate](data);
     });
   },
 
   dispatchToken: dispatcher.register(function (action) {
     var data = action.data;
     switch (action.actionType) {
-      case c.CONFIG_UPDATE:
-        _state['config'] = data;
+      case c.configUpdate:
+        _state[c.config] = data;
         self.emitChange();
         break;
     }
   })
-  
+
 });
 
 

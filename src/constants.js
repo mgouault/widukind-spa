@@ -1,22 +1,26 @@
 var keyMirror = require('keymirror');
 
 module.exports = keyMirror({
-  S_PROVIDERS: null,
-  S_SELECTED_PROVIDER: null,
-  S_DATASETS: null,
-  S_SELECTED_DATASET: null,
-  S_DIMENSIONS: null,
-  S_SELECTED_DIMENSIONS: null,
-  S_SERIES: null,
-  S_LOG: null,
-  S_LOG_DISPLAYED: null,
+  providers: null,
+  selectedProvider: null,
+  datasets: null,
+  selectedDataset: null,
+  dimensions: null,
+  selectedDimensions: null,
+  series: null,
+  log: null,
+  logDisplayed: null,
+  config: null,
 
-  PROVIDER_CHANGE: null,
-  DATASET_CHANGE: null,
-  DIMENSIONS_CHANGE: null,
-  DIMENSION_VALUES_CHANGE: null,
-  REQUEST_SERIES: null,
-  CONFIG_UPDATE: null,
-  DISPLAY_LOG: null,
-  SELECT_ROW: null
+  providersMissing: null,
+  datasetsMissing: null,
+  dimensionsMissing: null,
+  changeProvider: null,
+  changeDataset: null,
+  changeDimensions: null,
+  changeDimensionValues: null,
+  requestSeries: null,
+  updateConfig: null,
+  displayLog: null,
+  selectRow: null
 });
