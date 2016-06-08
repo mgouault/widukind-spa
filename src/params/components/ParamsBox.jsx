@@ -25,9 +25,9 @@ var ParamsBox = React.createClass({
     var selectedDimensions = _.map(state[c.selectedDimensions], function (obj) {
       return obj.name
     });
-
-    var providersMissingWrap = wrap(actions[c.providersMissing],state);
-    var datasetsMissingWrap = wrap(actions[c.datasetsMissing],state);
+    
+    var providersMissingWrap = wrap(actions[c.providersMissing], state);
+    var datasetsMissingWrap = wrap(actions[c.datasetsMissing], state);
     var dimensionsMissingWrap = wrap(actions[c.dimensionsMissing], state);
 
     return (

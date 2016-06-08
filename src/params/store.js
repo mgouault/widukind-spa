@@ -5,8 +5,6 @@ var Reflux = require('reflux');
 var c = require('../constants');
 var actions = require('../actions');
 
-
-
 var pattern = {};
 pattern[c.providers] = [];
 pattern[c.selectedProvider] = '';
@@ -84,11 +82,12 @@ var store = Reflux.createStore({
         'value': _.get(_.find(this.getValidData(c.dimensions), {'name': name}), 'value'),
         'selected': _.get(_.find(this.getValidData(c.selectedDimensions), {'name': name}), 'selected')
       };
-    });
+    }.bind(this));
   },
   /**/
 
   /* onActions */
+  onProvidersMissingFailed: console.error,
   onProvidersMissingCompleted: function (data) {
     this.state[c.providers] = _.map(data, function (el) {
       return {'name': el, 'value': []};
@@ -102,7 +101,8 @@ var store = Reflux.createStore({
     }
     this.trigger(this.state);
   },
-  onDatasetsMissing: function (data) {
+  onDatasetsMissingFailed: console.error,
+  onDatasetsMissingCompleted: function (data) {
     this.setDatasets(data);
     var datasets = this.getValidData(c.datasets);
     if (!_.isEmpty(datasets)) {
@@ -113,16 +113,17 @@ var store = Reflux.createStore({
     }
     this.trigger(this.state);
   },
-  onDimensionsMissing: function (data) {
+  onDimensionsMissingFailed: console.error,
+  onDimensionsMissingCompleted: function (data) {
     this.setDimensions(data);
     this.trigger(this.state);
   },
   onChangeProvider: function (value) {
-    this.setSelectedProvider(value);
+    this.setSelectedProvider(value.value);
     this.trigger(this.state);
   },
   onChangeDataset: function (value) {
-    this.setSelectedDataset(value);
+    this.setSelectedDataset(value.value);
     this.trigger(this.state);
   },
   onChangeDimensions: function (data) {
