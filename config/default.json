@@ -5,10 +5,10 @@
   "api": {
     "URLObj": {
       "protocol": "http",
-      "hostname": "widukind-api-dev.cepremap.org",
+      "hostname": "widukind-api.cepremap.org",
       "pathname": "/api/v1/json",
       "query": {
-        "limit": 10
+        "per_page": 10
       }
     }
   }

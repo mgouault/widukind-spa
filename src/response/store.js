@@ -1,53 +1,63 @@
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var Reflux = require('reflux');
 
-var dispatcher = require('../dispatcher');
 var c = require('../constants');
+var actions = require('../actions');
+var paramsStore = require('../params/store');
+var apiCall = require('../apiCall');
+
+var pattern = {};
+pattern[c.series] = [];
+pattern[c.log] = [];
+pattern[c.logDisplayed] = false;
 
 
 
-var CHANGE_EVENT = 'change';
+var store = Reflux.createStore({
+  listenables: [actions],
 
-var _state = {
-  'json': []
-};
-
-
-
-var store = _.assign({}, EventEmitter.prototype, {
-
-  getState: function () {
-    return _state;
+  getInitialState: function () {
+    this.state = _.cloneDeep(pattern);
+    return this.state;
   },
 
-  emitChange: function () {
-    this.emit(CHANGE_EVENT);
+  init: function () {
+    this.listenTo(paramsStore, actions[c.requestSeries]);
   },
 
-  addChangeListener: function (callback) {
-    this.on(CHANGE_EVENT, callback);
+  onRequestSeriesFailed: console.error,
+  onRequestSeriesCompleted: function (data) {
+    if (!_.isEmpty(data)) {
+      this.state[c.log] = JSON.stringify(data, null, 2)
+        + '\n -------------------- \n'
+        + this.state[c.log];
+    }
+    this.state[c.series] = data;
+    this.trigger(this.state);
   },
 
-  removeChangeListener: function (callback) {
-    this.removeListener(CHANGE_EVENT, callback);
+  onSelectRow: function (data) {
+    var index = _.findIndex(this.state[c.series], {'key': data});
+    var serie = this.state[c.series][index];
+    serie['checked'] = !serie['checked'];
+    this.state[c.series][index] = serie;
+    this.trigger(this.state);
+  },
+
+  onRequestValuesFailed: console.error,
+  onRequestValuesCompleted: function (data) {
+    var index = _.findIndex(this.state[c.series], {'key': data['key']});
+    var serie = this.state[c.series][index];
+    serie['values'] = _.get(data, 'values');
+    this.state[c.series][index] = serie;
+    this.trigger(this.state);
+  },
+
+  onDisplayLog: function (data) {
+    this.state[c.logDisplayed] = !this.state[c.logDisplayed];
+    this.trigger(this.state);
   }
-  
-});
 
-
-
-dispatcher.register(function (action) {
-  var data = action.data;
-  
-  switch (action.actionType) {
-    case c.REQUEST_JSON:
-      _state.json = data;
-      break;
-    default:
-      return;
-  }
-
-  store.emitChange();
 });
 
 module.exports = store;

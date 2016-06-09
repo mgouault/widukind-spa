@@ -1,37 +1,31 @@
 var React = require('react');
+var Reflux = require('reflux');
 
 var store = require('./store');
-var ResponseBox = require('./components/ResponseBox.jsx');
+var c = require('../constants');
+var Graph = require('./components/Graph.jsx');
+var Table = require('./components/Table.jsx');
+var LogBox = require('./components/LogBox.jsx');
 
 
 
 var container = React.createClass({
-
-  getInitialState: function () {
-    return this.getState();
-  },
-
-  getState: function () {
-    return store.getState();
-  },
-
-  _onChange: function() {
-    this.setState(this.getState());
-  },
-
-  componentDidMount: function () {
-    store.addChangeListener(this._onChange);
-  },
-
-  componentWillUnmount: function () {
-    store.removeChangeListener(this._onChange);
-  },
+  mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
     return (
-      <ResponseBox 
-        json={this.state.json} 
-      />
+      <div>
+        <Graph
+          series={this.state.storeState[c.series]}
+        />
+        <Table
+          series={this.state.storeState[c.series]}
+        />
+        <LogBox
+          log={this.state.storeState[c.log]}
+          displayed={this.state.storeState[c.logDisplayed]}
+        />
+      </div>
     );
   }
 

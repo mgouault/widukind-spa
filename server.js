@@ -15,7 +15,7 @@ var URLObj = {
   'port': process.env['WIDUKIND_API_PORT'] || configURLObj['port'],
   'pathname': process.env['WIDUKIND_API_PATHNAME'] || configURLObj['pathname'],
   'query': {
-    'limit': process.env['WIDUKIND_SPA_LIMIT'] || _.get(configURLObj, 'query.limit')
+    'per_page': process.env['WIDUKIND_SPA_LIMIT'] || _.get(configURLObj, 'query.per_page')
   }
 };
 
@@ -55,10 +55,12 @@ app.use('/data/:key', function (req, res, next) {
       pathname += '/providers/'+req.query['provider']+'/datasets/keys'; break;
     case 'dimensions':
       pathname += '/datasets/'+req.query['dataset']+'/dimensions'; break;
-    case 'json':
-      pathname += '/datasets/'+req.query['dataset']+'/values';
+    case 'series':
+      pathname += '/datasets/'+req.query['dataset']+'/series';
       _.assign(URL['query'], makeQuery(req.query['controls']));
       break;
+    case 'values':
+      pathname += '/series/'+req.query['slug']; break;
     default:
       var err = new Error();
       err.status = 400;

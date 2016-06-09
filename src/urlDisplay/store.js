@@ -1,72 +1,43 @@
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var Reflux = require('reflux');
+/* global io */
+var socket = io();
 
-var dispatcher = require('../dispatcher');
 var c = require('../constants');
 var actions = require('../actions');
-/* global io */
-var ParamsStore = require('../params/store');
+var paramsStore = require('../params/store');
+
+var pattern = {};
+pattern[c.selectedDataset] = '';
+pattern[c.selectedDimensions] = [];
+pattern[c.config] = {};
 
 
 
-var CHANGE_EVENT = 'change';
-
-var _statePattern = {};
-_statePattern[c.S_SELECTED_DATASET] = '';
-_statePattern[c.S_SELECTED_DIMENSIONS] = [];
-_statePattern['config'] = {};
-
-var _state = _.cloneDeep(_statePattern);
-
-
-
-var store = _.assign({}, EventEmitter.prototype);
-var self = store;
-store = _.assign(store, {
-
-  /* Store methods */
-  getState: function () {
-    return _state;
+var store = Reflux.createStore({
+  listenables: [actions],
+  
+  getInitialState: function () {
+    this.state = _.cloneDeep(pattern);
+    return this.state;
   },
-  emitChange: function () {
-    self.emit(CHANGE_EVENT);
-  },
-  addChangeListener: function (callback) {
-    self.on(CHANGE_EVENT, callback);
-  },
-  removeChangeListener: function (callback) {
-    self.removeListener(CHANGE_EVENT, callback);
-  },
-  /**/
 
   init: function () {
-    ParamsStore.addChangeListener(self.updateState);
-
-    var socket = io();
-    socket.on('urlChange', function (data) {
-      actions[c.CONFIG_UPDATE](data);
-    });
+    socket.on('urlChange', actions[c.updateConfig]);
+    this.listenTo(paramsStore, this.paramsStoreUpdate);
   },
 
-  updateState: function () {
-    var paramsState = ParamsStore.getState();
-    _state['S_SELECTED_DATASET'] = paramsState['S_SELECTED_DATASET'];
-    _state['S_SELECTED_DIMENSIONS'] = paramsState['S_SELECTED_DIMENSIONS'];
-    self.emitChange();
+  paramsStoreUpdate : function (paramsStoreState) {
+    this.state[c.selectedDataset] = paramsStoreState[c.selectedDataset];
+    this.state[c.selectedDimensions] = paramsStoreState[c.selectedDimensions];
+    this.trigger(this.state);
   },
 
-  dispatchToken: dispatcher.register(function (action) {
-    var data = action.data;
-    switch (action.actionType) {
+  onUpdateConfig: function (data) {
+    this.state[c.config] = data;
+    this.trigger(this.state);
+  }
 
-      case c.CONFIG_UPDATE:
-        _state['config'] = data;
-        self.emitChange();
-        break;
-
-    }
-  })
-  
 });
 
 
