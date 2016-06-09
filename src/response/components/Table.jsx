@@ -11,7 +11,7 @@ var actions = require('../../actions');
 
 var container = React.createClass({
 
-  onSelect: function (row, isSelected) {
+  onSelect: function (row) {
     actions[c.selectRow](row['key']);
   },
 

@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
 var Reflux = require('reflux');
 
 var c = require('../constants');
@@ -18,26 +17,11 @@ pattern[c.series] = [];
 
 var store = Reflux.createStore({
   listenables: [actions],
+
   getInitialState: function () {
     this.state = _.cloneDeep(pattern);
     return this.state;
   },
-
-  // requestSeries: function () {
-  //   var dataset = this.state[c.selectedDataset];
-  //   if (!dataset) {
-  //     return Promise.resolve();
-  //   }
-  //   return apiCall({
-  //     'pathname': '/series',
-  //     'query': {
-  //       'dataset': dataset,
-  //       'controls': this.state[c.dimensions]
-  //     }
-  //   }).then(function (data) {
-  //     this.state[c.series] = data;
-  //   });
-  // },
 
   /* Getters-Setters */
   getValidData: function (key) {
@@ -118,12 +102,12 @@ var store = Reflux.createStore({
     this.setDimensions(data);
     this.trigger(this.state);
   },
-  onChangeProvider: function (value) {
-    this.setSelectedProvider(value.value);
+  onChangeProvider: function (data) {
+    this.setSelectedProvider(data.value);
     this.trigger(this.state);
   },
-  onChangeDataset: function (value) {
-    this.setSelectedDataset(value.value);
+  onChangeDataset: function (data) {
+    this.setSelectedDataset(data.value);
     this.trigger(this.state);
   },
   onChangeDimensions: function (data) {
@@ -138,10 +122,6 @@ var store = Reflux.createStore({
     );
     this.trigger(this.state);
   }
-  // onRequestSeries: function () {},
-  // onUpdateConfig: function () {},
-  // onDisplayLog: function () {},
-  // onSelectRow: function () {},
   /**/
 
 });

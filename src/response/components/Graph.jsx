@@ -4,6 +4,9 @@ var Loader = require('react-loader');
 var {Dygraph} = require('react-dygraphs');
 var moment = require('moment');
 
+var c = require('../../constants');
+var actions = require('../../actions');
+
 
 
 var container = React.createClass({
@@ -16,6 +19,10 @@ var container = React.createClass({
       var data = {};
       _.forEach(series, function (serie) {
         if (serie['checked']) {
+          if (!serie['values']) {
+            actions[c.requestValues](serie['slug']); //todo .triggerAsync()
+            return;
+          }
           _.forEach(serie['values'], function (value) {
             var key = moment(value.period).toISOString();
             if (!key) {

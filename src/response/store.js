@@ -1,93 +1,62 @@
 var _ = require('lodash');
-var EventEmitter = require('events').EventEmitter;
+var Reflux = require('reflux');
 
-var dispatcher = require('../dispatcher');
 var c = require('../constants');
-var ParamsStore = require('../params/store');
+var actions = require('../actions');
+var paramsStore = require('../params/store');
 var apiCall = require('../apiCall');
 
-
-
-var CHANGE_EVENT = 'change';
-
-var _statePattern = {};
-_statePattern[c.series] = [];
-_statePattern[c.log] = [];
-_statePattern[c.logDisplayed] = false;
-
-var _state = _.cloneDeep(_statePattern);
+var pattern = {};
+pattern[c.series] = [];
+pattern[c.log] = [];
+pattern[c.logDisplayed] = false;
 
 
 
-var store = _.assign({}, EventEmitter.prototype);
-var self = store;
-store = _.assign(store, {
+var store = Reflux.createStore({
+  listenables: [actions],
 
-  /* Store methods */
-  getState: function () {
-    return _state;
-  },
-  emitChange: function () {
-    self.emit(CHANGE_EVENT);
-  },
-  addChangeListener: function (callback) {
-    self.on(CHANGE_EVENT, callback);
-  },
-  removeChangeListener: function (callback) {``
-    self.removeListener(CHANGE_EVENT, callback);
-  },
-  /**/
-
-  updateState: function () {
-    var paramsState = ParamsStore.getState();
-    _state[c.series] = paramsState[c.series];
-    if (!_.isEmpty(paramsState[c.series])) {
-      _state[c.log] = JSON.stringify(paramsState[c.series], null, 2)
-        + '\n -------------------- \n'
-        + _state[c.log];
-    }
-    self.emitChange();
+  getInitialState: function () {
+    this.state = _.cloneDeep(pattern);
+    return this.state;
   },
 
   init: function () {
-    ParamsStore.addChangeListener(self.updateState);
+    this.listenTo(paramsStore, actions[c.requestSeries]);
   },
 
-  selectSerie: function (index) {
-    var serie = _state[c.series][index];
-    serie['checked'] = !serie['checked'];
-    return Promise.resolve()
-      .then(function () {
-        if (serie['checked'] && !serie['values']) {
-          return apiCall({
-            'pathname': '/values',
-            'query': {'slug': serie['slug']}
-          });
-        }
-      })
-      .then(function (result) {
-        if (result) {
-          serie['values'] = result.values;
-        }
-        _state[c.series][index] = serie;
-      });
-  },
-
-  dispatchToken: dispatcher.register(function (action) {
-    switch (action.actionType) {
-
-      case c.displayLog:
-        _state[c.logDisplayed] = !_state[c.logDisplayed];
-        self.emitChange();
-        break;
-
-      case c.selectRow:
-        var index = _.findIndex(_state[c.series], {'key': action.data});
-        self.selectSerie(index).then(self.emitChange);
-        break;
-
+  onRequestSeriesFailed: console.error,
+  onRequestSeriesCompleted: function (data) {
+    if (!_.isEmpty(data)) {
+      this.state[c.log] = JSON.stringify(data, null, 2)
+        + '\n -------------------- \n'
+        + this.state[c.log];
     }
-  })
+    this.state[c.series] = data;
+    this.trigger(this.state);
+  },
+
+  onSelectRow: function (data) {
+    var index = _.findIndex(this.state[c.series], {'key': data});
+    var serie = this.state[c.series][index];
+    serie['checked'] = !serie['checked'];
+    this.state[c.series][index] = serie;
+    this.trigger(this.state);
+  },
+
+  onRequestValuesFailed: console.error,
+  onRequestValuesCompleted: function (data) {
+    var index = _.findIndex(this.state[c.series], {'key': data['key']});
+    var serie = this.state[c.series][index];
+    serie['values'] = _.get(data, 'values');
+    this.state[c.series][index] = serie;
+    this.trigger(this.state);
+  },
+
+  onDisplayLog: function (data) {
+    this.state[c.logDisplayed] = !this.state[c.logDisplayed];
+    this.trigger(this.state);
+  }
 
 });
 

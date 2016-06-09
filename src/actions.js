@@ -21,9 +21,7 @@ var actions = Reflux.createActions([
   c.selectRow
 ]);
 
-actions[c.providersMissing] = Reflux.createAction({
-  asyncResult: true
-});
+actions[c.providersMissing] = Reflux.createAction({ asyncResult: true });
 actions[c.providersMissing].listenAndPromise(function (state) {
   return apiCall({
     'pathname': '/providers',
@@ -54,6 +52,30 @@ actions[c.dimensionsMissing].listenAndPromise(function (state) {
   return apiCall({
     'pathname': '/dimensions',
     'query': {'dataset': state[c.selectedDataset]}
+  });
+});
+
+actions[c.requestSeries] = Reflux.createAction({
+  asyncResult: true,
+  shouldEmit: function (state) {
+    return (state[c.selectedDataset] && !_.isEmpty(state[c.selectedDataset]));
+  }
+});
+actions[c.requestSeries].listenAndPromise(function (state) {
+  return apiCall({
+    'pathname': '/series',
+    'query': {
+      'dataset': state[c.selectedDataset],
+      'controls': state[c.dimensions]
+    }
+  });
+});
+
+actions[c.requestValues] = Reflux.createAction({ asyncResult: true });
+actions[c.requestValues].listenAndPromise(function (slug) {
+  return apiCall({
+    'pathname': '/values',
+    'query': {'slug': slug}
   });
 });
 

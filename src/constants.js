@@ -20,6 +20,7 @@ var constants = keyMirror({
   changeDimensions: null,
   changeDimensionValues: null,
   requestSeries: null,
+  requestValues: null,
   updateConfig: null,
   displayLog: null,
   selectRow: null
