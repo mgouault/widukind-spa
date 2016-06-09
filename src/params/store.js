@@ -43,6 +43,7 @@ var store = Reflux.createStore({
       return {'name': el, 'value': []};
     });
   },
+
   setSelectedDataset: function (data) {
     this.state[c.selectedDataset] = data;
     this.setDimensions({});
@@ -58,6 +59,7 @@ var store = Reflux.createStore({
       return {'name': el, 'value': value};
     });
   },
+
   setSelectedDimensions: function (data) {
     this.state[c.selectedDimensions] = _.map(data, function (el) {
       var name = el.value;
@@ -85,6 +87,7 @@ var store = Reflux.createStore({
     }
     this.trigger(this.state);
   },
+
   onDatasetsMissingFailed: console.error,
   onDatasetsMissingCompleted: function (data) {
     this.setDatasets(data);
@@ -97,23 +100,28 @@ var store = Reflux.createStore({
     }
     this.trigger(this.state);
   },
+
   onDimensionsMissingFailed: console.error,
   onDimensionsMissingCompleted: function (data) {
     this.setDimensions(data);
     this.trigger(this.state);
   },
+
   onChangeProvider: function (data) {
     this.setSelectedProvider(data.value);
     this.trigger(this.state);
   },
+
   onChangeDataset: function (data) {
     this.setSelectedDataset(data.value);
     this.trigger(this.state);
   },
+
   onChangeDimensions: function (data) {
     this.setSelectedDimensions(data);
     this.trigger(this.state);
   },
+
   onChangeDimensionValues: function (data, dimensionName) {
     _.set(
       _.find(this.state[c.selectedDimensions], {'name': dimensionName}),

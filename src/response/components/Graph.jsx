@@ -20,7 +20,7 @@ var container = React.createClass({
       _.forEach(series, function (serie) {
         if (serie['checked']) {
           if (!serie['values']) {
-            actions[c.requestValues](serie['slug']); //todo .triggerAsync()
+            actions[c.requestValues].triggerAsync(serie['slug']);
             return;
           }
           _.forEach(serie['values'], function (value) {
