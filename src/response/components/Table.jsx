@@ -16,6 +16,10 @@ var container = React.createClass({
   },
 
   render: function () {
+    if (this.props.loading) {
+      return(<Loader loaded={false}><div></div></Loader>);
+    }
+
     var data = [];
     var selected = [];
     var series = this.props.series;
@@ -48,7 +52,7 @@ var container = React.createClass({
     }
 
     var selectRow = {
-      mode: "checkbox",
+      mode: 'checkbox',
       clickToSelect: true,
       selected: selected,
       onSelect: this.onSelect
@@ -56,25 +60,23 @@ var container = React.createClass({
 
     return (
       <Well>
-        <Loader loaded={validSeries}>
-          <BootstrapTable
-            data={data}
-            bordered={true}
-            striped={true}
-            hover={true}
-            condensed={true}
-            pagination={true}
-            selectRow={selectRow}
-          >
-            <TableHeaderColumn dataField="provider">Provider</TableHeaderColumn>
-            <TableHeaderColumn dataField="dataset">Dataset</TableHeaderColumn>
-            <TableHeaderColumn isKey={true} dataField="key">Key</TableHeaderColumn>
-            <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-            <TableHeaderColumn dataField="freq">Freq</TableHeaderColumn>
-            <TableHeaderColumn dataField="startDate">Start date</TableHeaderColumn>
-            <TableHeaderColumn dataField="endDate">End date</TableHeaderColumn>
-          </BootstrapTable>
-        </Loader>
+        <BootstrapTable
+          data={data}
+          bordered={true}
+          striped={true}
+          hover={true}
+          condensed={true}
+          pagination={true}
+          selectRow={selectRow}
+        >
+          <TableHeaderColumn dataField="provider">Provider</TableHeaderColumn>
+          <TableHeaderColumn dataField="dataset">Dataset</TableHeaderColumn>
+          <TableHeaderColumn isKey={true} dataField="key">Key</TableHeaderColumn>
+          <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
+          <TableHeaderColumn dataField="freq">Freq</TableHeaderColumn>
+          <TableHeaderColumn dataField="startDate">Start date</TableHeaderColumn>
+          <TableHeaderColumn dataField="endDate">End date</TableHeaderColumn>
+        </BootstrapTable>
       </Well>
     );
   }

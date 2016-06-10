@@ -13,17 +13,24 @@ var container = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
+    var state = this.state.storeState;
+
+    var graphLoading = (state[c.loading].indexOf('values') > -1);
+    var tableLoading = (state[c.loading].indexOf('series') > -1);
+
     return (
       <div>
         <Graph
-          series={this.state.storeState[c.series]}
+          series={state[c.series]}
+          loading={graphLoading}
         />
         <Table
-          series={this.state.storeState[c.series]}
+          series={state[c.series]}
+          loading={tableLoading}
         />
         <LogBox
-          log={this.state.storeState[c.log]}
-          displayed={this.state.storeState[c.logDisplayed]}
+          log={state[c.log]}
+          displayed={state[c.logDisplayed]}
         />
       </div>
     );

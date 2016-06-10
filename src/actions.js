@@ -66,7 +66,7 @@ actions[c.requestSeries].listenAndPromise(function (state) {
     'pathname': '/series',
     'query': {
       'dataset': state[c.selectedDataset],
-      'controls': state[c.dimensions]
+      'controls': state[c.selectedDimensions]
     }
   });
 });

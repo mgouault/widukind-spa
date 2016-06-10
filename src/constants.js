@@ -11,6 +11,7 @@ var constants = keyMirror({
   log: null,
   logDisplayed: null,
   config: null,
+  loading: null,
 
   providersMissing: null,
   datasetsMissing: null,

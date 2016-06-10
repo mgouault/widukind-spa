@@ -1,5 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
+import { Well } from 'react-bootstrap';
 var Loader = require('react-loader');
 var {Dygraph} = require('react-dygraphs');
 var moment = require('moment');
@@ -12,6 +13,10 @@ var actions = require('../../actions');
 var container = React.createClass({
 
   render: function () {
+    if (this.props.loading) {
+      return(<Loader loaded={false}><div></div></Loader>);
+    }
+
     var series = this.props.series;
     var graphData = [];
 
@@ -19,7 +24,7 @@ var container = React.createClass({
       var data = {};
       _.forEach(series, function (serie) {
         if (serie['checked']) {
-          if (!serie['values']) {
+           if (!serie['values']) {
             actions[c.requestValues].triggerAsync(serie['slug']);
             return;
           }
@@ -52,10 +57,14 @@ var container = React.createClass({
     }
 
     return (
-      <Dygraph
-        key="dygraph"
-        data={graphData}
-      />
+      <Well>
+        <Loader loaded={graphData !== null}>
+          <Dygraph
+            key="dygraph"
+            data={graphData}
+          />
+        </Loader>
+      </Well>
     );
   }
 

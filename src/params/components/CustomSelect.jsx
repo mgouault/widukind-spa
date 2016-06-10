@@ -17,6 +17,10 @@ var CustomSelect = React.createClass({
   },
 
   render: function () {
+    if (this.props.loading) {
+      return(<div>{this.props.name}:<Loader loaded={false}><div></div></Loader></div>);
+    }
+
     var data = this.props.data;
 
     if (!data || _.isEmpty(data)) {
@@ -28,14 +32,12 @@ var CustomSelect = React.createClass({
     return (
       <div>
         {this.props.name}:
-        <Loader loaded={!(typeof data === 'undefined')}>
-          <Select
-            onChange={this.props.onChange}
-            value={this.props.value}
-            multi={this.props.multiple}
-            options={options}
-          />
-        </Loader>
+        <Select
+          onChange={this.props.onChange}
+          value={this.props.value}
+          multi={this.props.multiple}
+          options={options}
+        />
       </div>
     );
   }
