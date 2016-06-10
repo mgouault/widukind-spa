@@ -52,7 +52,7 @@ var container = React.createClass({
     }
 
     var selectRow = {
-      mode: "checkbox",
+      mode: 'checkbox',
       clickToSelect: true,
       selected: selected,
       onSelect: this.onSelect
