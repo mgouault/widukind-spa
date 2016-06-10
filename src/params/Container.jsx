@@ -1,22 +1,75 @@
 var React = require('react');
 var Reflux = require('reflux');
+var _ = require('lodash');
+import { Well } from 'react-bootstrap';
 
+var c = require('../constants');
+var actions = require('../actions');
 var store = require('./store');
-var ParamsBox = require('./components/ParamsBox.jsx');
+var CustomSelect = require('./components/CustomSelect.jsx');
+var DimensionsBox = require('./components/DimensionsBox.jsx');
 
 
 
 var container = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
+  wrap: function (func, staticArg) {
+    return function () {
+      func(staticArg);
+    }
+  },
+
   render: function () {
+    var state = this.state.storeState;
+
+    var selectedDimensions = _.map(state[c.selectedDimensions], function (obj) {
+      return obj.name
+    });
+
+    var providersMissingWrap = this.wrap(actions[c.providersMissing], state);
+    var datasetsMissingWrap = this.wrap(actions[c.datasetsMissing], state);
+    var dimensionsMissingWrap = this.wrap(actions[c.dimensionsMissing], state);
+
+    var providersLoading = (state[c.loading].indexOf('providers') > -1);
+    var datasetsLoading = (state[c.loading].indexOf('datasets') > -1);
+    var dimensionsLoading = (state[c.loading].indexOf('dimensions') > -1);
+
     return (
-      <div>
-        <ParamsBox
-          key="ParamsBox"
-          storeState={this.state.storeState}
+      <Well>
+        <CustomSelect
+          key={'providerSelect'}
+          name={'Provider'}
+          data={state[c.providers]}
+          onMissing={providersMissingWrap}
+          value={state[c.selectedProvider]}
+          onChange={actions[c.changeProvider]}
+          loading={datasetsLoading}
         />
-      </div>
+        <CustomSelect
+          key={'datasetSelect'}
+          name={'Dataset'}
+          data={state[c.datasets]}
+          onMissing={datasetsMissingWrap}
+          value={state[c.selectedDataset]}
+          onChange={actions[c.changeDataset]}
+          loading={providersLoading}
+        />
+        <CustomSelect
+          key={'dimensionsSelect'}
+          name={'Dimensions'}
+          data={state[c.dimensions]}
+          onMissing={dimensionsMissingWrap}
+          value={selectedDimensions}
+          onChange={actions[c.changeDimensions]}
+          loading={dimensionsLoading}
+          multiple={true}
+        />
+        <DimensionsBox
+          key="DimensionsBox"
+          data={state[c.selectedDimensions]}
+        />
+      </Well>
     );
   }
 

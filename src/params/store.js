@@ -11,16 +11,26 @@ pattern[c.datasets] = [];
 pattern[c.selectedDataset] = '';
 pattern[c.dimensions] = [];
 pattern[c.selectedDimensions] = [];
-pattern[c.series] = [];
+pattern[c.loading] = [];
 
 
 
 var store = Reflux.createStore({
   listenables: [actions],
-
   getInitialState: function () {
     this.state = _.cloneDeep(pattern);
     return this.state;
+  },
+  refresh: function () {
+    this.trigger(this.state);
+  },
+
+  load: function (key) {
+    this.state[c.loading].push(key);
+  },
+  unload: function (key) {
+    var index = this.state[c.loading].indexOf(key);
+    this.state[c.loading].splice(index, 1);
   },
 
   /* Getters-Setters */
@@ -63,18 +73,28 @@ var store = Reflux.createStore({
   setSelectedDimensions: function (data) {
     this.state[c.selectedDimensions] = _.map(data, function (el) {
       var name = el.value;
+      var value = _.get(_.find(this.getValidData(c.dimensions), {'name': name}), 'value');
+      var selected =_.get(_.find(this.getValidData(c.selectedDimensions), {'name': name}), 'selected');
+      if (!selected) {
+        selected = [_.head(value)];
+      }
       return {
         'name': name,
-        'value': _.get(_.find(this.getValidData(c.dimensions), {'name': name}), 'value'),
-        'selected': _.get(_.find(this.getValidData(c.selectedDimensions), {'name': name}), 'selected')
+        'value': value,
+        'selected': selected
       };
     }.bind(this));
   },
   /**/
 
   /* onActions */
+  onProvidersMissing: function () {
+    this.load('providers');
+    this.refresh();
+  },
   onProvidersMissingFailed: console.error,
   onProvidersMissingCompleted: function (data) {
+    this.unload('providers');
     this.state[c.providers] = _.map(data, function (el) {
       return {'name': el, 'value': []};
     });
@@ -85,11 +105,16 @@ var store = Reflux.createStore({
         this.setSelectedProvider(_.head(providers).name);
       }
     }
-    this.trigger(this.state);
+    this.refresh();
   },
 
+  onDatasetsMissing: function () {
+    this.load('datasets');
+    this.refresh();
+  },
   onDatasetsMissingFailed: console.error,
   onDatasetsMissingCompleted: function (data) {
+    this.unload('datasets');
     this.setDatasets(data);
     var datasets = this.getValidData(c.datasets);
     if (!_.isEmpty(datasets)) {
@@ -98,28 +123,43 @@ var store = Reflux.createStore({
         this.setSelectedDataset(_.head(datasets).name);
       }
     }
-    this.trigger(this.state);
+    this.refresh();
   },
 
+  onDimensionsMissing: function () {
+    this.load('dimensions');
+    this.refresh();
+  },
   onDimensionsMissingFailed: console.error,
   onDimensionsMissingCompleted: function (data) {
+    this.unload('dimensions');
     this.setDimensions(data);
-    this.trigger(this.state);
+    var dimensions = this.getValidData(c.dimensions);
+    if (!_.isEmpty(dimensions)) {
+      var selectedDimensions = this.getValidData(c.selectedDimensions);
+      if (_.isEmpty(selectedDimensions)) {
+        var tmp = _.map(dimensions, function (el) {
+          return { value: el.name };
+        })
+        this.setSelectedDimensions(tmp);
+      }
+    }
+    this.refresh();
   },
 
-  onChangeProvider: function (data) {
-    this.setSelectedProvider(data.value);
-    this.trigger(this.state);
+  onChangeProvider: function (value) {
+    this.setSelectedProvider(value.value);
+    this.refresh();
   },
 
-  onChangeDataset: function (data) {
-    this.setSelectedDataset(data.value);
-    this.trigger(this.state);
+  onChangeDataset: function (value) {
+    this.setSelectedDataset(value.value);
+    this.refresh();
   },
 
   onChangeDimensions: function (data) {
     this.setSelectedDimensions(data);
-    this.trigger(this.state);
+    this.refresh();
   },
 
   onChangeDimensionValues: function (data, dimensionName) {
@@ -128,7 +168,7 @@ var store = Reflux.createStore({
       'selected',
       _.map(data, function (el) { return el.value; })
     );
-    this.trigger(this.state);
+    this.refresh();
   }
   /**/
 
