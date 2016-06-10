@@ -29,7 +29,14 @@ var container = React.createClass({
             return;
           }
           _.forEach(serie['values'], function (value) {
-            var key = moment(value.period).toISOString();
+            var period = value.period;
+            if (period.indexOf('Q') > -1) {
+              var mult = parseInt(_.last(period)) - 1;
+              var str = _.slice(period, 0, 4);
+              var key = moment(_.join(str, '')).add(3 * mult, 'months').toISOString();
+            } else {
+              var key = moment(period).toISOString();
+            }
             if (!key) {
               return;
             }
