@@ -24,7 +24,8 @@ var constants = keyMirror({
   requestValues: null,
   updateConfig: null,
   displayLog: null,
-  selectRow: null
+  selectRow: null,
+  selectRowAll: null
 });
 
 module.exports = constants;

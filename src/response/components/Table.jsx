@@ -1,6 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
-import { Well, Table, Checkbox } from 'react-bootstrap';
+import { Panel, Table, Checkbox } from 'react-bootstrap';
 var Loader = require('react-loader');
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
@@ -13,6 +13,10 @@ var container = React.createClass({
 
   onSelect: function (row) {
     actions[c.selectRow](row['key']);
+  },
+
+  onSelectAll: function (data, checked) {
+    actions[c.selectRowAll](data, checked);
   },
 
   render: function () {
@@ -55,29 +59,30 @@ var container = React.createClass({
       mode: 'checkbox',
       clickToSelect: true,
       selected: selected,
-      onSelect: this.onSelect
+      onSelect: this.onSelect,
+      onSelectAll: function (checked) { this.onSelectAll(data, checked); },
+      bgColor: '#9ACBDB'
     };
 
     return (
-      <Well>
+      <Panel header="Data table">
         <BootstrapTable
           data={data}
           bordered={true}
           striped={true}
           hover={true}
           condensed={true}
-          pagination={true}
           selectRow={selectRow}
         >
-          <TableHeaderColumn dataField="provider">Provider</TableHeaderColumn>
-          <TableHeaderColumn dataField="dataset">Dataset</TableHeaderColumn>
-          <TableHeaderColumn isKey={true} dataField="key">Key</TableHeaderColumn>
+          <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
+          <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
+          <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
           <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-          <TableHeaderColumn dataField="freq">Freq</TableHeaderColumn>
-          <TableHeaderColumn dataField="startDate">Start date</TableHeaderColumn>
-          <TableHeaderColumn dataField="endDate">End date</TableHeaderColumn>
+          <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
+          <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
+          <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
         </BootstrapTable>
-      </Well>
+      </Panel>
     );
   }
 });

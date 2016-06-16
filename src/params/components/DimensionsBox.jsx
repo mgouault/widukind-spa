@@ -23,9 +23,10 @@ var DimensionConfig = React.createClass({
   render: function () {
     var options = this.getOptions();
 
+    var name = _.capitalize(this.props.name);
     return (
       <div>
-        Select {this.props.name}:
+        <strong>{name}:</strong>
         <Select
           onChange={this.onUserInput}
           value={this.props.value}

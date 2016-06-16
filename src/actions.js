@@ -18,7 +18,8 @@ var actions = Reflux.createActions([
   c.requestSeries,
   c.updateConfig,
   c.displayLog,
-  c.selectRow
+  c.selectRow,
+  c.selectRowAll
 ]);
 
 actions[c.providersMissing] = Reflux.createAction({ asyncResult: true });

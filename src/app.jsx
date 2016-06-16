@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-import { Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 
 var ParamsContainer = require('./params/Container.jsx');
 var ResponseContainer = require('./response/Container.jsx');
@@ -12,7 +12,7 @@ var WidukindSPA = React.createClass({
 
   render: function () {
     return (
-      <div className="container-fluid">
+      <Grid fluid>
 
         <div className="header clearfix">
           <nav>
@@ -25,21 +25,26 @@ var WidukindSPA = React.createClass({
         </div>
 
         <div className="row marketing">
-          <Col xs={12} sm={12} md={12} lg={12}>
-            <UrlDisplayContainer />
-          </Col>
-          <Col xs={4} sm={4} md={4} lg={4}>
-            <ParamsContainer />
-          </Col>
-          <Col xs={8} sm={8} md={8} lg={8}>
-            <ResponseContainer />
-          </Col>
+          <Row>
+            <Col sm={12}>
+              <UrlDisplayContainer />
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col sm={4}>
+              <ParamsContainer />
+            </Col>
+            <Col sm={8}>
+              <ResponseContainer />
+            </Col>
+          </Row>
         </div>
 
         <footer className="footer">
         </footer>
 
-      </div>
+      </Grid>
     );
   }
 });
