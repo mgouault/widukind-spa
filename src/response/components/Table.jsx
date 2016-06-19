@@ -60,7 +60,7 @@ var container = React.createClass({
       clickToSelect: true,
       selected: selected,
       onSelect: this.onSelect,
-      onSelectAll: function (checked) { this.onSelectAll(data, checked); },
+      onSelectAll: function (checked) { this.onSelectAll(data, checked); }.bind(this),
       bgColor: '#9ACBDB'
     };
 
