@@ -58,6 +58,12 @@ var store = Reflux.createStore({
     this.state[c.series][index] = serie;
     this.refresh();
   },
+  onSelectRowAll: function (data, checked) {
+    _.forEach(this.state[c.series], function (el) {
+      el['checked'] = checked;
+    });
+    this.refresh();
+  },
 
   onRequestValues: function () {
     this.load('values');

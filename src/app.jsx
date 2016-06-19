@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-import { Col } from 'react-bootstrap';
+import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 
 var ParamsContainer = require('./params/Container.jsx');
 var ResponseContainer = require('./response/Container.jsx');
@@ -12,34 +12,47 @@ var WidukindSPA = React.createClass({
 
   render: function () {
     return (
-      <div className="container-fluid">
+      <Grid fluid>
 
-        <div className="header clearfix">
-          <nav>
-            <ul className="nav nav-pills pull-right">
-              <li role="presentation" className="active"><a href="#">Main</a></li>
-              <li role="presentation"><a href="#">Config</a></li>
-            </ul>
-          </nav>
-          <h3 className="text-muted">Widukind SPA</h3>
-        </div>
+        <Navbar>
+          <Navbar.Header>
+            <Navbar.Brand>
+              Widukind SPA
+            </Navbar.Brand>
+          </Navbar.Header>
+          <Nav>
+            <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
+              <img src="assets/github.png" alt="repo github" />
+            </NavItem>
+            <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
+              Widukind
+            </NavItem>
+            <NavItem eventKey={3} href="//widukind-api.cepremap.org" target="_blank">
+              API
+            </NavItem>
+          </Nav>
+        </Navbar>
 
         <div className="row marketing">
-          <Col xs={12} sm={12} md={12} lg={12}>
+          <Row>
             <UrlDisplayContainer />
-          </Col>
-          <Col xs={4} sm={4} md={4} lg={4}>
-            <ParamsContainer />
-          </Col>
-          <Col xs={8} sm={8} md={8} lg={8}>
-            <ResponseContainer />
-          </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col sm={4}>
+              <ParamsContainer />
+            </Col>
+            <Col sm={8}>
+              <ResponseContainer />
+            </Col>
+          </Row>
         </div>
 
         <footer className="footer">
+          &copy; 2016 Widukind-SPA
         </footer>
 
-      </div>
+      </Grid>
     );
   }
 });

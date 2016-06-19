@@ -1,6 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
-import { Well } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 var Loader = require('react-loader');
 var Dygraph = require('react-dygraphs').Dygraph;
 var moment = require('moment');
@@ -62,11 +62,11 @@ var container = React.createClass({
     }
 
     if (_.isEmpty(graphData)) {
-      return (<div>Graph</div>);
+      return (<div>empty</div>);
     }
 
     return (
-      <Well>
+      <Panel header="Graph">
         <Loader loaded={graphData !== null}>
           <Dygraph
             key="dygraph"
@@ -74,7 +74,7 @@ var container = React.createClass({
             labels={graphLabels}
           />
         </Loader>
-      </Well>
+      </Panel>
     );
   }
 

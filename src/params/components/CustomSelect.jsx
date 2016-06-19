@@ -31,7 +31,7 @@ var CustomSelect = React.createClass({
     var options = this.getOptions();
     return (
       <div>
-        {this.props.name}:
+        <strong>{this.props.name}:</strong>
         <Select
           onChange={this.props.onChange}
           value={this.props.value}

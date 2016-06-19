@@ -1,7 +1,7 @@
 var React = require('react');
 var Reflux = require('reflux');
 var _ = require('lodash');
-import { Well } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 
 var c = require('../constants');
 var actions = require('../actions');
@@ -36,7 +36,7 @@ var container = React.createClass({
     var dimensionsLoading = (state[c.loading].indexOf('dimensions') > -1);
 
     return (
-      <Well>
+      <Panel header="Controls">
         <CustomSelect
           key={'providerSelect'}
           name={'Provider'}
@@ -46,6 +46,7 @@ var container = React.createClass({
           onChange={actions[c.changeProvider]}
           loading={datasetsLoading}
         />
+        <br/>
         <CustomSelect
           key={'datasetSelect'}
           name={'Dataset'}
@@ -55,6 +56,7 @@ var container = React.createClass({
           onChange={actions[c.changeDataset]}
           loading={providersLoading}
         />
+        <br/>
         <CustomSelect
           key={'dimensionsSelect'}
           name={'Dimensions'}
@@ -65,11 +67,12 @@ var container = React.createClass({
           loading={dimensionsLoading}
           multiple={true}
         />
+        <br/>
         <DimensionsBox
           key="DimensionsBox"
           data={state[c.selectedDimensions]}
         />
-      </Well>
+      </Panel>
     );
   }
 
