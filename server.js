@@ -84,13 +84,13 @@ app.use(function (err, req, res, next) {
 
 
 var server = require('http').Server(app);
-var io = require('socket.io')(server);
-io.on('connection', function (socket) {
-  socket.emit('urlChange', URLObj);
-  // listener.on('newUrl', function () {
-  //   socket.emit('urlChange', URLObj);
-  // })
-});
+// var io = require('socket.io')(server);
+// io.on('connection', function (socket) {
+//   socket.emit('urlChange', URLObj);
+//   listener.on('newUrl', function () {
+//     socket.emit('urlChange', URLObj);
+//   })
+// });
 
 server.listen(app.get('port'), function() {
   console.log('Server started: http://localhost:'+app.get('port')+'/');

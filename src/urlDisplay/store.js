@@ -21,7 +21,7 @@ var store = Reflux.createStore({
     return this.state;
   },
   init: function () {
-    socket.on('urlChange', actions[c.updateConfig]);
+    // socket.on('urlChange', actions[c.updateConfig]);
     this.listenTo(paramsStore, this.paramsStoreUpdate);
   },
   refresh: function () {
