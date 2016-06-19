@@ -69,3 +69,8 @@ body {
     position: relative;
     top: 50px;
 }
+
+.urlDisplay img {
+    width: 24px;
+    display: inline-block;
+}

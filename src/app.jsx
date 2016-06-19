@@ -26,9 +26,7 @@ var WidukindSPA = React.createClass({
 
         <div className="row marketing">
           <Row>
-            <Col sm={12}>
-              <UrlDisplayContainer />
-            </Col>
+            <UrlDisplayContainer />
           </Row>
           <br/>
           <Row>

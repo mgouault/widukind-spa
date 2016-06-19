@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
-import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+var ClipboardButton = require('react-clipboard.js')
+import { FormGroup, FormControl, ControlLabel, Col } from 'react-bootstrap';
 var url = require('url');
 
 
@@ -23,9 +24,18 @@ var QueryBox = React.createClass({
   render: function () {
     var url = this.makeUrl();
     return (
-      <FormGroup controlId="formControlsText">
-        <FormControl type="text" disabled value={url} />
-      </FormGroup>
+      <div className="urlDisplay">
+        <Col sm={11}>
+          <FormGroup controlId="formControlsText">
+            <FormControl type="text" disabled value={url} />
+          </FormGroup>
+        </Col>
+        <Col sm={1}>
+          <ClipboardButton data-clipboard-text={url}>
+            <img src="assets/clippy.svg" alt="Copy to clipboard" />
+          </ClipboardButton>
+        </Col>
+      </div>
     );
   }
 });
