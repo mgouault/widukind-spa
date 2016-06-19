@@ -5,6 +5,7 @@ var rp = require('request-promise');
 var url = require('url');
 var config = require('config');
 var _ = require('lodash');
+var debug = require('debug')('spa');
 //var EventEmitter = require('events').EventEmitter;
 
 var configURLObj = config.get('api.URLObj');
@@ -18,6 +19,11 @@ var URLObj = {
     'per_page': process.env['WIDUKIND_SPA_LIMIT'] || _.get(configURLObj, 'query.per_page')
   }
 };
+
+var debugEnabled = false;
+if (_.has(process.env, 'DEBUG')) {
+  debugEnabled = true;
+}
 
 var app = express();
 app.set('port', (process.env['WIDUKIND_SPA_PORT'] || config.get('app.port')));
@@ -68,8 +74,15 @@ app.use('/data/:key', function (req, res, next) {
   }
   URL['pathname'] = pathname;
 
-  rp(unescape(url.format(URL)))
+  var link = unescape(url.format(URL));
+  if (debugEnabled) {
+    console.time(link);
+  }
+  rp(link)
     .then(function (response) {
+      if (debugEnabled) {
+        console.timeEnd(link);
+      }
       req.responseData = response;
       next();
     })
