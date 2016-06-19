@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Reflux = require('reflux');
-/* global io */
-var socket = io();
+// /* global io */
+// var socket = io();
 
 var c = require('../constants');
 var actions = require('../actions');

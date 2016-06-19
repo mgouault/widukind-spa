@@ -17,8 +17,9 @@ var WidukindSPA = React.createClass({
         <div className="header clearfix">
           <nav>
             <ul className="nav nav-pills pull-right">
-              <li role="presentation" className="active"><a href="#">Main</a></li>
-              <li role="presentation"><a href="#">Config</a></li>
+              <li role="presentation"><a href="//github.com/mgouault/widukind-spa" target="_blank"><img src="assets/github.png" alt="repo github" /></a></li>
+              <li role="presentation"><a href="//widukind.cepremap.org" target="_blank">Widukind</a></li>
+              <li role="presentation"><a href="//widukind-api.cepremap.org" target="_blank">API</a></li>
             </ul>
           </nav>
           <h3 className="text-muted">Widukind SPA</h3>
