@@ -41,6 +41,7 @@ var WidukindSPA = React.createClass({
         </div>
 
         <footer className="footer">
+          &copy; 2016 Widukind-SPA
         </footer>
 
       </Grid>
