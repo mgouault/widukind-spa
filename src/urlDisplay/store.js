@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var Reflux = require('reflux');
-// /* global io */
-// var socket = io();
+/* global io */
+var socket = io();
 
 var c = require('../constants');
 var actions = require('../actions');
@@ -21,7 +21,7 @@ var store = Reflux.createStore({
     return this.state;
   },
   init: function () {
-    // socket.on('urlChange', actions[c.updateConfig]);
+    socket.on('urlChange', actions[c.updateConfig]);
     this.listenTo(paramsStore, this.paramsStoreUpdate);
   },
   refresh: function () {
