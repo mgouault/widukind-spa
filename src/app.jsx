@@ -14,24 +14,30 @@ var WidukindSPA = React.createClass({
     return (
       <Grid fluid>
 
-        <Navbar>
-          <Navbar.Header>
-            <Navbar.Brand>
-              Widukind SPA
-            </Navbar.Brand>
-          </Navbar.Header>
-          <Nav>
-            <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
-              <img src="assets/github.png" alt="repo github" />
-            </NavItem>
-            <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
-              Widukind
-            </NavItem>
-            <NavItem eventKey={3} href="//widukind-api.cepremap.org" target="_blank">
-              API
-            </NavItem>
-          </Nav>
-        </Navbar>
+        <Row>
+          <Col sm={3}></Col>
+          <Col sm={6}>
+            <Navbar>
+              <Navbar.Header>
+                <Navbar.Brand>
+                  Widukind SPA
+                </Navbar.Brand>
+              </Navbar.Header>
+              <Nav>
+                <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
+                  <img src="assets/github.png" alt="repo github" />
+                </NavItem>
+                <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
+                  Widukind
+                </NavItem>
+                <NavItem eventKey={3} href="//widukind-api.cepremap.org" target="_blank">
+                  API
+                </NavItem>
+              </Nav>
+            </Navbar>
+          </Col>
+          <Col sm={3}></Col>
+        </Row>
 
         <div className="row marketing">
           <Row>
