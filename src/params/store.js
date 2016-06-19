@@ -13,6 +13,11 @@ pattern[c.dimensions] = [];
 pattern[c.selectedDimensions] = [];
 pattern[c.loading] = [];
 
+var defaultValue = {
+  'provider': 'insee',
+  'dataset': 'insee-ipch-2015-fr-coicop'
+}
+
 
 
 var store = Reflux.createStore({
@@ -102,7 +107,7 @@ var store = Reflux.createStore({
     if (!_.isEmpty(providers)) {
       var selectedProvider = this.getValidData(c.selectedProvider);
       if (_.isEmpty(selectedProvider)) {
-        this.setSelectedProvider(_.head(providers).name);
+        this.setSelectedProvider(defaultValue['provider']);
       }
     }
     this.refresh();
@@ -120,7 +125,7 @@ var store = Reflux.createStore({
     if (!_.isEmpty(datasets)) {
       var selectedDataset = this.getValidData(c.selectedDataset);
       if (_.isEmpty(selectedDataset)) {
-        this.setSelectedDataset(_.head(datasets).name);
+        this.setSelectedDataset(defaultValue['dataset']);
       }
     }
     this.refresh();
