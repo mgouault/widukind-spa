@@ -21,7 +21,7 @@ var container = React.createClass({
 
   render: function () {
     if (this.props.loading) {
-      return(<Loader loaded={false}><div></div></Loader>);
+      return(<Panel><div className="tableDiv"><Loader loaded={false}><div></div></Loader></div></Panel>);
     }
 
     var data = [];
@@ -65,23 +65,25 @@ var container = React.createClass({
     };
 
     return (
-      <Panel header="Data table">
-        <BootstrapTable
-          data={data}
-          bordered={true}
-          striped={true}
-          hover={true}
-          condensed={true}
-          selectRow={selectRow}
-        >
-          <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
-          <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
-          <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
-          <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-          <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
-          <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
-          <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
-        </BootstrapTable>
+      <Panel>
+        <div className="tableDiv">
+          <BootstrapTable
+            data={data}
+            bordered={true}
+            striped={true}
+            hover={true}
+            condensed={true}
+            selectRow={selectRow}
+          >
+            <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
+            <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
+            <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
+            <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
+            <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
+            <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
+            <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
+          </BootstrapTable>
+        </div>
       </Panel>
     );
   }

@@ -14,7 +14,7 @@ var container = React.createClass({
 
   render: function () {
     if (this.props.loading) {
-      return(<Loader loaded={false}><div></div></Loader>);
+      return(<Panel><div className="graphDiv"><Loader loaded={false}><div></div></Loader></div></Panel>);
     }
 
     var series = this.props.series;
@@ -62,18 +62,20 @@ var container = React.createClass({
     }
 
     if (_.isEmpty(graphData)) {
-      return (<div>empty</div>);
+      return (<Panel><div className="graphDiv"></div></Panel>);
     }
 
     return (
-      <Panel header="Graph">
-        <Loader loaded={graphData !== null}>
-          <Dygraph
-            key="dygraph"
-            data={graphData}
-            labels={graphLabels}
-          />
-        </Loader>
+      <Panel>
+        <div className="graphDiv">
+          <Loader loaded={graphData !== null}>
+            <Dygraph
+              key="dygraph"
+              data={graphData}
+              labels={graphLabels}
+            />
+          </Loader>
+        </div>
       </Panel>
     );
   }

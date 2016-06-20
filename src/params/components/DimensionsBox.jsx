@@ -33,6 +33,7 @@ var DimensionConfig = React.createClass({
           multi
           options={options}
         />
+      <br/>
       </div>
     );
   }

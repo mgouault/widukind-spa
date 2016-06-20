@@ -36,42 +36,44 @@ var container = React.createClass({
     var dimensionsLoading = (state[c.loading].indexOf('dimensions') > -1);
 
     return (
-      <Panel header="Controls">
-        <CustomSelect
-          key={'providerSelect'}
-          name={'Provider'}
-          data={state[c.providers]}
-          onMissing={providersMissingWrap}
-          value={state[c.selectedProvider]}
-          onChange={actions[c.changeProvider]}
-          loading={datasetsLoading}
-        />
-        <br/>
-        <CustomSelect
-          key={'datasetSelect'}
-          name={'Dataset'}
-          data={state[c.datasets]}
-          onMissing={datasetsMissingWrap}
-          value={state[c.selectedDataset]}
-          onChange={actions[c.changeDataset]}
-          loading={providersLoading}
-        />
-        <br/>
-        <CustomSelect
-          key={'dimensionsSelect'}
-          name={'Dimensions'}
-          data={state[c.dimensions]}
-          onMissing={dimensionsMissingWrap}
-          value={selectedDimensions}
-          onChange={actions[c.changeDimensions]}
-          loading={dimensionsLoading}
-          multiple={true}
-        />
-        <br/>
-        <DimensionsBox
-          key="DimensionsBox"
-          data={state[c.selectedDimensions]}
-        />
+      <Panel>
+        <div className="controlsDiv">
+          <CustomSelect
+            key={'providerSelect'}
+            name={'Provider'}
+            data={state[c.providers]}
+            onMissing={providersMissingWrap}
+            value={state[c.selectedProvider]}
+            onChange={actions[c.changeProvider]}
+            loading={datasetsLoading}
+          />
+          <br/>
+          <CustomSelect
+            key={'datasetSelect'}
+            name={'Dataset'}
+            data={state[c.datasets]}
+            onMissing={datasetsMissingWrap}
+            value={state[c.selectedDataset]}
+            onChange={actions[c.changeDataset]}
+            loading={providersLoading}
+          />
+          <br/>
+          <CustomSelect
+            key={'dimensionsSelect'}
+            name={'Dimensions'}
+            data={state[c.dimensions]}
+            onMissing={dimensionsMissingWrap}
+            value={selectedDimensions}
+            onChange={actions[c.changeDimensions]}
+            loading={dimensionsLoading}
+            multiple={true}
+          />
+          <br/>
+          <DimensionsBox
+            key="DimensionsBox"
+            data={state[c.selectedDimensions]}
+          />
+        </div>
       </Panel>
     );
   }

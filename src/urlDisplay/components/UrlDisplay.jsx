@@ -24,7 +24,7 @@ var QueryBox = React.createClass({
   render: function () {
     var url = this.makeUrl();
     return (
-      <div className="urlDisplay">
+      <div className="urlDisplayDiv">
         <Col sm={11}>
           <FormGroup controlId="formControlsText">
             <FormControl type="text" disabled value={url} />

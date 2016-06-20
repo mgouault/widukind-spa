@@ -70,7 +70,23 @@ body {
     top: 50px;
 }
 
-.urlDisplay img {
+.urlDisplayDiv img {
     width: 24px;
     display: inline-block;
+}
+
+.urlDisplayDiv {
+    min-height: 34px;
+}
+
+.controlsDiv {
+    min-height: 228px;
+}
+
+.graphDiv {
+    min-height: 320px;
+}
+
+.tableDiv {
+    min-height: 72px;
 }

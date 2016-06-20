@@ -12,14 +12,12 @@ var container = React.createClass({
 
   render: function () {
     return (
-      <div>
-        <UrlDisplay
-          key="UrlDisplay"
-          dataset={this.state.storeState[c.selectedDataset]}
-          dimensions={this.state.storeState[c.selectedDimensions]}
-          config={this.state.storeState[c.config]}
-        />
-      </div>
+      <UrlDisplay
+        key="UrlDisplay"
+        dataset={this.state.storeState[c.selectedDataset]}
+        dimensions={this.state.storeState[c.selectedDimensions]}
+        config={this.state.storeState[c.config]}
+      />
     );
   }
 
