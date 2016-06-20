@@ -1,6 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
-import { Panel, Table, Checkbox } from 'react-bootstrap';
+import { Table, Checkbox } from 'react-bootstrap';
 var Loader = require('react-loader');
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
@@ -21,7 +21,7 @@ var container = React.createClass({
 
   render: function () {
     if (this.props.loading) {
-      return(<Panel><div className="tableDiv"><Loader loaded={false}><div></div></Loader></div></Panel>);
+      return(<div className="tableDiv"><Loader loaded={false}><div></div></Loader></div>);
     }
 
     var data = [];
@@ -65,26 +65,24 @@ var container = React.createClass({
     };
 
     return (
-      <Panel>
-        <div className="tableDiv">
-          <BootstrapTable
-            data={data}
-            bordered={true}
-            striped={true}
-            hover={true}
-            condensed={true}
-            selectRow={selectRow}
-          >
-            <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
-            <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
-            <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
-            <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-            <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
-            <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
-            <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
-          </BootstrapTable>
-        </div>
-      </Panel>
+      <div className="tableDiv">
+        <BootstrapTable
+          data={data}
+          bordered={true}
+          striped={true}
+          hover={true}
+          condensed={true}
+          selectRow={selectRow}
+        >
+          <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
+          <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
+          <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
+          <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
+          <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
+          <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
+          <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
+        </BootstrapTable>
+      </div>
     );
   }
 });

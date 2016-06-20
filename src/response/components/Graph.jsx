@@ -1,6 +1,5 @@
 var React = require('react');
 var _ = require('lodash');
-import { Panel } from 'react-bootstrap';
 var Loader = require('react-loader');
 var Dygraph = require('react-dygraphs').Dygraph;
 var moment = require('moment');
@@ -14,7 +13,7 @@ var container = React.createClass({
 
   render: function () {
     if (this.props.loading) {
-      return(<Panel><div className="graphDiv"><Loader loaded={false}><div></div></Loader></div></Panel>);
+      return(<div className="graphDiv"><Loader loaded={false}><div></div></Loader></div>);
     }
 
     var series = this.props.series;
@@ -62,21 +61,19 @@ var container = React.createClass({
     }
 
     if (_.isEmpty(graphData)) {
-      return (<Panel><div className="graphDiv"></div></Panel>);
+      return (<div className="graphDiv"></div>);
     }
 
     return (
-      <Panel>
-        <div className="graphDiv">
-          <Loader loaded={graphData !== null}>
-            <Dygraph
-              key="dygraph"
-              data={graphData}
-              labels={graphLabels}
-            />
-          </Loader>
-        </div>
-      </Panel>
+      <div className="graphDiv">
+        <Loader loaded={graphData !== null}>
+          <Dygraph
+            key="dygraph"
+            data={graphData}
+            labels={graphLabels}
+          />
+        </Loader>
+      </div>
     );
   }
 

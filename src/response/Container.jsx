@@ -24,10 +24,12 @@ var container = React.createClass({
           series={state[c.series]}
           loading={graphLoading}
         />
+        <br/>
         <Table
           series={state[c.series]}
           loading={tableLoading}
         />
+        <br/>
         <LogBox
           log={state[c.log]}
           displayed={state[c.logDisplayed]}
