@@ -62,6 +62,8 @@ var store = Reflux.createStore({
   },
   setSelectedDataset: function (data) {
     this.state[c.selectedDataset] = data;
+    this.setFrequencies([]);
+    this.setSelectedFrequencies([]);
     this.setDimensions({});
     this.setSelectedDimensions([]);
   },
@@ -116,7 +118,11 @@ var store = Reflux.createStore({
     if (!_.isEmpty(providers)) {
       var selectedProvider = this.getValidData(c.selectedProvider);
       if (_.isEmpty(selectedProvider)) {
-        this.setSelectedProvider(defaultValue['provider']);
+        var def = defaultValue['provider'];
+        if (!_.find(providers, {'name': def})) {
+          def = _.get(_.head(providers), 'name');
+        }
+        this.setSelectedProvider(def);
       }
     }
     this.refresh();
@@ -134,7 +140,11 @@ var store = Reflux.createStore({
     if (!_.isEmpty(datasets)) {
       var selectedDataset = this.getValidData(c.selectedDataset);
       if (_.isEmpty(selectedDataset)) {
-        this.setSelectedDataset(defaultValue['dataset']);
+        var def = defaultValue['dataset'];
+        if (!_.find(datasets, {'name': def})) {
+          def = _.get(_.head(datasets), 'name');
+        }
+        this.setSelectedDataset(def);
       }
     }
     this.refresh();

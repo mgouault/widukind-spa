@@ -21,6 +21,12 @@ var container = React.createClass({
     var graphData = [];
     var graphLabels = ['period'];
 
+    function makePeriod (period, type) {
+      var mult = parseInt(_.last(period)) - 1;
+      var str = _.slice(period, 0, 4);
+      return moment(_.join(str, '')).add(mult, type).toISOString();
+    }
+
     if (series && !_.isEmpty(series)) {
       var data = {};
       _.forEach(series, function (serie) {
@@ -31,12 +37,17 @@ var container = React.createClass({
           }
           _.forEach(serie['values'], function (value) {
             var period = value.period;
+            var key;
             if (period.indexOf('Q') > -1) {
-              var mult = parseInt(_.last(period)) - 1;
-              var str = _.slice(period, 0, 4);
-              var key = moment(_.join(str, '')).add(3 * mult, 'months').toISOString();
+              key = makePeriod(period, 'quarters');
+            } else if (period.indexOf('M') > -1) { // todo: not working (because string is `1990-01`)
+              key = makePeriod(period, 'months');
+            } else if (period.indexOf('W') > -1) { // todo: not tested
+              key = makePeriod(period, 'weeks');
+            } else if (period.indexOf('D') > -1) { // todo: not tested
+              key = makePeriod(period, 'days');
             } else {
-              var key = moment(period).toISOString();
+              key = moment(period).toISOString();
             }
             if (!key) {
               return;
