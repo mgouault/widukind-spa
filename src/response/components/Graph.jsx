@@ -3,6 +3,7 @@ var _ = require('lodash');
 var Loader = require('react-loader');
 var Dygraph = require('react-dygraphs').Dygraph;
 var moment = require('moment');
+var Dimensions = require('react-dimensions');
 
 var c = require('../../constants');
 var actions = require('../../actions');
@@ -71,6 +72,7 @@ var container = React.createClass({
             key="dygraph"
             data={graphData}
             labels={graphLabels}
+            width={this.props.containerWidth - 30}
           />
         </Loader>
       </div>
@@ -79,4 +81,4 @@ var container = React.createClass({
 
 });
 
-module.exports = container;
+module.exports = Dimensions()(container);

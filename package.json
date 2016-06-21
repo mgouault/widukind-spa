@@ -28,6 +28,7 @@
     "react-bootstrap": "^0.29.3",
     "react-bootstrap-table": "^2.3.3",
     "react-clipboard.js": "^0.2.3",
+    "react-dimensions": "^1.2.0",
     "react-dom": "^15.0.1",
     "react-dygraphs": "0.0.1",
     "react-loader": "^2.4.0",
