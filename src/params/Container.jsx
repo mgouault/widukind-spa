@@ -29,10 +29,12 @@ var container = React.createClass({
 
     var providersMissingWrap = this.wrap(actions[c.providersMissing], state);
     var datasetsMissingWrap = this.wrap(actions[c.datasetsMissing], state);
+    var frequenciesMissingWrap = this.wrap(actions[c.frequenciesMissing], state);
     var dimensionsMissingWrap = this.wrap(actions[c.dimensionsMissing], state);
 
     var providersLoading = (state[c.loading].indexOf('providers') > -1);
     var datasetsLoading = (state[c.loading].indexOf('datasets') > -1);
+    var frequenciesLoading = (state[c.loading].indexOf('frequencies') > -1);
     var dimensionsLoading = (state[c.loading].indexOf('dimensions') > -1);
 
     return (
@@ -56,6 +58,17 @@ var container = React.createClass({
             value={state[c.selectedDataset]}
             onChange={actions[c.changeDataset]}
             loading={providersLoading}
+          />
+          <br/>
+          <CustomSelect
+            key={'frequenciesSelect'}
+            name={'Frequencies'}
+            data={state[c.frequencies]}
+            onMissing={frequenciesMissingWrap}
+            value={state[c.selectedFrequencies]}
+            onChange={actions[c.changeFrequencies]}
+            loading={frequenciesLoading}
+            multiple={true}
           />
           <br/>
           <CustomSelect

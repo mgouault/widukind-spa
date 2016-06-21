@@ -13,6 +13,7 @@ var apiCall = require('./apiCall');
 var actions = Reflux.createActions([
   c.changeProvider,
   c.changeDataset,
+  c.changeFrequencies,
   c.changeDimensions,
   c.changeDimensionValues,
   c.requestSeries,
@@ -43,6 +44,19 @@ actions[c.datasetsMissing].listenAndPromise(function (state) {
   });
 });
 
+actions[c.frequenciesMissing] = Reflux.createAction({
+  asyncResult: true,
+  shouldEmit: function (state) {
+    return (state[c.selectedDataset] && !_.isEmpty(state[c.selectedDataset]));
+  }
+ });
+actions[c.frequenciesMissing].listenAndPromise(function (state) {
+  return apiCall({
+    'pathname': '/frequencies',
+    'query': {'dataset': state[c.selectedDataset]}
+  });
+});
+
 actions[c.dimensionsMissing] = Reflux.createAction({
   asyncResult: true,
   shouldEmit: function (state) {
@@ -63,11 +77,16 @@ actions[c.requestSeries] = Reflux.createAction({
   }
 });
 actions[c.requestSeries].listenAndPromise(function (state) {
+  var controls = _.cloneDeep(state[c.selectedDimensions]);
+  controls.push({
+    'name': 'frequency',
+    'selected': state[c.selectedFrequencies]
+  });
   return apiCall({
     'pathname': '/series',
     'query': {
       'dataset': state[c.selectedDataset],
-      'controls': state[c.selectedDimensions]
+      'controls': controls
     }
   });
 });

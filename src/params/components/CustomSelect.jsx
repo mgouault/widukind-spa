@@ -12,7 +12,11 @@ var CustomSelect = React.createClass({
 
   getOptions: function () {
     return _.map(this.props.data, function (el) {
-      return ({ 'value':el.name, 'label':el.name });
+      var name = el.name;
+      if (typeof el === 'string') {
+        name = el;
+      }
+      return ({ 'value':name, 'label':name });
     });
   },
 

@@ -59,6 +59,8 @@ app.use('/data/:key', function (req, res, next) {
       pathname += '/providers/keys'; break;
     case 'datasets':
       pathname += '/providers/'+req.query['provider']+'/datasets/keys'; break;
+    case 'frequencies':
+      pathname += '/datasets/'+req.query['dataset']+'/frequencies'; break;
     case 'dimensions':
       pathname += '/datasets/'+req.query['dataset']+'/dimensions'; break;
     case 'series':

@@ -9,6 +9,8 @@ pattern[c.providers] = [];
 pattern[c.selectedProvider] = '';
 pattern[c.datasets] = [];
 pattern[c.selectedDataset] = '';
+pattern[c.frequencies] = [];
+pattern[c.selectedFrequencies] = [];
 pattern[c.dimensions] = [];
 pattern[c.selectedDimensions] = [];
 pattern[c.loading] = [];
@@ -58,23 +60,30 @@ var store = Reflux.createStore({
       return {'name': el, 'value': []};
     });
   },
-
   setSelectedDataset: function (data) {
     this.state[c.selectedDataset] = data;
     this.setDimensions({});
     this.setSelectedDimensions([]);
   },
-    /* Dimensions */
-  setDimensions: function (data) {
-    this.state[c.dimensions] = _.map(Object.keys(data), function (el) {
-      var value = Object.keys(data[el]);
-      if (el === 'frequency') {
-        value = _.map(value, _.upperCase);
-      }
-      return {'name': el, 'value': value};
+    /* Frequencies */
+  setFrequencies: function (data) {
+    this.state[c.frequencies] = _.clone(data);
+  },
+  setSelectedFrequencies: function (data) {
+    this.state[c.selectedFrequencies] = _.map(data, function (el) {
+      return el.value;
     });
   },
-
+    /* Dimensions */
+  setDimensions: function (data) {
+    this.state[c.dimensions] = [];
+    _.forEach(Object.keys(data), function (el) {
+      if (el !== 'freq' && el !== 'frequency') {
+        var value = Object.keys(data[el]);
+        this.state[c.dimensions].push({'name': el, 'value': value});
+      }
+    }.bind(this));
+  },
   setSelectedDimensions: function (data) {
     this.state[c.selectedDimensions] = _.map(data, function (el) {
       var name = el.value;
@@ -131,6 +140,26 @@ var store = Reflux.createStore({
     this.refresh();
   },
 
+  onFrequenciesMissing: function () {
+    this.load('frequencies');
+    this.refresh();
+  },
+  onFrequenciesMissingFailed: console.error,
+  onFrequenciesMissingCompleted: function (data) {
+    this.unload('frequencies');
+    this.setFrequencies(data);
+    var frequencies = this.getValidData(c.frequencies);
+    if (!_.isEmpty(frequencies)) {
+      var selectedFrequencies = this.getValidData(c.selectedFrequencies);
+      if (_.isEmpty(selectedFrequencies)) {
+        this.setSelectedFrequencies([{
+          'value': _.head(frequencies)
+        }]);
+      }
+    }
+    this.refresh();
+  },
+
   onDimensionsMissing: function () {
     this.load('dimensions');
     this.refresh();
@@ -156,17 +185,18 @@ var store = Reflux.createStore({
     this.setSelectedProvider(value.value);
     this.refresh();
   },
-
   onChangeDataset: function (value) {
     this.setSelectedDataset(value.value);
     this.refresh();
   },
-
+  onChangeFrequencies: function (data) {
+    this.setSelectedFrequencies(data);
+    this.refresh();
+  },
   onChangeDimensions: function (data) {
     this.setSelectedDimensions(data);
     this.refresh();
   },
-
   onChangeDimensionValues: function (data, dimensionName) {
     _.set(
       _.find(this.state[c.selectedDimensions], {'name': dimensionName}),
