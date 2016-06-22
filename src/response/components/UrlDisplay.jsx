@@ -1,17 +1,18 @@
 var React = require('react');
+var Reflux = require('reflux');
 var _ = require('lodash');
-var ClipboardButton = require('react-clipboard.js')
-import { FormGroup, FormControl, ControlLabel, Col } from 'react-bootstrap';
 var url = require('url');
+var ClipboardButton = require('react-clipboard.js')
+import { FormGroup, FormControl, Col } from 'react-bootstrap';
 
 
 
-var QueryBox = React.createClass({
+var UrlDisplay = React.createClass({
 
   makeUrl: function () {
     var URL = _.cloneDeep(this.props.config);
-    URL['pathname'] += '/datasets/'+this.props.dataset+'/values';
-    _.forEach(this.props.dimensions, function (el) {
+    URL['pathname'] += '/datasets/'+this.props.selectedDataset+'/values';
+    _.forEach(this.props.selectedDimensions, function (el) {
       if (!_.isEmpty(el.selected)) {
         var tmp = {};
         tmp[el.name] = _.join(el.selected, '+');
@@ -27,7 +28,7 @@ var QueryBox = React.createClass({
       <div className="urlDisplayDiv">
         <Col sm={11}>
           <FormGroup controlId="formControlsText">
-            <FormControl type="text" disabled value={url} />
+            <FormControl type="text" value={url} disabled />
           </FormGroup>
         </Col>
         <Col sm={1}>
@@ -40,4 +41,4 @@ var QueryBox = React.createClass({
   }
 });
 
-module.exports = QueryBox;
+module.exports = UrlDisplay;

@@ -9,7 +9,7 @@ var actions = require('../../actions');
 
 
 
-var container = React.createClass({
+var DataTable = React.createClass({
 
   onSelect: function (row) {
     actions[c.selectRow](row['key']);
@@ -87,4 +87,4 @@ var container = React.createClass({
   }
 });
 
-module.exports = container;
+module.exports = DataTable;

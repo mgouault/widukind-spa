@@ -10,7 +10,7 @@ var actions = require('../../actions');
 
 
 
-var container = React.createClass({
+var Graph = React.createClass({
 
   render: function () {
     if (this.props.loading) {
@@ -116,4 +116,4 @@ var container = React.createClass({
 
 });
 
-module.exports = Dimensions()(container);
+module.exports = Dimensions()(Graph);

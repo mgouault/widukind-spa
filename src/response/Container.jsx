@@ -4,6 +4,7 @@ var Reflux = require('reflux');
 var store = require('./store');
 var c = require('../constants');
 var Graph = require('./components/Graph.jsx');
+var UrlDisplay = require('./components/UrlDisplay.jsx');
 var Table = require('./components/Table.jsx');
 var LogBox = require('./components/LogBox.jsx');
 
@@ -23,6 +24,12 @@ var container = React.createClass({
         <Graph
           series={state[c.series]}
           loading={graphLoading}
+        />
+        <br/>
+        <UrlDisplay
+          config={state[c.config]}
+          selectedDataset={state[c.selectedDataset]}
+          selectedDimensions={state[c.selectedDimensions]}
         />
         <br/>
         <Table

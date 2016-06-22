@@ -4,7 +4,6 @@ import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 
 var ParamsContainer = require('./params/Container.jsx');
 var ResponseContainer = require('./response/Container.jsx');
-var UrlDisplayContainer = require('./urlDisplay/Container.jsx');
 
 
 
@@ -40,10 +39,6 @@ var WidukindSPA = React.createClass({
         </Row>
 
         <div className="row marketing">
-          <Row>
-            <UrlDisplayContainer />
-          </Row>
-          <br/>
           <Row>
             <Col sm={4}>
               <ParamsContainer />

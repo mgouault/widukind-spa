@@ -48,35 +48,19 @@ var store = Reflux.createStore({
     }
     return this.state[key];
   },
-    /* Providers */
-  setSelectedProvider: function (data) {
-    this.state[c.selectedProvider] = data;
-    this.setDatasets([]);
-    this.setSelectedDataset('');
+  setProviders: function (data) {
+    this.state[c.providers] = _.map(data, function (el) {
+      return {'name': el, 'value': []};
+    });
   },
-    /* Datasets */
   setDatasets: function (data) {
     this.state[c.datasets] = _.map(data, function (el) {
       return {'name': el, 'value': []};
     });
   },
-  setSelectedDataset: function (data) {
-    this.state[c.selectedDataset] = data;
-    this.setFrequencies([]);
-    this.setSelectedFrequencies([]);
-    this.setDimensions({});
-    this.setSelectedDimensions([]);
-  },
-    /* Frequencies */
   setFrequencies: function (data) {
     this.state[c.frequencies] = _.clone(data);
   },
-  setSelectedFrequencies: function (data) {
-    this.state[c.selectedFrequencies] = _.map(data, function (el) {
-      return el.value;
-    });
-  },
-    /* Dimensions */
   setDimensions: function (data) {
     this.state[c.dimensions] = [];
     _.forEach(Object.keys(data), function (el) {
@@ -85,6 +69,23 @@ var store = Reflux.createStore({
         this.state[c.dimensions].push({'name': el, 'value': value});
       }
     }.bind(this));
+  },
+  setSelectedProvider: function (data) {
+    this.state[c.selectedProvider] = data;
+    this.setDatasets([]);
+    this.setSelectedDataset('');
+  },
+  setSelectedDataset: function (data) {
+    this.state[c.selectedDataset] = data;
+    this.setFrequencies([]);
+    this.setSelectedFrequencies([]);
+    this.setDimensions({});
+    this.setSelectedDimensions([]);
+  },
+  setSelectedFrequencies: function (data) {
+    this.state[c.selectedFrequencies] = _.map(data, function (el) {
+      return el.value;
+    });
   },
   setSelectedDimensions: function (data) {
     this.state[c.selectedDimensions] = _.map(data, function (el) {
@@ -111,9 +112,7 @@ var store = Reflux.createStore({
   onProvidersMissingFailed: console.error,
   onProvidersMissingCompleted: function (data) {
     this.unload('providers');
-    this.state[c.providers] = _.map(data, function (el) {
-      return {'name': el, 'value': []};
-    });
+    this.setProviders(data);
     var providers = this.getValidData(c.providers);
     if (!_.isEmpty(providers)) {
       var selectedProvider = this.getValidData(c.selectedProvider);
