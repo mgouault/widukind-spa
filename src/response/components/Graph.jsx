@@ -22,30 +22,43 @@ var container = React.createClass({
     var graphLabels = ['period'];
 
     function makePeriod (period, type) {
-      var mult = parseInt(_.last(period)) - 1;
-      var str = _.slice(period, 0, 4);
-      return moment(_.join(str, '')).add(mult, type).toISOString();
+
     }
 
     if (series && !_.isEmpty(series)) {
-      var data = {};
+      let data = {};
       _.forEach(series, function (serie) {
         if (serie['checked']) {
           if (!serie['values']) {
             actions[c.requestValues].triggerAsync(serie['slug']);
             return;
           }
+
           _.forEach(serie['values'], function (value) {
-            var period = value.period;
-            var key;
-            if (period.indexOf('Q') > -1) {
-              key = makePeriod(period, 'quarters');
-            } else if (period.indexOf('M') > -1) { // todo: not working (because string is `1990-01`)
-              key = makePeriod(period, 'months');
-            } else if (period.indexOf('W') > -1) { // todo: not tested
-              key = makePeriod(period, 'weeks');
-            } else if (period.indexOf('D') > -1) { // todo: not tested
-              key = makePeriod(period, 'days');
+            let period = value.period;
+            let key;
+            let customHandling = _.some(['Q', 'M', 'W', 'D'], function (el) {
+              return period.indexOf(el) > 1;
+            });
+            if (customHandling) {
+              let type;
+              switch (serie['frequency']) {
+                case 'Q':
+                  type = 'quarters';
+                  break;
+                case 'M':
+                  type = 'months';
+                  break;
+                case 'W':
+                  type = 'weeks';
+                  break;
+                case 'D':
+                  type = 'days';
+                  break;
+              }
+              let year = _.join(_.slice(period, 0, 4), '');
+              let mult = parseInt( _.trim( _.join( _.slice(period, 4), ''), '-QMWD') ) - 1;
+              key = moment(year).add(mult, type).toISOString();
             } else {
               key = moment(period).toISOString();
             }
@@ -57,16 +70,27 @@ var container = React.createClass({
             }
             data[key].push(value.value);
           });
+
           graphLabels.push(serie['key']);
         }
       });
+
       if (!_.isEmpty(data)) {
-        graphData = _.map(Object.keys(data), function (key_) {
-          var tmp = [];
-          tmp.push(moment(key_).toDate());
-          _.forEach(data[key_], function (el) {
+        let keys = Object.keys(data);
+        keys.sort(function (a, b) {
+        	return (moment(a).isBefore(moment(b))) ? -1 : 1;
+        });
+        graphData = _.map(keys, function (key) {
+          let tmp = [];
+          tmp.push(moment(key).toDate());
+          _.forEach(data[key], function (el) {
             tmp.push(parseFloat(el));
           });
+          if (graphLabels.length !== tmp.length) {
+            let tmp = _.fill(Array(graphLabels.length), 0, 1);
+            tmp[0] = moment(key).toDate();
+            return tmp;
+          }
           return tmp;
         });
       }

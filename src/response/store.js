@@ -72,6 +72,11 @@ var store = Reflux.createStore({
   onRequestValuesFailed: console.error,
   onRequestValuesCompleted: function (data) {
     this.unload('values');
+    if (!_.isEmpty(data)) {
+      this.state[c.log] = JSON.stringify(data, null, 2)
+        + '\n -------------------- \n'
+        + this.state[c.log];
+    }
     var index = _.findIndex(this.state[c.series], {'key': data['key']});
     var serie = this.state[c.series][index];
     serie['values'] = _.get(data, 'values');
