@@ -3,14 +3,14 @@ var Reflux = require('reflux');
 var _ = require('lodash');
 import { Panel } from 'react-bootstrap';
 
-var c = require('../constants');
-var actions = require('../actions');
+var c = require('./constants');
+var actions = require('./actions');
 var store = require('./store');
-var CustomSelect = require('./components/CustomSelect.jsx');
+var CustomSelect = require('../../components/CustomSelect.jsx');
 
 
 
-var container = React.createClass({
+var Container = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   wrap: function (func, staticArg) {
@@ -21,6 +21,10 @@ var container = React.createClass({
 
   render: function () {
     let state = this.state.storeState;
+
+    if (state.loading) {
+      return (<Loader loaded={false}><div></div></Loader>);
+    }
 
     let selectedDimensionsString = _.map(state[c.selectedDimensions], function (el) {
       return el.name
@@ -106,4 +110,4 @@ var container = React.createClass({
 
 });
 
-module.exports = container;
+module.exports = Container;

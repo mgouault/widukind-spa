@@ -2,9 +2,6 @@ var React = require('react');
 import { Row, Col, Panel, Button } from 'react-bootstrap';
 var Loader = require('react-loader');
 
-var c = require('../../constants');
-var actions = require('../../actions');
-
 
 
 var LogBox = React.createClass({
@@ -17,7 +14,7 @@ var LogBox = React.createClass({
       <Panel header="Logs">
         <Row>
           <Col sm={6} smOffset={3}>
-            <Button onClick={actions[c.displayLog]} block>
+            <Button onClick={this.props.displayLog} block>
               {(!this.props.displayed) ? "Show" : "Hide"}
             </Button>
           </Col>

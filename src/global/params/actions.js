@@ -8,19 +8,14 @@ Reflux.use(RefluxPromise(Q.Promise));
 Reflux.use(RefluxPromise(bluebird))
 
 var c = require('./constants');
-var apiCall = require('./apiCall');
+var apiCall = require('../../helpers/apiCall');
 
 var actions = Reflux.createActions([
   c.changeProvider,
   c.changeDataset,
   c.changeFrequencies,
   c.changeDimensions,
-  c.changeDimensionValues,
-  c.requestSeries,
-  c.updateConfig,
-  c.displayLog,
-  c.selectRow,
-  c.selectRowAll
+  c.changeDimensionValues
 ]);
 
 actions[c.providersMissing] = Reflux.createAction({ asyncResult: true });
@@ -67,35 +62,6 @@ actions[c.dimensionsMissing].listenAndPromise(function (state) {
   return apiCall({
     'pathname': '/dimensions',
     'query': {'dataset': state[c.selectedDataset]}
-  });
-});
-
-actions[c.requestSeries] = Reflux.createAction({
-  asyncResult: true,
-  shouldEmit: function (state) {
-    return (state[c.selectedDataset] && !_.isEmpty(state[c.selectedDataset]));
-  }
-});
-actions[c.requestSeries].listenAndPromise(function (state) {
-  var controls = _.cloneDeep(state[c.selectedDimensions]);
-  controls.push({
-    'name': 'frequency',
-    'selected': state[c.selectedFrequencies]
-  });
-  return apiCall({
-    'pathname': '/series',
-    'query': {
-      'dataset': state[c.selectedDataset],
-      'controls': controls
-    }
-  });
-});
-
-actions[c.requestValues] = Reflux.createAction({ asyncResult: true });
-actions[c.requestValues].listenAndPromise(function (slug) {
-  return apiCall({
-    'pathname': '/values',
-    'query': {'slug': slug}
   });
 });
 

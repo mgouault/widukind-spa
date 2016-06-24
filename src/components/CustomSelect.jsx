@@ -4,8 +4,6 @@ import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 var Loader = require('react-loader');
 var Select = require('react-select');
 
-var c = require('../../constants');
-
 
 
 var CustomSelect = React.createClass({

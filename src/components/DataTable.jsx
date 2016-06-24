@@ -4,19 +4,16 @@ import { Table, Checkbox } from 'react-bootstrap';
 var Loader = require('react-loader');
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-var c = require('../../constants');
-var actions = require('../../actions');
-
 
 
 var DataTable = React.createClass({
 
   onSelect: function (row) {
-    actions[c.selectRow](row['key']);
+    this.props.selectRow(row['key']);
   },
 
   onSelectAll: function (data, checked) {
-    actions[c.selectRowAll](data, checked);
+    this.props.selectRowAll(data, checked);
   },
 
   render: function () {

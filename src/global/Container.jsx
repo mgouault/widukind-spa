@@ -1,13 +1,15 @@
 var React = require('react');
-var ReactDOM = require('react-dom');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 
+var GraphContainer = require('./graph/Container.jsx');
+var LogContainer = require('./log/Container.jsx');
 var ParamsContainer = require('./params/Container.jsx');
-var ResponseContainer = require('./response/Container.jsx');
+var TableContainer = require('./table/Container.jsx');
+var UrlContainer = require('./url/Container.jsx');
 
 
 
-var WidukindSPA = React.createClass({
+var Container = React.createClass({
 
   render: function () {
     return (
@@ -41,10 +43,16 @@ var WidukindSPA = React.createClass({
         <div className="row marketing">
           <Row>
             <Col sm={4}>
-              <ParamsContainer />
+              <ParamsContainer/>
             </Col>
             <Col sm={8}>
-              <ResponseContainer />
+              {// <GraphContainer/>
+              // <br/>
+              // <UrlContainer/>
+              // <br/>
+              // <TableContainer/>
+              // <br/>
+              // <LogContainer/>}
             </Col>
           </Row>
         </div>
@@ -58,9 +66,4 @@ var WidukindSPA = React.createClass({
   }
 });
 
-
-
-ReactDOM.render(
-  <WidukindSPA />,
-  document.getElementById('content')
-);
+module.exports = Container;

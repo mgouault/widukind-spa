@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var Reflux = require('reflux');
 
-var c = require('../constants');
-var actions = require('../actions');
+var c = require('./constants');
+var actions = require('./actions');
 
 var pattern = {};
 pattern[c.providers] = [];
@@ -13,7 +13,6 @@ pattern[c.frequencies] = [];
 pattern[c.selectedFrequencies] = [];
 pattern[c.dimensions] = [];
 pattern[c.selectedDimensions] = [];
-pattern[c.loading] = [];
 
 var defaultValue = {
   'provider': 'insee',
@@ -31,15 +30,7 @@ var store = Reflux.createStore({
   refresh: function () {
     this.trigger(this.state);
   },
-
-  load: function (key) {
-    this.state[c.loading].push(key);
-  },
-  unload: function (key) {
-    var index = this.state[c.loading].indexOf(key);
-    this.state[c.loading].splice(index, 1);
-  },
-
+  
   /* Getters-Setters */
   getValidData: function (key) {
     if ((typeof this.state[key] !== typeof pattern[key]) ||

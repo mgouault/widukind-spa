@@ -9,11 +9,6 @@ var constants = keyMirror({
   selectedFrequencies: null,
   dimensions: null,
   selectedDimensions: null,
-  series: null,
-  log: null,
-  logDisplayed: null,
-  config: null,
-  loading: null,
 
   providersMissing: null,
   datasetsMissing: null,
@@ -23,13 +18,7 @@ var constants = keyMirror({
   changeDataset: null,
   changeFrequencies: null,
   changeDimensions: null,
-  changeDimensionValues: null,
-  requestSeries: null,
-  requestValues: null,
-  updateConfig: null,
-  displayLog: null,
-  selectRow: null,
-  selectRowAll: null
+  changeDimensionValues: null
 });
 
 module.exports = constants;
