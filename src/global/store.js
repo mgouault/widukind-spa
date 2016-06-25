@@ -1,22 +1,41 @@
-var _ = require('lodash');
-var Reflux = require('reflux');
+let _ = require('lodash');
+let Reflux = require('reflux');
 
-var c = require('./constants');
-var actions = require('./actions');
-var apiCall = require('../helpers/apiCall');
+let actions = require('./actions');
 
-var pattern = {};
+let _state = {
+  'requestPathname': {
+    'series': '',
+    'values': ''
+  }
+};
 
 
 
-var store = Reflux.createStore({
+let store = Reflux.createStore({
   listenables: [actions],
   getInitialState: function () {
-    this.state = _.cloneDeep(pattern);
-    return this.state;
+    return _state;
   },
   refresh: function () {
-    this.trigger(this.state);
+    this.trigger(_state);
+  },
+
+  onNewURL: function (URL) {
+console.log('3');
+    let dataset = URL['dataset'];
+    let querystring = URL['querystring'];
+    let QSString = '';
+    if (!_.isEmpty(querystring)) {
+      let tmp = _.map(Object.keys(querystring), function (key) {
+        let val = querystring[key];
+        return key+'='+val;
+      });
+      QSString = '?' + _.join(tmp, '&');
+    }
+    _state['requestPathname']['series'] = '/datasets/' + dataset + '/series' + QSString;
+    _state['requestPathname']['values'] = '/datasets/' + dataset + '/values' + QSString;
+    this.refresh();
   }
 });
 

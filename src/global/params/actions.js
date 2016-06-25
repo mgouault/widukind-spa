@@ -9,7 +9,10 @@ Reflux.use(RefluxPromise(bluebird))
 
 let apiCall = require('../../helpers/apiCall');
 
+
+
 let paramsActions = Reflux.createActions({
+  'buildURL': {},
   'selectProvider': {},
   'selectDataset': {},
   'selectFrequency': {},
@@ -35,7 +38,7 @@ let paramsActions = Reflux.createActions({
     shouldEmit: function (selectedDataset) {
       return (selectedDataset && !_.isEmpty(selectedDataset));
     }
-  },
+  }
 });
 
 paramsActions.fetchProvider.listenAndPromise(function () {

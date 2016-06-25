@@ -2,6 +2,7 @@ let Reflux = require('reflux');
 let _ = require('lodash');
 
 let actions = require('./actions');
+let globalActions = require('../actions');
 
 
 
@@ -10,9 +11,11 @@ let actions = require('./actions');
     return {
       data: function (data) {
         _state[key].data = data;
+        _set[key].defaultValue();
       },
       value: function (value) {
         _state[key].value = value;
+        actions.buildURL(_state);
       },
       defaultValue: function () {
         if (_state[key].init) {
@@ -87,13 +90,7 @@ let actions = require('./actions');
       }
       _state['provider'].value = value;
       _state['dataset'].data = [];
-      _state['dataset'].value = '';
-      _state['frequency'].data = []
-      _state['frequency'].value = [];
-      _state['dimension'].data = [];
-      _state['dimension'].value = [];
-      _state['dimensionvalue'].data = [];
-      _state['dimensionvalue'].value = [];
+      _set['dataset'].value('');
       actions.fetchDataset(value);
     }
   });
@@ -110,6 +107,7 @@ let actions = require('./actions');
       _state['dimension'].value = [];
       _state['dimensionvalue'].data = [];
       _state['dimensionvalue'].value = [];
+      actions.buildURL(_state);
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
     }
@@ -120,6 +118,8 @@ let actions = require('./actions');
       _state['dimension'].data = _.filter(Object.keys(data),
         (key) => (key !== 'freq' && key !== 'frequency')
       );
+      _set['dimensionvalue'].data(data);
+      _set['dimension'].defaultValue();
     },
     value: function (value) {
       _state['dimension'].value = value;
@@ -134,6 +134,8 @@ let actions = require('./actions');
           'value': _.head(data) // reminder: default is set here
         };
       });
+console.log('1');
+      actions.buildURL(_state);
     }
   });
 
@@ -152,6 +154,7 @@ let actions = require('./actions');
         'value',
         value
       );
+      actions.buildURL(_state);
     }
   });
 /**/
@@ -226,27 +229,33 @@ let paramsStore = Reflux.createStore({
     onFetchProviderCompleted: function (data) {
       _set['provider'].loading(false);
       _set['provider'].data(data);
-      _set['provider'].defaultValue();
     },
     onFetchDatasetCompleted: function (data) {
       _set['dataset'].loading(false);
       _set['dataset'].data(data);
-      _set['dataset'].defaultValue();
     },
     onFetchFrequencyCompleted: function (data) {
       _set['frequency'].loading(false);
       _set['frequency'].data(data);
-      _set['frequency'].defaultValue();
       this.refresh();
     },
     onFetchDimensionCompleted: function (data) {
       _set['dimension'].loading(false);
       _set['dimension'].data(data);
-      _set['dimensionvalue'].data(data);
-      _set['dimension'].defaultValue();
       this.refresh();
-    }
+    },
   /**/
+
+  onBuildURL: function (state) {
+    let querystring = _.reduce(state['dimensionvalue'].value, (acc, value) => {
+        acc[el.name] = _.join(el.selected, '+');
+        return acc;
+    }, {});
+    globalActions.newURL({
+      'dataset': state['dataset'].value,
+      'querystring': querystring
+    });
+  }
 });
 
 module.exports = paramsStore;

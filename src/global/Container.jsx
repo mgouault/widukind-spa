@@ -1,17 +1,25 @@
-var React = require('react');
+let React = require('react');
+let Reflux = require('reflux');
+let _ = require('lodash');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 
-// var GraphContainer = require('./graph/Container.jsx');
-// var LogContainer = require('./log/Container.jsx');
-var ParamsContainer = require('./params/Container.jsx');
-// var TableContainer = require('./table/Container.jsx');
-// var UrlContainer = require('./url/Container.jsx');
+let actions = require('./actions');
+let store = require('./store');
+
+// let GraphContainer = require('./graph/Container.jsx');
+// let LogContainer = require('./log/Container.jsx');
+let ParamsContainer = require('./params/Container.jsx');
+// let TableContainer = require('./table/Container.jsx');
+let UrlContainer = require('./url/Container.jsx');
 
 
 
-var Container = React.createClass({
+let GlobalContainer = React.createClass({
+  mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
+    let state = this.state.storeState;
+console.log(state['requestPathname']);
     return (
       <Grid fluid>
 
@@ -46,14 +54,10 @@ var Container = React.createClass({
               <ParamsContainer/>
             </Col>
             <Col sm={8}>
-              {
-              // <GraphContainer/>
-              // <br/>
-              // <UrlContainer/>
-              // <br/>
-              // <TableContainer/>
-              // <br/>
-              // <LogContainer/>
+              {_.isEmpty(state['requestPathname']['values']) ? <div></div> :
+                <UrlContainer
+                  pathname={state['requestPathname']['values']}
+                />
               }
             </Col>
           </Row>
@@ -68,4 +72,4 @@ var Container = React.createClass({
   }
 });
 
-module.exports = Container;
+module.exports = GlobalContainer;

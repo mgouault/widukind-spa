@@ -9,21 +9,8 @@ import { FormGroup, FormControl, Col } from 'react-bootstrap';
 
 var UrlDisplay = React.createClass({
 
-  makeUrl: function () {
-    var URL = _.cloneDeep(this.props.config);
-    URL['pathname'] += '/datasets/'+this.props.selectedDataset+'/values';
-    _.forEach(this.props.selectedDimensions, function (el) {
-      if (!_.isEmpty(el.selected)) {
-        var tmp = {};
-        tmp[el.name] = _.join(el.selected, '+');
-        _.assign(URL['query'], tmp);
-      }
-    });
-    return unescape(url.format(URL));
-  },
-
   render: function () {
-    var url = this.makeUrl();
+    var url = this.props.url;
     return (
       <div className="urlDisplayDiv">
         <Col sm={11}>
