@@ -1,56 +1,90 @@
-let _ = require('lodash');
 let Reflux = require('reflux');
+let _ = require('lodash');
 
 let actions = require('./actions');
 
 
 
-let pattern = {
-  'provider': {
-    data: [],
+/* Constructor */
+  let setConstructor = function (key) {
+    return {
+      data: function (data) {
+        _state[key].data = data;
+      },
+      value: function (value) {
+        _state[key].value = value;
+      },
+      defaultValue: function () {
+        if (_state[key].init) {
+          return _set[key].init();
+        }
+        _set[key].value([_.head(_state[key].data)]);
+      },
+      init: function () {
+        _set[key].value([_state[key].init]);
+        _state[key].init = null;
+      },
+      loading: function (isLoading) {
+        _state[key].loading = isLoading;
+      }
+    };
+  };
+
+  let stateConstructor = function (key) {
+    return {
+      data: [],
+      value: [],
+      loading: false
+    };
+  };
+/**/
+
+
+
+/* Private */
+  let _state = {
+    'provider': stateConstructor('provider'),
+    'dataset': stateConstructor('dataset'),
+    'frequency': stateConstructor('frequency'),
+    'dimension': stateConstructor('dimension'),
+    'dimensionvalue': stateConstructor('dimensionvalue')
+  };
+
+   _.assign(_state['provider'], {
     value: '',
     setter: actions.selectProvider,
-    loading: false
-  },
-  'dataset': {
-    data: [],
+    init: 'insee'
+  });
+
+   _.assign(_state['dataset'], {
     value: '',
     setter: actions.selectDataset,
-    loading: false
-  },
-  'frequency': {
-    data: [],
-    value: [],
+    init: 'insee-ipch-2015-fr-coicop'
+  });
+
+   _.assign(_state['frequency'], {
     setter: actions.selectFrequency,
-    loading: false
-  },
-  'dimension': {
-    data: [],
-    value: [],
-    setter: actions.selectDimension,
-    loading: false
-  },
-  'dimensionvalue': {
-    data: [],
-    value: []
-  }
-};
+  });
 
-let initValue = {
-  'provider': 'insee',
-  'dataset': 'insee-ipch-2015-fr-coicop'
-}
+   _.assign(_state['dimension'], {
+    setter: actions.selectDimension
+  });
 
 
 
-let _state = _.cloneDeep(pattern);
-// todo: prototype extends p1
-let _set = {
-  'provider': {
-    data: function (data) {
-      _state['provider'].data = data;
-    },
+  let _set = {
+    'provider': setConstructor('provider'),
+    'dataset': setConstructor('dataset'),
+    'frequency': setConstructor('frequency'),
+    'dimension': setConstructor('dimension'),
+    'dimensionvalue': setConstructor('dimensionvalue')
+  };
+
+  _.assign(_set['provider'], {
     value: function (value) {
+      if (value instanceof Array) {
+        value = _.head(value);
+      }
       _state['provider'].value = value;
       _state['dataset'].data = [];
       _state['dataset'].value = '';
@@ -61,17 +95,14 @@ let _set = {
       _state['dimensionvalue'].data = [];
       _state['dimensionvalue'].value = [];
       actions.fetchDataset(value);
-    },
-    loading: function (isLoading) {
-      _state['provider'].loading = isLoading;
     }
-  },
+  });
 
-  'dataset': {
-    data: function (data) {
-      _state['dataset'].data = data;
-    },
+  _.assign(_set['dataset'], {
     value: function (value) {
+      if (value instanceof Array) {
+        value = _.head(value);
+      }
       _state['dataset'].value = value;
       _state['frequency'].data = [];
       _state['frequency'].value = [];
@@ -81,25 +112,10 @@ let _set = {
       _state['dimensionvalue'].value = [];
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
-    },
-    loading: function (isLoading) {
-      _state['dataset'].loading = isLoading;
     }
-  },
+  });
 
-  'frequency': {
-    data: function (data) {
-      _state['frequency'].data = data;
-    },
-    value: function (value) {
-      _state['frequency'].value = value;
-    },
-    loading: function (isLoading) {
-      _state['frequency'].loading = isLoading;
-    }
-  },
-
-  'dimension': {
+  _.assign(_set['dimension'], {
     data: function (data) {
       _state['dimension'].data = _.filter(Object.keys(data),
         (key) => (key !== 'freq' && key !== 'frequency')
@@ -115,21 +131,18 @@ let _set = {
         return {
           'name': el,
           'data': data,
-          'value': _.head(data) // todo: reminder, default is set here
+          'value': _.head(data) // reminder: default is set here
         };
       });
-    },
-    loading: function (isLoading) {
-      _state['dimension'].loading = isLoading;
     }
-  },
+  });
 
-  'dimensionvalue': {
+  _.assign(_set['dimensionvalue'], {
     data: function (data) {
       _state['dimensionvalue'].data = _.map(_state['dimension'].data, (key) => {
         return {
           'name': key,
-          'data': Object.keys(data[key]) // todo: reminder, keys are picked instead of value
+          'data': Object.keys(data[key]) // reminder: keys are picked instead of value
         }
       });
     },
@@ -139,17 +152,13 @@ let _set = {
         'value',
         value
       );
-    },
-    loading: function (isLoading) {
-      _state['dimensionvalue'].loading = isLoading;
     }
-  }
-};
+  });
+/**/
 
 
 
 let paramsStore = Reflux.createStore({
-
   listenables: [actions],
   getInitialState: function () {
     return _state;
@@ -161,7 +170,7 @@ let paramsStore = Reflux.createStore({
     this.trigger(_state);
   },
 
-  /* onActions Sync */
+  /* onAction Sync */
     onSelectProvider: function (value) {
       _set['provider'].value(value.value);
       this.refresh();
@@ -191,7 +200,7 @@ let paramsStore = Reflux.createStore({
     },
   /**/
 
-  /* onActions Async */
+  /* onAction Async */
     onFetchProvider: function () {
       _set['provider'].loading(true);
       this.refresh();
@@ -217,38 +226,27 @@ let paramsStore = Reflux.createStore({
     onFetchProviderCompleted: function (data) {
       _set['provider'].loading(false);
       _set['provider'].data(data);
-      _set['provider'].value(
-        _.head(_state['provider'].data)
-      );
-      // this.refresh();
+      _set['provider'].defaultValue();
     },
     onFetchDatasetCompleted: function (data) {
       _set['dataset'].loading(false);
       _set['dataset'].data(data);
-      _set['dataset'].value(
-        _.head(_state['dataset'].data)
-      );
-      // this.refresh();
+      _set['dataset'].defaultValue();
     },
     onFetchFrequencyCompleted: function (data) {
       _set['frequency'].loading(false);
       _set['frequency'].data(data);
-      _set['frequency'].value(
-        [_.head(_state['frequency'].data)]
-      );
+      _set['frequency'].defaultValue();
       this.refresh();
     },
     onFetchDimensionCompleted: function (data) {
       _set['dimension'].loading(false);
       _set['dimension'].data(data);
       _set['dimensionvalue'].data(data);
-      _set['dimension'].value(
-        [_.head(_state['dimension'].data)]
-      );
+      _set['dimension'].defaultValue();
       this.refresh();
     }
   /**/
-
 });
-// todo: init default value
+
 module.exports = paramsStore;

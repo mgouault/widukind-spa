@@ -9,15 +9,35 @@ Reflux.use(RefluxPromise(bluebird))
 
 let apiCall = require('../../helpers/apiCall');
 
-let paramsActions = Reflux.createActions([
-  'selectProvider',
-  'selectDataset',
-  'selectFrequency',
-  'selectDimension',
-  'selectDimensionvalue'
-]);
-//todo: create in [] with {asyncResult: true}
-paramsActions.fetchProvider = Reflux.createAction({ asyncResult: true });
+let paramsActions = Reflux.createActions({
+  'selectProvider': {},
+  'selectDataset': {},
+  'selectFrequency': {},
+  'selectDimension': {},
+  'selectDimensionvalue': {},
+  'fetchProvider': {
+    asyncResult: true
+  },
+  'fetchDataset': {
+    asyncResult: true,
+    shouldEmit: function (selectedProvider) {
+      return (selectedProvider && !_.isEmpty(selectedProvider));
+    }
+  },
+  'fetchFrequency': {
+    asyncResult: true,
+    shouldEmit: function (selectedDataset) {
+      return (selectedDataset && !_.isEmpty(selectedDataset));
+    }
+  },
+  'fetchDimension': {
+    asyncResult: true,
+    shouldEmit: function (selectedDataset) {
+      return (selectedDataset && !_.isEmpty(selectedDataset));
+    }
+  },
+});
+
 paramsActions.fetchProvider.listenAndPromise(function () {
   return apiCall({
     'pathname': '/provider',
@@ -25,12 +45,6 @@ paramsActions.fetchProvider.listenAndPromise(function () {
   });
 });
 
-paramsActions.fetchDataset = Reflux.createAction({
-  asyncResult: true,
-  shouldEmit: function (selectedProvider) {
-    return (selectedProvider && !_.isEmpty(selectedProvider));
-  }
-});
 paramsActions.fetchDataset.listenAndPromise(function (selectedProvider) {
   return apiCall({
     'pathname': '/dataset',
@@ -38,12 +52,6 @@ paramsActions.fetchDataset.listenAndPromise(function (selectedProvider) {
   });
 });
 
-paramsActions.fetchFrequency = Reflux.createAction({
-  asyncResult: true,
-  shouldEmit: function (selectedDataset) {
-    return (selectedDataset && !_.isEmpty(selectedDataset));
-  }
-});
 paramsActions.fetchFrequency.listenAndPromise(function (selectedDataset) {
   return apiCall({
     'pathname': '/frequency',
@@ -51,12 +59,6 @@ paramsActions.fetchFrequency.listenAndPromise(function (selectedDataset) {
   });
 });
 
-paramsActions.fetchDimension = Reflux.createAction({
-  asyncResult: true,
-  shouldEmit: function (selectedDataset) {
-    return (selectedDataset && !_.isEmpty(selectedDataset));
-  }
-}); // todo: }).listenAndPromise(function
 paramsActions.fetchDimension.listenAndPromise(function (selectedDataset) {
   return apiCall({
     'pathname': '/dimension',

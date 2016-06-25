@@ -34,7 +34,7 @@ let ParamsContainer = React.createClass({
           />
         </div>
       );
-    }); // todo: refactorize dimensionvalue
+    });
 
     return (
       <Panel>
