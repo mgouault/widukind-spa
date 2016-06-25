@@ -10,7 +10,7 @@ let CustomSelect = require('../../components/CustomSelect.jsx');
 
 
 
-let Container = React.createClass({
+let ParamsContainer = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
@@ -19,27 +19,29 @@ let Container = React.createClass({
     let dimensionBox = _.map(state['dimensionvalue'].value, function (el) {
       let title = _.capitalize(el.name);
       let onSelectWrap = function (event) {
-        actions.selectDimensionvalues(event, el.name);
+        actions.selectDimensionvalue(event, el.name);
       };
       return (
-        <br />
-        <CustomSelect
-          key={el.name+'Select'}
-          title={title}
-          data={el.data}
-          value={el.value}
-          onChange={onSelectWrap}
-          multiple
-        />
+        <div key={el.name+'Div'}>
+          <br />
+          <CustomSelect
+            key={el.name+'Select'}
+            title={title}
+            data={el.data}
+            value={el.value}
+            onChange={onSelectWrap}
+            multiple
+          />
+        </div>
       );
     }); // todo: refactorize dimensionvalue
 
     return (
       <Panel>
-        <div classtitle="controlDiv">
+        <div className="controlDiv">
 
-          {(!state['provider'].active) ?:
-            <Loader loaded={!state['provider'].loading}>
+          <Loader loaded={!state['provider'].loading}>
+            {_.isEmpty(state['provider'].data) ? <div></div> :
               <CustomSelect
                 key={'providerSelect'}
                 title={'Provider'}
@@ -47,12 +49,12 @@ let Container = React.createClass({
                 value={state['provider'].value}
                 onChange={state['provider'].setter}
               />
-            </Loader>
-          }
+            }
+          </Loader>
 
-          {(!state['dataset'].active) ?:
+          <Loader loaded={!state['dataset'].loading}>
             <br/>
-            <Loader loaded={!state['dataset'].loading}>
+            {_.isEmpty(state['dataset'].data) ? <div></div>:
               <CustomSelect
                 key={'datasetSelect'}
                 title={'Dataset'}
@@ -60,12 +62,12 @@ let Container = React.createClass({
                 value={state['dataset'].value}
                 onChange={state['dataset'].setter}
               />
-            </Loader>
-          }
+            }
+          </Loader>
 
-          {(!state['frequency'].active) ?:
+          <Loader loaded={!state['frequency'].loading}>
             <br/>
-            <Loader loaded={!state['frequency'].loading}>
+            {_.isEmpty(state['frequency'].data) ? <div></div> :
               <CustomSelect
                 key={'frequencySelect'}
                 title={'Frequency'}
@@ -74,12 +76,12 @@ let Container = React.createClass({
                 onChange={state['frequency'].setter}
                 multiple
               />
-            </Loader>
-          }
+            }
+          </Loader>
 
-          {(!state['dimension'].active) ?:
+          <Loader loaded={!state['dimension'].loading}>
             <br/>
-            <Loader loaded={!state['dimension'].loading}>
+            {_.isEmpty(state['dimension'].data) ? <div></div> :
               <CustomSelect
                 key={'dimensionSelect'}
                 title={'Dimension'}
@@ -88,8 +90,8 @@ let Container = React.createClass({
                 onChange={state['dimension'].setter}
                 multiple
               />
-            </Loader>
-          }
+            }
+          </Loader>
 
           {dimensionBox}
 
@@ -100,4 +102,4 @@ let Container = React.createClass({
 
 });
 
-module.exports = Container;
+module.exports = ParamsContainer;

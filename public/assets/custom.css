@@ -64,6 +64,9 @@ body {
     }
 }
 
+
+
+
 /* Custom style */
 .loader {
     position: relative;
@@ -79,8 +82,8 @@ body {
     min-height: 34px;
 }
 
-.controlsDiv {
-    min-height: 228px;
+.controlDiv {
+    min-height: 284px;
 }
 
 .graphDiv {

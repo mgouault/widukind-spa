@@ -10,29 +10,25 @@ let pattern = {
     data: [],
     value: '',
     setter: actions.selectProvider,
-    loading: false,
-    active: false,
+    loading: false
   },
   'dataset': {
     data: [],
     value: '',
     setter: actions.selectDataset,
-    loading: false,
-    active: false
+    loading: false
   },
   'frequency': {
     data: [],
     value: [],
     setter: actions.selectFrequency,
-    loading: false,
-    active: false
+    loading: false
   },
   'dimension': {
     data: [],
     value: [],
     setter: actions.selectDimension,
-    loading: false,
-    active: false
+    loading: false
   },
   'dimensionvalue': {
     data: [],
@@ -60,18 +56,14 @@ let _set = {
       _state['dataset'].value = '';
       _state['frequency'].data = []
       _state['frequency'].value = [];
-      _state['dimension'].data = {};
+      _state['dimension'].data = [];
       _state['dimension'].value = [];
+      _state['dimensionvalue'].data = [];
+      _state['dimensionvalue'].value = [];
       actions.fetchDataset(value);
     },
     loading: function (isLoading) {
-      if (!_state['provider'].active) {
-        _state['provider'].active = true;
-      }
       _state['provider'].loading = isLoading;
-    },
-    active: function (isActive) {
-      _state['provider'].active = isActive;
     }
   },
 
@@ -83,19 +75,15 @@ let _set = {
       _state['dataset'].value = value;
       _state['frequency'].data = [];
       _state['frequency'].value = [];
-      _state['dimension'].data = {};
+      _state['dimension'].data = [];
       _state['dimension'].value = [];
+      _state['dimensionvalue'].data = [];
+      _state['dimensionvalue'].value = [];
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
     },
     loading: function (isLoading) {
-      if (!_state['dataset'].active) {
-        _state['dataset'].active = true;
-      }
       _state['dataset'].loading = isLoading;
-    },
-    active: function (isActive) {
-      _state['dataset'].active = isActive;
     }
   },
 
@@ -107,21 +95,15 @@ let _set = {
       _state['frequency'].value = value;
     },
     loading: function (isLoading) {
-      if (!_state['frequency'].active) {
-        _state['frequency'].active = true;
-      }
       _state['frequency'].loading = isLoading;
-    },
-    active: function (isActive) {
-      _state['frequency'].active = isActive;
     }
   },
 
   'dimension': {
     data: function (data) {
-      _state['dimension'].data = _.filter(Object.keys(data), (key) => {
-        (key !== 'freq' && key !== 'frequency')
-      });
+      _state['dimension'].data = _.filter(Object.keys(data),
+        (key) => (key !== 'freq' && key !== 'frequency')
+      );
     },
     value: function (value) {
       _state['dimension'].value = value;
@@ -138,21 +120,17 @@ let _set = {
       });
     },
     loading: function (isLoading) {
-      if (!_state['dimension'].active) {
-        _state['dimension'].active = true;
-      }
       _state['dimension'].loading = isLoading;
-    },
-    active: function (isActive) {
-      _state['dimension'].active = isActive;
     }
   },
 
   'dimensionvalue': {
     data: function (data) {
-      _state['dimensionvalue'].data = _.map(_state['dimensions'].data, (key) => {
-        'name': key,
-        'data': Object.keys(data[key]) // todo: reminder, keys are picked instead of value
+      _state['dimensionvalue'].data = _.map(_state['dimension'].data, (key) => {
+        return {
+          'name': key,
+          'data': Object.keys(data[key]) // todo: reminder, keys are picked instead of value
+        }
       });
     },
     value: function (value, dimensionName) {
@@ -163,20 +141,14 @@ let _set = {
       );
     },
     loading: function (isLoading) {
-      if (!_state['dimensionvalue'].active) {
-        _state['dimensionvalue'].active = true;
-      }
       _state['dimensionvalue'].loading = isLoading;
-    },
-    active: function (isActive) {
-      _state['dimensionvalue'].active = isActive;
     }
   }
-});
+};
 
 
 
-let store = Reflux.createStore({
+let paramsStore = Reflux.createStore({
 
   listenables: [actions],
   getInitialState: function () {
@@ -279,4 +251,4 @@ let store = Reflux.createStore({
 
 });
 // todo: init default value
-module.exports = store;
+module.exports = paramsStore;

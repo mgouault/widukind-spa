@@ -46,13 +46,15 @@ var Container = React.createClass({
               <ParamsContainer/>
             </Col>
             <Col sm={8}>
-              {// <GraphContainer/>
+              {
+              // <GraphContainer/>
               // <br/>
               // <UrlContainer/>
               // <br/>
               // <TableContainer/>
               // <br/>
-              // <LogContainer/>}
+              // <LogContainer/>
+              }
             </Col>
           </Row>
         </div>
