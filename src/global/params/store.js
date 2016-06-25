@@ -34,7 +34,7 @@ let pattern = {
     loading: false,
     active: false
   },
-  'dimensionValue': {
+  'dimensionvalue': {
     data: [],
     value: []
   }
@@ -50,43 +50,11 @@ let initValue = {
 let _state = _.cloneDeep(pattern);
 // todo: prototype extends p1
 let _set = {
-
-  data: {
-    'provider': function (data) {
+  'provider': {
+    data: function (data) {
       _state['provider'].data = data;
     },
-    'dataset': function (data) {
-      _state['dataset'].data = data;
-    },
-    'frequency': function (data) {
-      _state['frequency'].data = data;
-    },
-    'dimension': function (data) {
-      _state['dimension'].data = _.map(
-        _.filter(Object.keys(data), (el) => {
-          return (el !== 'freq' && el !== 'frequency');
-        }),
-        (el) => {
-          let value = Object.keys(data[el]);
-          _state['dimension'].data.push({'name': el, 'value': value});
-        }
-      );
-    },
-    'dimensionValue': function (data) {
-      _state['dimension'].data = _.map(
-        _.filter(Object.keys(data), (el) => {
-          return (el !== 'freq' && el !== 'frequency');
-        }),
-        (el) => {
-          let value = Object.keys(data[el]);
-          _state['dimension'].data.push({'name': el, 'value': value});
-        }
-      );
-    }
-  },
-
-  value: {
-    'provider': function (value) {
+    value: function (value) {
       _state['provider'].value = value;
       _state['dataset'].data = [];
       _state['dataset'].value = '';
@@ -96,53 +64,114 @@ let _set = {
       _state['dimension'].value = [];
       actions.fetchDataset(value);
     },
-    'dataset': function (value) {
+    loading: function (isLoading) {
+      if (!_state['provider'].active) {
+        _state['provider'].active = true;
+      }
+      _state['provider'].loading = isLoading;
+    },
+    active: function (isActive) {
+      _state['provider'].active = isActive;
+    }
+  },
+
+  'dataset': {
+    data: function (data) {
+      _state['dataset'].data = data;
+    },
+    value: function (value) {
       _state['dataset'].value = value;
-      _state['frequency'].data = []
+      _state['frequency'].data = [];
       _state['frequency'].value = [];
       _state['dimension'].data = {};
       _state['dimension'].value = [];
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
     },
-    'frequency': function (value) {
-      _state['frequency'].value = value;
+    loading: function (isLoading) {
+      if (!_state['dataset'].active) {
+        _state['dataset'].active = true;
+      }
+      _state['dataset'].loading = isLoading;
     },
-    'dimension': function (value) { // todo: factorize default value
-      _state['dimension'].value = _.map(value, (el) => {
-        let dName = el.value;
-        let dValue = _.get(_.find(_state['dimension'].data, {'name': dName}), 'value');
-        let dSelected =_.get(_.find(_state['dimension'].value, {'name': dName}), 'selected');
-        if (!dSelected) {
-          dSelected = [_.head(dValue)];
-        }
-        return {
-          'name': dName,
-          'value': dValue,
-          'selected': dSelected
-        };
-      });
-    },
-    'dimensionValue': function (value, dimensionName) {
-      _.set(
-        _.find(_state['dimension'].value, {'name': dimensionName}),
-        'selected',
-        _.map(value, (el) => { return el.value; })
-      );
+    active: function (isActive) {
+      _state['dataset'].active = isActive;
     }
   },
 
-  loading: function (key, isLoading) {
-    if (!_state[key].active) {
-      _state[key].active = true;
+  'frequency': {
+    data: function (data) {
+      _state['frequency'].data = data;
+    },
+    value: function (value) {
+      _state['frequency'].value = value;
+    },
+    loading: function (isLoading) {
+      if (!_state['frequency'].active) {
+        _state['frequency'].active = true;
+      }
+      _state['frequency'].loading = isLoading;
+    },
+    active: function (isActive) {
+      _state['frequency'].active = isActive;
     }
-    _state[key].loading = isLoading;
-  }, // todo: prototype extends p2
+  },
 
-  active: function (key, isActive) {
-    _state[key].active = isActive;
+  'dimension': {
+    data: function (data) {
+      _state['dimension'].data = _.filter(Object.keys(data), (key) => {
+        (key !== 'freq' && key !== 'frequency')
+      });
+    },
+    value: function (value) {
+      _state['dimension'].value = value;
+      _state['dimensionvalue'].value = _.map(value, (el) => {
+        let data = _.get(
+          _.find(_state['dimensionvalue'].data, {'name':el}),
+          'data'
+        );
+        return {
+          'name': el,
+          'data': data,
+          'value': _.head(data) // todo: reminder, default is set here
+        };
+      });
+    },
+    loading: function (isLoading) {
+      if (!_state['dimension'].active) {
+        _state['dimension'].active = true;
+      }
+      _state['dimension'].loading = isLoading;
+    },
+    active: function (isActive) {
+      _state['dimension'].active = isActive;
+    }
+  },
+
+  'dimensionvalue': {
+    data: function (data) {
+      _state['dimensionvalue'].data = _.map(_state['dimensions'].data, (key) => {
+        'name': key,
+        'data': Object.keys(data[key]) // todo: reminder, keys are picked instead of value
+      });
+    },
+    value: function (value, dimensionName) {
+      _.set(
+        _.find(_state['dimensionvalue'].value, {'name': dimensionName}),
+        'value',
+        value
+      );
+    },
+    loading: function (isLoading) {
+      if (!_state['dimensionvalue'].active) {
+        _state['dimensionvalue'].active = true;
+      }
+      _state['dimensionvalue'].loading = isLoading;
+    },
+    active: function (isActive) {
+      _state['dimensionvalue'].active = isActive;
+    }
   }
-
 });
 
 
@@ -162,42 +191,49 @@ let store = Reflux.createStore({
 
   /* onActions Sync */
     onSelectProvider: function (value) {
-      _set.value['provider'](value.value);
+      _set['provider'].value(value.value);
       this.refresh();
     },
     onSelectDataset: function (value) {
-      _set.value['dataset'](value.value);
+      _set['dataset'].value(value.value);
       this.refresh();
     },
-    onSelectFrequency: function (data) {
-      _set.value['frequency'](data);
+    onSelectFrequency: function (value) {
+      _set['frequency'].value(
+        _.map(value, (el) => el.value)
+      );
       this.refresh();
     },
-    onSelectDimension: function (data) {
-      _set.value['dimension'](data);
+    onSelectDimension: function (value) {
+      _set['dimension'].value(
+        _.map(value, (el) => el.value)
+      );
       this.refresh();
     },
-    onSelectDimensionValue: function (data, dimensionName) {
-      _set.value['dimensionValue'](data, dimensionName);
+    onSelectDimensionvalue: function (value, dimensionName) {
+      _set['dimensionvalue'].value(
+        _.map(value, (el) => el.value),
+        dimensionName
+      );
       this.refresh();
     },
   /**/
 
   /* onActions Async */
     onFetchProvider: function () {
-      _set.loading('provider', true);
+      _set['provider'].loading(true);
       this.refresh();
     },
     onFetchDataset: function () {
-      _set.loading('dataset', true);
+      _set['dataset'].loading(true);
       this.refresh();
     },
     onFetchFrequency: function () {
-      _set.loading('frequency', true);
+      _set['frequency'].loading(true);
       this.refresh();
     },
     onFetchDimension: function () {
-      _set.loading('dimension', true);
+      _set['dimension'].loading(true);
       this.refresh();
     },
 
@@ -207,40 +243,36 @@ let store = Reflux.createStore({
     onFetchDimensionFailed: console.error,
 
     onFetchProviderCompleted: function (data) {
-      _set.loading('provider', false);
-      _set.data['provider'](data);
-      _set.value['provider'](
-        _.get(_.head(_state['provider'].data), 'name')
+      _set['provider'].loading(false);
+      _set['provider'].data(data);
+      _set['provider'].value(
+        _.head(_state['provider'].data)
       );
       // this.refresh();
     },
     onFetchDatasetCompleted: function (data) {
-      _set.loading('dataset', false);
-      _set.data['dataset'](data);
-      _set.value['dataset'](
-        _.get(_.head(_state['dataset'].data), 'name')
+      _set['dataset'].loading(false);
+      _set['dataset'].data(data);
+      _set['dataset'].value(
+        _.head(_state['dataset'].data)
       );
       // this.refresh();
     },
     onFetchFrequencyCompleted: function (data) {
-      _set.loading('frequency', false);
-      _set.data['frequency'](data);
-      _set.value['frequency']([
-        _.head(_state['frequency'].data)
-      ]);
+      _set['frequency'].loading(false);
+      _set['frequency'].data(data);
+      _set['frequency'].value(
+        [_.head(_state['frequency'].data)]
+      );
       this.refresh();
     },
     onFetchDimensionCompleted: function (data) {
-      _set.loading('dimension', false);
-      _set.data['dimension'](data);
-      _set.value['dimension']([
-        _.get(_.head(_state['dimension'].data), 'name')
-      ]);
-      // _set.value['dimension'](
-      //   _.map(_state['dimension'].data, (el) => {
-      //     return {value: el.name};
-      //   })
-      // );
+      _set['dimension'].loading(false);
+      _set['dimension'].data(data);
+      _set['dimensionvalue'].data(data);
+      _set['dimension'].value(
+        [_.head(_state['dimension'].data)]
+      );
       this.refresh();
     }
   /**/

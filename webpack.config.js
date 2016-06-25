@@ -2,8 +2,11 @@ var path = require('path');
 
 module.exports = {
 	context: __dirname,
-	entry: "./src/App.jsx",
-	output: "./public/bundle.js",
+	entry: './src/App.jsx',
+	output: {
+		path: './public',
+		filename: 'bundle.js'
+	},
 	module: {
 		loaders: [{
 			test: /\.jsx?$/,

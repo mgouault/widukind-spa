@@ -16,14 +16,10 @@ let Container = React.createClass({
   render: function () {
     let state = this.state.storeState;
 
-    let selectedDimension = _.map(state['dimension'].value, function (el) {
-      return el.name
-    });
-
-    let dimensionBox = _.map(state['dimensionValue'].value, function (el) {
+    let dimensionBox = _.map(state['dimensionvalue'].value, function (el) {
       let title = _.capitalize(el.name);
       let onSelectWrap = function (event) {
-        actions.selectDimensionValues(event, el.name);
+        actions.selectDimensionvalues(event, el.name);
       };
       return (
         <br />
@@ -36,7 +32,7 @@ let Container = React.createClass({
           multiple
         />
       );
-    }); // todo: refactorize dimensionValue
+    }); // todo: refactorize dimensionvalue
 
     return (
       <Panel>
@@ -88,7 +84,7 @@ let Container = React.createClass({
                 key={'dimensionSelect'}
                 title={'Dimension'}
                 data={state['dimension'].data}
-                value={selectedDimension}
+                value={state['dimension'].value}
                 onChange={state['dimension'].setter}
                 multiple
               />

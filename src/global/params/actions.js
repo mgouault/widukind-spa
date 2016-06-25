@@ -14,7 +14,7 @@ let actions = Reflux.createActions([
   'selectDataset',
   'selectFrequency',
   'selectDimension',
-  'selectDimensionValue'
+  'selectDimensionvalue'
 ]);
 //todo: create in [] with {asyncResult: true}
 actions.fetchProvider = Reflux.createAction({ asyncResult: true });
