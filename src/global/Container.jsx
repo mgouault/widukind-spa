@@ -1,11 +1,11 @@
 var React = require('react');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 
-var GraphContainer = require('./graph/Container.jsx');
-var LogContainer = require('./log/Container.jsx');
+// var GraphContainer = require('./graph/Container.jsx');
+// var LogContainer = require('./log/Container.jsx');
 var ParamsContainer = require('./params/Container.jsx');
-var TableContainer = require('./table/Container.jsx');
-var UrlContainer = require('./url/Container.jsx');
+// var TableContainer = require('./table/Container.jsx');
+// var UrlContainer = require('./url/Container.jsx');
 
 
 

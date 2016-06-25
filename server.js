@@ -55,19 +55,19 @@ app.use('/data/:key', function (req, res, next) {
   var URL = _.cloneDeep(URLObj);
   var pathname = URL['pathname'] || '';
   switch (req.params.key) {
-    case 'providers':
+    case 'provider':
       pathname += '/providers/keys'; break;
-    case 'datasets':
+    case 'dataset':
       pathname += '/providers/'+req.query['provider']+'/datasets/keys'; break;
-    case 'frequencies':
+    case 'frequency':
       pathname += '/datasets/'+req.query['dataset']+'/frequencies'; break;
-    case 'dimensions':
+    case 'dimension':
       pathname += '/datasets/'+req.query['dataset']+'/dimensions'; break;
-    case 'series':
+    case 'serie':
       pathname += '/datasets/'+req.query['dataset']+'/series';
-      _.assign(URL['query'], makeQuery(req.query['controls']));
+      _.assign(URL['query'], makeQuery(req.query['control']));
       break;
-    case 'values':
+    case 'value':
       pathname += '/series/'+req.query['slug']; break;
     default:
       var err = new Error();

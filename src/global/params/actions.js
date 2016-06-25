@@ -1,67 +1,66 @@
-var Reflux = require('reflux');
-var RefluxPromise = require('reflux-promise');
-var Q = require('q');
-var bluebird = require('bluebird');
+let Reflux = require('reflux');
+let RefluxPromise = require('reflux-promise');
+let Q = require('q');
+let bluebird = require('bluebird');
 
 Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
 Reflux.use(RefluxPromise(bluebird))
 
-var c = require('./constants');
-var apiCall = require('../../helpers/apiCall');
+let apiCall = require('../../helpers/apiCall');
 
-var actions = Reflux.createActions([
-  c.changeProvider,
-  c.changeDataset,
-  c.changeFrequencies,
-  c.changeDimensions,
-  c.changeDimensionValues
+let actions = Reflux.createActions([
+  'selectProvider',
+  'selectDataset',
+  'selectFrequency',
+  'selectDimension',
+  'selectDimensionValue'
 ]);
-
-actions[c.providersMissing] = Reflux.createAction({ asyncResult: true });
-actions[c.providersMissing].listenAndPromise(function (state) {
+//todo: create in [] with {asyncResult: true}
+actions.fetchProvider = Reflux.createAction({ asyncResult: true });
+actions.fetchProvider.listenAndPromise(function () {
   return apiCall({
-    'pathname': '/providers',
+    'pathname': '/provider',
     'query': {}
   });
 });
 
-actions[c.datasetsMissing] = Reflux.createAction({
+actions.fetchDataset = Reflux.createAction({
   asyncResult: true,
-  shouldEmit: function (state) {
-    return (state[c.selectedProvider] && !_.isEmpty(state[c.selectedProvider]));
+  shouldEmit: function (selectedProvider) {
+    return (selectedProvider && !_.isEmpty(selectedProvider));
   }
- });
-actions[c.datasetsMissing].listenAndPromise(function (state) {
+});
+actions.fetchDataset.listenAndPromise(function (selectedProvider) {
   return apiCall({
-    'pathname': '/datasets',
-    'query': {'provider': state[c.selectedProvider]}
+    'pathname': '/dataset',
+    'query': {'provider': selectedProvider}
   });
 });
 
-actions[c.frequenciesMissing] = Reflux.createAction({
+actions.fetchFrequency = Reflux.createAction({
   asyncResult: true,
-  shouldEmit: function (state) {
-    return (state[c.selectedDataset] && !_.isEmpty(state[c.selectedDataset]));
+  shouldEmit: function (selectedDataset) {
+    return (selectedDataset && !_.isEmpty(selectedDataset));
   }
- });
-actions[c.frequenciesMissing].listenAndPromise(function (state) {
+});
+actions.fetchFrequency.listenAndPromise(function (selectedDataset) {
   return apiCall({
-    'pathname': '/frequencies',
-    'query': {'dataset': state[c.selectedDataset]}
+    'pathname': '/frequency',
+    'query': {'dataset': selectedDataset}
   });
 });
 
-actions[c.dimensionsMissing] = Reflux.createAction({
+actions.fetchDimension = Reflux.createAction({
   asyncResult: true,
-  shouldEmit: function (state) {
-    return (state[c.selectedDataset] && !_.isEmpty(state[c.selectedDataset]));
+  shouldEmit: function (selectedDataset) {
+    return (selectedDataset && !_.isEmpty(selectedDataset));
   }
-});
-actions[c.dimensionsMissing].listenAndPromise(function (state) {
+}); // todo: }).listenAndPromise(function
+actions.fetchDimension.listenAndPromise(function (selectedDataset) {
   return apiCall({
-    'pathname': '/dimensions',
-    'query': {'dataset': state[c.selectedDataset]}
+    'pathname': '/dimension',
+    'query': {'dataset': selectedDataset}
   });
 });
 
