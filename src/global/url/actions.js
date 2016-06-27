@@ -7,11 +7,10 @@ Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
 Reflux.use(RefluxPromise(bluebird))
 
-var c = require('./constants');
 var apiCall = require('../../helpers/apiCall');
 
-var actions = Reflux.createActions([
-  c.updateConfig
-]);
+var actions = Reflux.createActions({
+  'updateConfig': {}
+});
 
 module.exports = actions;

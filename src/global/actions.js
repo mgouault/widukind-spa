@@ -10,7 +10,7 @@ Reflux.use(RefluxPromise(bluebird))
 
 
 let actions = Reflux.createActions({
-	'newURL': {
+	'buildURL': {
 		shouldEmit: function (URL) {
 			return !_.isEmpty(URL['dataset']);
 		}

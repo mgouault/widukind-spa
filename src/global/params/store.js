@@ -15,7 +15,7 @@ let globalActions = require('../actions');
       },
       value: function (value) {
         _state[key].value = value;
-        actions.buildURL(_state);
+        actions.buildQS(_state);
       },
       defaultValue: function () {
         if (_state[key].init) {
@@ -49,8 +49,7 @@ let globalActions = require('../actions');
     'provider': stateConstructor('provider'),
     'dataset': stateConstructor('dataset'),
     'frequency': stateConstructor('frequency'),
-    'dimension': stateConstructor('dimension'),
-    'dimensionvalue': stateConstructor('dimensionvalue')
+    'dimension': stateConstructor('dimension')
   };
 
    _.assign(_state['provider'], {
@@ -80,7 +79,6 @@ let globalActions = require('../actions');
     'dataset': setConstructor('dataset'),
     'frequency': setConstructor('frequency'),
     'dimension': setConstructor('dimension'),
-    'dimensionvalue': setConstructor('dimensionvalue')
   };
 
   _.assign(_set['provider'], {
@@ -105,9 +103,7 @@ let globalActions = require('../actions');
       _state['frequency'].value = [];
       _state['dimension'].data = [];
       _state['dimension'].value = [];
-      _state['dimensionvalue'].data = [];
-      _state['dimensionvalue'].value = [];
-      actions.buildURL(_state);
+      actions.buildQS(_state);
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
     }
@@ -115,46 +111,44 @@ let globalActions = require('../actions');
 
   _.assign(_set['dimension'], {
     data: function (data) {
-      _state['dimension'].data = _.filter(Object.keys(data),
+      let filteredKeys = _.filter(Object.keys(data),
         (key) => (key !== 'freq' && key !== 'frequency')
       );
-      _set['dimensionvalue'].data(data);
+      _state['dimension'].data = _.map(filteredKeys, (key) => {
+        return {
+          'name': key,
+          'data': Object.keys(data[key]), // reminder: keys are picked instead of value
+          'value': key,
+          'label': key
+        }
+      });
       _set['dimension'].defaultValue();
     },
     value: function (value) {
-      _state['dimension'].value = value;
-      _state['dimensionvalue'].value = _.map(value, (el) => {
-        let data = _.get(
-          _.find(_state['dimensionvalue'].data, {'name':el}),
-          'data'
-        );
-        return {
-          'name': el,
-          'data': data,
-          'value': _.head(data) // reminder: default is set here
-        };
+      let addedValue = _.filter(value, (el) => {
+        return (!_.find(_state['dimension'].value, {'name':el.name}));
       });
-console.log('1');
-      actions.buildURL(_state);
+      _.remove(_state['dimension'].value, (el) => {
+        return (!_.find(value, {'name': el.name}));
+      });
+      _.reduce(addedValue, (acc, el) => {
+        let tmp = _.cloneDeep(_.find(_state['dimension'].data, {'name':el.name}));
+        tmp.value = [_.head(tmp.data)] // reminder: default is set here
+        acc.push(tmp);
+        return acc;
+      }, _state['dimension'].value);
+      actions.buildQS(_state);
     }
   });
 
-  _.assign(_set['dimensionvalue'], {
-    data: function (data) {
-      _state['dimensionvalue'].data = _.map(_state['dimension'].data, (key) => {
-        return {
-          'name': key,
-          'data': Object.keys(data[key]) // reminder: keys are picked instead of value
-        }
-      });
-    },
-    value: function (value, dimensionName) {
+  _.assign(_set, {
+    'dimensionvalue': function (value, dimensionName) {
       _.set(
-        _.find(_state['dimensionvalue'].value, {'name': dimensionName}),
+        _.find(_state['dimension'].value, {'name': dimensionName}),
         'value',
         value
       );
-      actions.buildURL(_state);
+      actions.buildQS(_state);
     }
   });
 /**/
@@ -189,15 +183,12 @@ let paramsStore = Reflux.createStore({
       this.refresh();
     },
     onSelectDimension: function (value) {
-      _set['dimension'].value(
-        _.map(value, (el) => el.value)
-      );
+      _set['dimension'].value(value);
       this.refresh();
     },
     onSelectDimensionvalue: function (value, dimensionName) {
-      _set['dimensionvalue'].value(
-        _.map(value, (el) => el.value),
-        dimensionName
+      _set['dimensionvalue'](
+        _.map(value, (el) => el.value), dimensionName
       );
       this.refresh();
     },
@@ -246,12 +237,14 @@ let paramsStore = Reflux.createStore({
     },
   /**/
 
-  onBuildURL: function (state) {
-    let querystring = _.reduce(state['dimensionvalue'].value, (acc, value) => {
-        acc[el.name] = _.join(el.selected, '+');
-        return acc;
+  onBuildQS: function (state) {
+    let querystring = _.reduce(state['dimension'].value, (acc, el) => {
+      if (!_.isEmpty(el.value)) {
+        acc[el.name] = _.join(el.value, '+');
+      }
+      return acc;
     }, {});
-    globalActions.newURL({
+    globalActions.buildURL({
       'dataset': state['dataset'].value,
       'querystring': querystring
     });

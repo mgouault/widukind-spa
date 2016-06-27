@@ -12,7 +12,7 @@ let apiCall = require('../../helpers/apiCall');
 
 
 let paramsActions = Reflux.createActions({
-  'buildURL': {},
+  'buildQS': {},
   'selectProvider': {},
   'selectDataset': {},
   'selectFrequency': {},

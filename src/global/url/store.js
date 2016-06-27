@@ -3,29 +3,29 @@ var Reflux = require('reflux');
 /* global io */
 var socket = io();
 
-var c = require('./constants');
 var actions = require('./actions');
+let globalActions = require('../actions');
 
-var pattern = {};
-pattern[c.config] = {};
+var _state = {
+  'config': {}
+}
 
 
 
 var store = Reflux.createStore({
-  listenables: [actions],
+  listenables: [actions, globalActions],
   getInitialState: function () {
-    this.state = _.cloneDeep(pattern);
-    return this.state;
+    return _state;
   },
   init: function () {
-    socket.on('urlChange', actions[c.updateConfig]);
+    socket.on('urlChange', actions.updateConfig);
   },
   refresh: function () {
-    this.trigger(this.state);
+    this.trigger(_state);
   },
 
   onUpdateConfig: function (data) {
-    this.state[c.config] = data;
+    _state['config'] = data;
     this.refresh();
   }
 });

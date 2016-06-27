@@ -3,10 +3,35 @@ let Reflux = require('reflux');
 let _ = require('lodash');
 import { Panel } from 'react-bootstrap';
 let Loader = require('react-loader');
+let Select = require('react-select');
 
 let actions = require('./actions');
 let store = require('./store');
-let CustomSelect = require('../../components/CustomSelect.jsx');
+
+
+
+let CustomSelect = React.createClass({
+
+  render: function () {
+    let options = _.map(this.props.data, function (el) {
+      if (typeof el === 'object') {
+        return el;
+      }
+      return ({'value':el, 'label':el});
+    });
+    return (
+      <div>
+        <strong>{this.props.title}:</strong>
+        <Select
+          onChange={this.props.onChange}
+          value={this.props.value}
+          multi={this.props.multiple}
+          options={options}
+        />
+      </div>
+    );
+  }
+});
 
 
 
@@ -16,7 +41,7 @@ let ParamsContainer = React.createClass({
   render: function () {
     let state = this.state.storeState;
 
-    let dimensionBox = _.map(state['dimensionvalue'].value, function (el) {
+    let dimensionBox = _.map(state['dimension'].value, function (el) {
       let title = _.capitalize(el.name);
       let onSelectWrap = function (event) {
         actions.selectDimensionvalue(event, el.name);
@@ -35,6 +60,8 @@ let ParamsContainer = React.createClass({
         </div>
       );
     });
+
+    let dimensionValueSimple = _.map(state['dimension'].value, (el) => el.name);
 
     return (
       <Panel>
@@ -86,7 +113,7 @@ let ParamsContainer = React.createClass({
                 key={'dimensionSelect'}
                 title={'Dimension'}
                 data={state['dimension'].data}
-                value={state['dimension'].value}
+                value={dimensionValueSimple}
                 onChange={state['dimension'].setter}
                 multiple
               />

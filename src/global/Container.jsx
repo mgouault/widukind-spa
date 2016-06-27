@@ -19,7 +19,6 @@ let GlobalContainer = React.createClass({
 
   render: function () {
     let state = this.state.storeState;
-console.log(state['requestPathname']);
     return (
       <Grid fluid>
 
@@ -56,7 +55,7 @@ console.log(state['requestPathname']);
             <Col sm={8}>
               {_.isEmpty(state['requestPathname']['values']) ? <div></div> :
                 <UrlContainer
-                  pathname={state['requestPathname']['values']}
+                  url={state['requestPathname']['values']}
                 />
               }
             </Col>

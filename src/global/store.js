@@ -21,8 +21,7 @@ let store = Reflux.createStore({
     this.trigger(_state);
   },
 
-  onNewURL: function (URL) {
-console.log('3');
+  onBuildURL: function (URL) {
     let dataset = URL['dataset'];
     let querystring = URL['querystring'];
     let QSString = '';
