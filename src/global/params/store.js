@@ -238,15 +238,19 @@ let paramsStore = Reflux.createStore({
   /**/
 
   onBuildQS: function (state) {
-    let querystring = _.reduce(state['dimension'].value, (acc, el) => {
+    let qs = {};
+    if (!_.isEmpty(state['frequency'].value)) {
+      qs['frequency'] = _.join(state['frequency'].value, '+');
+    }
+    qs = _.reduce(state['dimension'].value, (acc, el) => {
       if (!_.isEmpty(el.value)) {
         acc[el.name] = _.join(el.value, '+');
       }
       return acc;
-    }, {});
+    }, qs);
     globalActions.buildURL({
       'dataset': state['dataset'].value,
-      'querystring': querystring
+      'querystring': qs
     });
   }
 });
