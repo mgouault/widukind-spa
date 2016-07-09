@@ -24,12 +24,12 @@
     "path": "^0.12.7",
     "q": "^1.4.1",
     "querystring": "^0.2.0",
-    "react": "^15.0.1",
-    "react-bootstrap": "^0.29.3",
+    "react": "^15.2.1",
+    "react-bootstrap": "^0.29.5",
     "react-bootstrap-table": "^2.3.3",
     "react-clipboard.js": "^0.2.3",
     "react-dimensions": "^1.2.0",
-    "react-dom": "^15.0.1",
+    "react-dom": "^15.2.1",
     "react-dygraphs": "0.0.1",
     "react-loader": "^2.4.0",
     "react-select": "^1.0.0-beta13",
@@ -37,6 +37,6 @@
     "reflux-core": "^0.3.0",
     "reflux-promise": "^1.0.4",
     "request-promise": "^3.0.0",
-    "socket.io": "^1.4.6"
+    "url": "^0.11.0"
   }
 }

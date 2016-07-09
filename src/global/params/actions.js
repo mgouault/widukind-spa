@@ -7,7 +7,7 @@ Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
 Reflux.use(RefluxPromise(bluebird))
 
-let apiCall = require('../../helpers/apiCall');
+let getData = require('../getData');
 
 
 
@@ -41,31 +41,31 @@ let paramsActions = Reflux.createActions({
   }
 });
 
-paramsActions.fetchProvider.listenAndPromise(function () {
-  return apiCall({
-    'pathname': '/provider',
+paramsActions.fetchProvider.listenAndPromise(() => {
+  return getData({
+    'pathname': '/providers/keys',
     'query': {}
   });
 });
 
-paramsActions.fetchDataset.listenAndPromise(function (selectedProvider) {
-  return apiCall({
-    'pathname': '/dataset',
-    'query': {'provider': selectedProvider}
+paramsActions.fetchDataset.listenAndPromise((selectedProvider) => {
+  return getData({
+    'pathname': '/providers/' + selectedProvider + '/datasets/keys',
+    'query': {}
   });
 });
 
-paramsActions.fetchFrequency.listenAndPromise(function (selectedDataset) {
-  return apiCall({
-    'pathname': '/frequency',
-    'query': {'dataset': selectedDataset}
+paramsActions.fetchFrequency.listenAndPromise((selectedDataset) => {
+  return getData({
+    'pathname': '/datasets/' + selectedDataset + '/frequencies',
+    'query': {}
   });
 });
 
-paramsActions.fetchDimension.listenAndPromise(function (selectedDataset) {
-  return apiCall({
-    'pathname': '/dimension',
-    'query': {'dataset': selectedDataset}
+paramsActions.fetchDimension.listenAndPromise((selectedDataset) => {
+  return getData({
+    'pathname': '/datasets/' + selectedDataset + '/dimensions',
+    'query': {}
   });
 });
 

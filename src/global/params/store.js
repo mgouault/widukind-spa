@@ -1,5 +1,5 @@
-let Reflux = require('reflux');
 let _ = require('lodash');
+let Reflux = require('reflux');
 
 let actions = require('./actions');
 let globalActions = require('../actions');

@@ -1,27 +1,27 @@
-var _ = require('lodash');
-var Reflux = require('reflux');
+let _ = require('lodash');
+let Reflux = require('reflux');
 
-var c = require('./constants');
-var actions = require('./actions');
+let actions = require('./actions');
 
-var pattern = {};
-pattern[c.log] = [];
-pattern[c.logDisplayed] = false;
+
+
+let _state = {
+  'logDisplayed': false
+};
 
 
 
 var store = Reflux.createStore({
   listenables: [actions],
   getInitialState: function () {
-    this.state = _.cloneDeep(pattern);
-    return this.state;
+    return _state;
   },
   refresh: function () {
-    this.trigger(this.state);
+    this.trigger(_state);
   },
 
   onDisplayLog: function (data) {
-    this.state[c.logDisplayed] = !this.state[c.logDisplayed];
+    _state['logDisplayed'] = !_state['logDisplayed'];
     this.refresh();
   }
 });

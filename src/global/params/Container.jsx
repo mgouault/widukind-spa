@@ -13,7 +13,7 @@ let store = require('./store');
 let CustomSelect = React.createClass({
 
   render: function () {
-    let options = _.map(this.props.data, function (el) {
+    let options = _.map(this.props.data, (el) => {
       if (typeof el === 'object') {
         return el;
       }
@@ -41,7 +41,7 @@ let ParamsContainer = React.createClass({
   render: function () {
     let state = this.state.storeState;
 
-    let dimensionBox = _.map(state['dimension'].value, function (el) {
+    let dimensionBox = _.map(state['dimension'].value, (el) => {
       let title = _.capitalize(el.name);
       let onSelectWrap = function (event) {
         actions.selectDimensionvalue(event, el.name);

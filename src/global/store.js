@@ -3,12 +3,22 @@ let Reflux = require('reflux');
 
 let actions = require('./actions');
 
+
+
 let _state = {
   'requestPathname': {
     'series': '',
     'values': ''
-  }
+  },
+  'configObj': {}
 };
+
+function getConfig () {
+  let axios = require('axios');
+	return axios.get('/config').then((received) => {
+		return received.data;
+	});
+}
 
 
 
@@ -26,7 +36,7 @@ let store = Reflux.createStore({
     let querystring = URL['querystring'];
     let QSString = '';
     if (!_.isEmpty(querystring)) {
-      let tmp = _.map(Object.keys(querystring), function (key) {
+      let tmp = _.map(Object.keys(querystring), (key) => {
         let val = querystring[key];
         return key+'='+val;
       });
@@ -35,6 +45,16 @@ let store = Reflux.createStore({
     _state['requestPathname']['series'] = '/datasets/' + dataset + '/series' + QSString;
     _state['requestPathname']['values'] = '/datasets/' + dataset + '/values' + QSString;
     this.refresh();
+  },
+
+  getConfigObj: function () {
+    if (!_.isEmpty(_state['configObj'])) {
+      return Promise.resolve(_state['configObj']);
+    }
+    return getConfig().then((configObj) => {
+      _state['configObj'] = configObj;
+      return _state['configObj'];
+    });
   }
 });
 

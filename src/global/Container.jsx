@@ -10,7 +10,7 @@ let store = require('./store');
 // let LogContainer = require('./log/Container.jsx');
 let ParamsContainer = require('./params/Container.jsx');
 // let TableContainer = require('./table/Container.jsx');
-let UrlContainer = require('./url/Container.jsx');
+let UrlDisplay = require('../components/UrlDisplay.jsx');
 
 
 
@@ -23,8 +23,7 @@ let GlobalContainer = React.createClass({
       <Grid fluid>
 
         <Row>
-          <Col sm={3}></Col>
-          <Col sm={6}>
+          <Col sm={6} smOffset={3}>
             <Navbar>
               <Navbar.Header>
                 <Navbar.Brand>
@@ -44,7 +43,6 @@ let GlobalContainer = React.createClass({
               </Nav>
             </Navbar>
           </Col>
-          <Col sm={3}></Col>
         </Row>
 
         <div className="row marketing">
@@ -54,8 +52,9 @@ let GlobalContainer = React.createClass({
             </Col>
             <Col sm={8}>
               {_.isEmpty(state['requestPathname']['values']) ? <div></div> :
-                <UrlContainer
-                  url={state['requestPathname']['values']}
+                <UrlDisplay
+                  config={state['configObj']}
+                  pathname={state['requestPathname']['values']}
                 />
               }
             </Col>
