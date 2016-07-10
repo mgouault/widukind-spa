@@ -1,64 +1,62 @@
-var React = require('react');
-var _ = require('lodash');
-import { Table, Checkbox } from 'react-bootstrap';
-var Loader = require('react-loader');
+let React = require('react');
+let Reflux = require('reflux');
+let _ = require('lodash');
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
 
-var DataTable = React.createClass({
+let DataTable = React.createClass({
 
-  onSelect: function (row) {
-    this.props.selectRow(row['key']);
+  buildData: function () {
+    let data = _.map(this.props.series, (el) => {
+      let freq = el['frequency'];
+      switch (el['frequency']) {
+        case 'A':
+          freq = 'Annually'; break;
+        case 'Q':
+          freq = 'Quarterly'; break;
+        case 'M':
+          freq = 'Monthly'; break;
+      }
+      return ({
+        'provider': el['provider_name'],
+        'dataset': el['dataset_code'],
+        'key': el['key'],
+        'slug': el['slug'],
+        'name': el['name'],
+        'freq': freq,
+        'startDate': el['start_date'],
+        'endDate': el['end_date']
+      });
+    });
   },
 
-  onSelectAll: function (data, checked) {
-    this.props.selectRowAll(data, checked);
+  onClickRow: function (slug, checked) {
+    let selection = _.clone(this.props.selection);
+    if (checked) {
+      selection.push(slug);
+    } else {
+      _.remove(selection, slug);
+    }
+    this.props.updateSelection(selection);
+  },
+  onClickRowAll: function (data, checked) {
+    let selection = []
+    if (checked) {
+      selection = _.map(data, (el) => { return el['slug'] });
+    }
+    this.props.updateSelection(selection);
   },
 
   render: function () {
-    if (this.props.loading) {
-      return(<div className="tableDiv"><Loader loaded={false}><div></div></Loader></div>);
-    }
-
-    var data = [];
-    var selected = [];
-    var series = this.props.series;
-    var validSeries = !_.isEmpty(series);
-
-    if (validSeries) {
-      data = _.map(series, function (el) {
-        var freq = el['frequency'];
-        switch (el['frequency']) {
-          case 'A':
-            freq = 'Annually'; break;
-          case 'Q':
-            freq = 'Quarterly'; break;
-          case 'M':
-            freq = 'Monthly'; break;
-        }
-        if (el['checked']) {
-          selected.push(el['key']);
-        }
-        return ({
-          'provider': el['provider_name'],
-          'dataset': el['dataset_code'],
-          'key': el['key'],
-          'name': el['name'],
-          'freq': freq,
-          'startDate': el['start_date'],
-          'endDate': el['end_date']
-        });
-      });
-    }
-
-    var selectRow = {
-      mode: 'checkbox',
-      clickToSelect: true,
-      selected: selected,
-      onSelect: this.onSelect,
-      onSelectAll: function (checked) { this.onSelectAll(data, checked); }.bind(this),
-      bgColor: '#9ACBDB'
+    let data = this.buildData();
+    let selectRow = {
+      'mode': 'checkbox',
+      'clickToSelect': true,
+      'selected': this.props.selection,
+      'onSelect': (row, checked) => { this.onClickRow(row['slug'], checked); },
+      'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },
+      'bgColor': '#9ACBDB'
     };
 
     return (
@@ -73,7 +71,8 @@ var DataTable = React.createClass({
         >
           <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
           <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
-          <TableHeaderColumn isKey={true} dataField="key" dataSort>Key</TableHeaderColumn>
+          <TableHeaderColumn dataField="key" dataSort>Key</TableHeaderColumn>
+          <TableHeaderColumn isKey={true} dataField="slug" dataSort>Slug</TableHeaderColumn>
           <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
           <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
           <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
@@ -82,6 +81,7 @@ var DataTable = React.createClass({
       </div>
     );
   }
+
 });
 
 module.exports = DataTable;

@@ -6,6 +6,11 @@ let actions = require('./actions');
 
 
 let _state = {
+  'series': {
+    data: [],
+    value: [],
+    loading: false
+  },
   'requestObj': {
     'series': {
       pathname: '',
@@ -16,7 +21,8 @@ let _state = {
       query: {}
     }
   },
-  'configObj': {}
+  'configObj': {},
+  'log': []
 };
 
 function getConfig () {
@@ -28,7 +34,7 @@ function getConfig () {
 
 
 
-let store = Reflux.createStore({
+let globalStore = Reflux.createStore({
   listenables: [actions],
   getInitialState: function () {
     return _state;
@@ -44,7 +50,26 @@ let store = Reflux.createStore({
     _state['requestObj']['series'].query = query;
     _state['requestObj']['values'].pathname = '/datasets/' + dataset + '/values';
     _state['requestObj']['values'].query = query;
+    actions.fetchSeries(_state['requestObj']['series']);
     this.refresh();
+  },
+  onFetchSeries: function () {
+    _state['series'].loading = true;
+    this.refresh();
+  },
+  onFetchSeriesFailed: console.error,
+  onFetchSeriesCompleted: function (data) {
+    // if (!_.isEmpty(data)) {
+    //   this.state[c.log] = JSON.stringify(data, null, 2)
+    //     + '\n -------------------- \n'
+    //     + this.state[c.log];
+    // }
+    _state['series'].loading = false;
+    _state['series'].data = data;
+    this.refresh();
+  },
+  onUpdateSelection: function (selection) {
+    _state['series'].value = selection;
   },
 
   getConfigObj: function () {
@@ -58,4 +83,4 @@ let store = Reflux.createStore({
   }
 });
 
-module.exports = store;
+module.exports = globalStore;

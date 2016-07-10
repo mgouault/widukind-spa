@@ -1,26 +1,26 @@
-var React = require('react');
-var Reflux = require('reflux');
+let React = require('react');
 import { Row, Col, Panel, Button } from 'react-bootstrap';
 
-let actions = require('./actions');
-let store = require('./store');
 
 
+let LogDisplay = React.createClass({
+  getInitialState: function () {
+    return { 'displayed': false };
+  },
 
-var LogContainer = React.createClass({
-  mixins: [Reflux.connect(store, 'storeState')],
+  onClick: function () {
+    this.setState({ 'displayed': !this.state['displayed'] });
+  },
 
   render: function () {
-    var state = this.state.storeState;
+    let displayed = this.state.displayed;
     let log = this.props.log;
-    let displayed = state['logDisplayed'];
-
     return (
       <div>
         <Panel header="Logs">
           <Row>
             <Col sm={6} smOffset={3}>
-              <Button onClick={actions[c.displayLog]} block>
+              <Button onClick={this.onClick} block>
                 {(!displayed) ? "Show" : "Hide"}
               </Button>
             </Col>
@@ -40,4 +40,4 @@ var LogContainer = React.createClass({
 
 });
 
-module.exports = LogContainer;
+module.exports = LogDisplay;

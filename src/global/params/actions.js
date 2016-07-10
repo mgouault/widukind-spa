@@ -5,7 +5,7 @@ let bluebird = require('bluebird');
 
 Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
-Reflux.use(RefluxPromise(bluebird))
+Reflux.use(RefluxPromise(bluebird));
 
 let getData = require('../getData');
 

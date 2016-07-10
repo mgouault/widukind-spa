@@ -5,16 +5,20 @@ let bluebird = require('bluebird');
 
 Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
-Reflux.use(RefluxPromise(bluebird))
+Reflux.use(RefluxPromise(bluebird));
+
+let getData = require('./getData');
 
 
 
-let actions = Reflux.createActions({
-	'buildURL': {
-		shouldEmit: function (URL) {
-			return !_.isEmpty(URL['dataset']);
-		}
-	}
+let globalActions = Reflux.createActions({
+	'buildURL': {},
+	'fetchSeries': { asyncResult: true },
+	'updateSelection': {}
 });
 
-module.exports = actions;
+globalActions.fetchSeries.listenAndPromise((requestObj) => {
+  return getData(requestObj);
+});
+
+module.exports = globalActions;

@@ -2,15 +2,16 @@ let React = require('react');
 let Reflux = require('reflux');
 let _ = require('lodash');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
+let Loader = require('react-loader');
 
 let actions = require('./actions');
 let store = require('./store');
 
-// let GraphContainer = require('./graph/Container.jsx');
-// let LogContainer = require('./log/Container.jsx');
 let ParamsContainer = require('./params/Container.jsx');
-// let TableContainer = require('./table/Container.jsx');
+// let GraphContainer = require('./graph/Container.jsx');
 let UrlDisplay = require('../components/UrlDisplay.jsx');
+let DataTable = require('../components/DataTable.jsx');
+let LogDisplay = require('../components/LogDisplay.jsx');
 
 
 
@@ -45,21 +46,43 @@ let GlobalContainer = React.createClass({
           </Col>
         </Row>
 
-        <div className="row marketing">
-          <Row>
-            <Col sm={4}>
-              <ParamsContainer/>
-            </Col>
-            <Col sm={8}>
-              {_.isEmpty(state['requestObj']['values']) ? <div></div> :
-                <UrlDisplay
-                  config={state['configObj']}
-                  request={state['requestObj']['values']}
+        <Row>
+          <Col sm={4}>
+            <ParamsContainer/>
+          </Col>
+          <Col sm={8}>
+            <Row>
+              <Col sm={12}>
+                {_.isEmpty(state['requestObj']['values']) ? <div></div> :
+                  <UrlDisplay
+                    config={state['configObj']}
+                    request={state['requestObj']['values']}
+                  />
+                }
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={12}>
+                <Loader loaded={!state['series'].loading}>
+                  {_.isEmpty(state['series'].data) ? <div></div> :
+                    <DataTable
+                      series={state['series'].data}
+                      selection={state['series'].value}
+                      updateSelection={actions.updateSelection}
+                    />
+                  }
+                </Loader>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={12}>
+                <LogDisplay
+                  log={state['log']}
                 />
-              }
-            </Col>
-          </Row>
-        </div>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
 
         <footer className="footer">
           &copy; 2016 Widukind-SPA
