@@ -51,10 +51,10 @@ let GlobalContainer = React.createClass({
               <ParamsContainer/>
             </Col>
             <Col sm={8}>
-              {_.isEmpty(state['requestPathname']['values']) ? <div></div> :
+              {_.isEmpty(state['requestObj']['values']) ? <div></div> :
                 <UrlDisplay
                   config={state['configObj']}
-                  pathname={state['requestPathname']['values']}
+                  request={state['requestObj']['values']}
                 />
               }
             </Col>

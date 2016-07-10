@@ -12,7 +12,7 @@ let getData = require('../getData');
 
 
 let paramsActions = Reflux.createActions({
-  'buildQS': {},
+  'buildQuery': {},
   'selectProvider': {},
   'selectDataset': {},
   'selectFrequency': {},

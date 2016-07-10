@@ -15,7 +15,7 @@ let globalActions = require('../actions');
       },
       value: function (value) {
         _state[key].value = value;
-        actions.buildQS(_state);
+        actions.buildQuery(_state);
       },
       defaultValue: function () {
         if (_state[key].init) {
@@ -103,7 +103,7 @@ let globalActions = require('../actions');
       _state['frequency'].value = [];
       _state['dimension'].data = [];
       _state['dimension'].value = [];
-      actions.buildQS(_state);
+      actions.buildQuery(_state);
       actions.fetchFrequency(value);
       actions.fetchDimension(value);
     }
@@ -137,7 +137,7 @@ let globalActions = require('../actions');
         acc.push(tmp);
         return acc;
       }, _state['dimension'].value);
-      actions.buildQS(_state);
+      actions.buildQuery(_state);
     }
   });
 
@@ -148,7 +148,7 @@ let globalActions = require('../actions');
         'value',
         value
       );
-      actions.buildQS(_state);
+      actions.buildQuery(_state);
     }
   });
 /**/
@@ -237,20 +237,20 @@ let paramsStore = Reflux.createStore({
     },
   /**/
 
-  onBuildQS: function (state) {
-    let qs = {};
+  onBuildQuery: function (state) {
+    let query = {};
     if (!_.isEmpty(state['frequency'].value)) {
-      qs['frequency'] = _.join(state['frequency'].value, '+');
+      query['frequency'] = _.join(state['frequency'].value, '+');
     }
-    qs = _.reduce(state['dimension'].value, (acc, el) => {
+    query = _.reduce(state['dimension'].value, (acc, el) => {
       if (!_.isEmpty(el.value)) {
         acc[el.name] = _.join(el.value, '+');
       }
       return acc;
-    }, qs);
+    }, query);
     globalActions.buildURL({
       'dataset': state['dataset'].value,
-      'querystring': qs
+      'query': query
     });
   }
 });

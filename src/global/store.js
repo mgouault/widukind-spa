@@ -6,9 +6,15 @@ let actions = require('./actions');
 
 
 let _state = {
-  'requestPathname': {
-    'series': '',
-    'values': ''
+  'requestObj': {
+    'series': {
+      pathname: '',
+      query: {}
+    },
+    'values': {
+      pathname: '',
+      query: {}
+    }
   },
   'configObj': {}
 };
@@ -33,17 +39,11 @@ let store = Reflux.createStore({
 
   onBuildURL: function (URL) {
     let dataset = URL['dataset'];
-    let querystring = URL['querystring'];
-    let QSString = '';
-    if (!_.isEmpty(querystring)) {
-      let tmp = _.map(Object.keys(querystring), (key) => {
-        let val = querystring[key];
-        return key+'='+val;
-      });
-      QSString = '?' + _.join(tmp, '&');
-    }
-    _state['requestPathname']['series'] = '/datasets/' + dataset + '/series' + QSString;
-    _state['requestPathname']['values'] = '/datasets/' + dataset + '/values' + QSString;
+    let query = URL['query'];
+    _state['requestObj']['series'].pathname = '/datasets/' + dataset + '/series';
+    _state['requestObj']['series'].query = query;
+    _state['requestObj']['values'].pathname = '/datasets/' + dataset + '/values';
+    _state['requestObj']['values'].query = query;
     this.refresh();
   },
 
