@@ -52,6 +52,7 @@ let globalStore = Reflux.createStore({
       _state['series'].value = selection;
       if (_.isEmpty(selection)) {
         _state['selection'].data = [];
+        this.refresh();
       } else {
         let storedSelection = _.map(_state['selection'].data, (el) => {
           return el['slug']
@@ -59,7 +60,6 @@ let globalStore = Reflux.createStore({
         let wantedSelection = _.difference(selection, storedSelection);
         actions.fetchSelection(wantedSelection);
       }
-      this.refresh();
     },
   /**/
 

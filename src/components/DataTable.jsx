@@ -60,7 +60,7 @@ let DataTable = React.createClass({
       'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },
       'bgColor': '#9ACBDB'
     };
-
+    
     return (
       <div className="dataTableDiv">
         <BootstrapTable
