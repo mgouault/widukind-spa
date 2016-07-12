@@ -82,15 +82,15 @@ body {
     min-height: 34px;
 }
 
-.controlDiv {
+.paramsDiv {
     min-height: 284px;
 }
 
-.graphDiv {
+.seriesGraphDiv {
     min-height: 320px;
 }
 
-.tableDiv {
+.dataTableDiv {
     min-height: 72px;
     width: 100%;
 }

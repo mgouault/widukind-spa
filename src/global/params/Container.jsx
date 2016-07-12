@@ -65,7 +65,7 @@ let ParamsContainer = React.createClass({
 
     return (
       <Panel>
-        <div className="controlDiv">
+        <div className="paramsDiv">
 
           <Loader loaded={!state['provider'].loading}>
             {_.isEmpty(state['provider'].data) ? <div></div> :

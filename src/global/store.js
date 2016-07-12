@@ -50,7 +50,11 @@ let globalStore = Reflux.createStore({
     },
     onUpdateSelection: function (selection) {
       _state['series'].value = selection;
-      actions.fetchSelection(selection);
+      if (_.isEmpty(selection)) {
+        _state['selection'].data = [];
+      } else {
+        actions.fetchSelection(selection);
+      }
       this.refresh();
     },
   /**/
@@ -79,6 +83,9 @@ let globalStore = Reflux.createStore({
       this.refresh();
     },
     onFetchSelectionCompleted: function (data) {
+      if (!(data instanceof Array)) {
+        data = [data];
+      }
       if (!_.isEmpty(data)) {
         _state['log'] = JSON.stringify(data, null, 2)
           + '\n -------------------- \n'

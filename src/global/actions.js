@@ -18,12 +18,7 @@ let globalActions = Reflux.createActions({
 		}
 	},
 	'fetchSeries': { asyncResult: true },
-	'fetchSelection': {
-		asyncResult: true,
-		shouldEmit: function (selection) {
-			return !_.isEmpty(selection);
-		}
-	},
+	'fetchSelection': { asyncResult: true },
 	'updateSelection': {}
 });
 

@@ -1,7 +1,6 @@
 var React = require('react');
 var _ = require('lodash');
 var moment = require('moment');
-var Loader = require('react-loader');
 var Dygraph = require('react-dygraphs').Dygraph;
 var ReactDimensions = require('react-dimensions');
 
@@ -29,7 +28,7 @@ var SeriesGraph = React.createClass({
         return result;
       }
     });
-  }
+  },
 
   makeKey: function (period, frequency) {
     let customHandling = _.some(['Q', 'M', 'W', 'D'], function (el) {
@@ -60,37 +59,24 @@ var SeriesGraph = React.createClass({
   },
 
   foo: function (acc, serie) {
-    let tmp = _.reduce(serie['values'], function (acc, value) {
-      let key = makeKey(value['period'], value['frequency']);
-      if (!acc[key]) {
-        acc[key] = [];
+    _.forEach(serie['values'], function (value) {
+      let key = this.makeKey(value['period'], value['frequency']);
+      if (!acc['data'][key]) {
+        acc['data'][key] = [];
       }
-      acc[key].push(value.value);
-      return acc;
-    }, {});
-    _.assign(acc['data'], tmp); //todo: not sure
+      acc['data'][key].push(value.value);
+    }.bind(this));
     acc['labels'].push(serie['key']);
     return acc;
   },
 
   render: function () {
-    if (this.props.loading) {
-      return(<div className="graphDiv"><Loader loaded={false}><div></div></Loader></div>);
-    }
-
-    let series = this.props.series;
-    if (!series || _.isEmpty(series)) {
-      return (<div className="graphDiv"></div>);
-    }
-
-    let filteredSeries = _.filter(series, {'checked': true});
-    let tmp = _.reduce(filteredSeries, this.foo, {'data':{}, 'labels':[]});
-
+    let tmp = _.reduce(this.props.series, this.foo, {'data':{}, 'labels':['time']});
     let labels = tmp['labels'];
-    let data = bar(tmp['data'], labels);
+    let data = this.bar(tmp['data'], labels);
 
     return (
-      <div className="graphDiv">
+      <div className="seriesGraphDiv">
         <Dygraph
           key="dygraph"
           data={data}

@@ -60,7 +60,7 @@ let DataTable = React.createClass({
     };
 
     return (
-      <div className="tableDiv">
+      <div className="dataTableDiv">
         <BootstrapTable
           data={data}
           bordered={true}

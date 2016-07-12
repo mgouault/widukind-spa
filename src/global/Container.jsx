@@ -9,7 +9,7 @@ let actions = require('./actions');
 actions.connectAPIService();
 
 let ParamsContainer = require('./params/Container.jsx');
-// let GraphContainer = require('./graph/Container.jsx');
+let SeriesGraph = require('../components/SeriesGraph.jsx');
 let UrlDisplay = require('../components/UrlDisplay.jsx');
 let DataTable = require('../components/DataTable.jsx');
 let LogDisplay = require('../components/LogDisplay.jsx');
@@ -54,25 +54,42 @@ let GlobalContainer = React.createClass({
           <Col sm={8}>
             <Row>
               <Col sm={12}>
-                {_.isEmpty(state['requestObj']) ? <div></div> :
-                  <UrlDisplay
-                    config={state['configObj']}
-                    request={state['requestObj']}
-                  />
-                }
+                <div className="seriesGraphDiv">
+                  <Loader loaded={!state['selection'].loading}>
+                    {_.isEmpty(state['selection'].data) ? <div></div> :
+                      <SeriesGraph
+                        series={state['selection'].data}
+                      />
+                    }
+                  </Loader>
+                </div>
               </Col>
             </Row>
             <Row>
               <Col sm={12}>
-                <Loader loaded={!state['series'].loading}>
-                  {_.isEmpty(state['series'].data) ? <div></div> :
-                    <DataTable
-                      series={state['series'].data}
-                      selection={state['series'].value}
-                      updateSelection={actions.updateSelection}
+                <div className="urlDisplayDiv">
+                  {_.isEmpty(state['requestObj']) ? <div></div> :
+                    <UrlDisplay
+                      config={state['configObj']}
+                      request={state['requestObj']}
                     />
                   }
-                </Loader>
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={12}>
+                <div className="dataTableDiv">
+                  <Loader loaded={!state['series'].loading}>
+                    {_.isEmpty(state['series'].data) ? <div></div> :
+                      <DataTable
+                        series={state['series'].data}
+                        selection={state['series'].value}
+                        updateSelection={actions.updateSelection}
+                      />
+                    }
+                  </Loader>
+                </div>
               </Col>
             </Row>
             <Row>
