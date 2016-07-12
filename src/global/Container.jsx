@@ -4,8 +4,9 @@ let _ = require('lodash');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 let Loader = require('react-loader');
 
-let actions = require('./actions');
 let store = require('./store');
+let actions = require('./actions');
+actions.connectAPIService();
 
 let ParamsContainer = require('./params/Container.jsx');
 // let GraphContainer = require('./graph/Container.jsx');

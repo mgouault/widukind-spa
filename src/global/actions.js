@@ -7,12 +7,16 @@ Reflux.use(RefluxPromise(window.Promise));
 Reflux.use(RefluxPromise(Q.Promise));
 Reflux.use(RefluxPromise(bluebird));
 
-let getData = require('./getData');
+let getData = () => {return Promise.resolve()};
 
 
 
 let globalActions = Reflux.createActions({
-	'buildURL': {},
+	'buildURL': {
+		shouldEmit: function (URL) {
+			return !_.isEmpty(URL['dataset']);
+		}
+	},
 	'fetchSeries': { asyncResult: true },
 	'updateSelection': {}
 });
@@ -20,5 +24,9 @@ let globalActions = Reflux.createActions({
 globalActions.fetchSeries.listenAndPromise((requestObj) => {
   return getData(requestObj);
 });
+
+globalActions.connectAPIService = function () {
+	getData = require('./getData');
+}
 
 module.exports = globalActions;

@@ -70,6 +70,7 @@ let globalStore = Reflux.createStore({
   },
   onUpdateSelection: function (selection) {
     _state['series'].value = selection;
+    this.refresh();
   },
 
   getConfigObj: function () {

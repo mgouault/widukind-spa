@@ -8,7 +8,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 let DataTable = React.createClass({
 
   buildData: function () {
-    let data = _.map(this.props.series, (el) => {
+    return _.map(this.props.series, (el) => {
       let freq = el['frequency'];
       switch (el['frequency']) {
         case 'A':
@@ -32,11 +32,11 @@ let DataTable = React.createClass({
   },
 
   onClickRow: function (slug, checked) {
-    let selection = _.clone(this.props.selection);
+    let selection = _.cloneDeep(this.props.selection);
     if (checked) {
       selection.push(slug);
     } else {
-      _.remove(selection, slug);
+      _.remove(selection, (el) => {return el === slug});
     }
     this.props.updateSelection(selection);
   },
