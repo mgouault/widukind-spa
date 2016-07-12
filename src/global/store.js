@@ -11,15 +11,13 @@ let _state = {
     value: [],
     loading: false
   },
+  'selection': {
+    data: [],
+    loading: false
+  },
   'requestObj': {
-    'series': {
-      pathname: '',
-      query: {}
-    },
-    'values': {
-      pathname: '',
-      query: {}
-    }
+    pathname: '',
+    query: {}
   },
   'configObj': {},
   'log': []
@@ -43,35 +41,54 @@ let globalStore = Reflux.createStore({
     this.trigger(_state);
   },
 
-  onBuildURL: function (URL) {
-    let dataset = URL['dataset'];
-    let query = URL['query'];
-    _state['requestObj']['series'].pathname = '/datasets/' + dataset + '/series';
-    _state['requestObj']['series'].query = query;
-    _state['requestObj']['values'].pathname = '/datasets/' + dataset + '/values';
-    _state['requestObj']['values'].query = query;
-    actions.fetchSeries(_state['requestObj']['series']);
-    this.refresh();
-  },
-  onFetchSeries: function () {
-    _state['series'].loading = true;
-    this.refresh();
-  },
-  onFetchSeriesFailed: console.error,
-  onFetchSeriesCompleted: function (data) {
-    // if (!_.isEmpty(data)) {
-    //   this.state[c.log] = JSON.stringify(data, null, 2)
-    //     + '\n -------------------- \n'
-    //     + this.state[c.log];
-    // }
-    _state['series'].loading = false;
-    _state['series'].data = data;
-    this.refresh();
-  },
-  onUpdateSelection: function (selection) {
-    _state['series'].value = selection;
-    this.refresh();
-  },
+  /* onActions Sync */
+    onBuildURL: function (URL) {
+      _state['requestObj'].dataset = URL['dataset'];
+      _state['requestObj'].controls = URL['controls'];
+      actions.fetchSeries(_state['requestObj']);
+      this.refresh();
+    },
+    onUpdateSelection: function (selection) {
+      _state['series'].value = selection;
+      actions.fetchSelection(selection);
+      this.refresh();
+    },
+  /**/
+
+  /* onActions Async */
+    onFetchSeries: function () {
+      _state['series'].loading = true;
+      this.refresh();
+    },
+    onFetchSelection: function () {
+      _state['selection'].loading = true;
+      this.refresh();
+    },
+
+    onFetchSeriesFailed: console.error,
+    onFetchSelectionFailed: console.error,
+
+    onFetchSeriesCompleted: function (data) {
+      if (!_.isEmpty(data)) {
+        _state['log'] = JSON.stringify(data, null, 2)
+          + '\n -------------------- \n'
+          + _state['log'];
+      }
+      _state['series'].loading = false;
+      _state['series'].data = data;
+      this.refresh();
+    },
+    onFetchSelectionCompleted: function (data) {
+      if (!_.isEmpty(data)) {
+        _state['log'] = JSON.stringify(data, null, 2)
+          + '\n -------------------- \n'
+          + _state['log'];
+      }
+      _state['selection'].loading = false;
+      _state['selection'].data = data;
+      this.refresh();
+    },
+  /**/
 
   getConfigObj: function () {
     if (!_.isEmpty(_state['configObj'])) {

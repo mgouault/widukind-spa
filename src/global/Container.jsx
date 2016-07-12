@@ -54,10 +54,10 @@ let GlobalContainer = React.createClass({
           <Col sm={8}>
             <Row>
               <Col sm={12}>
-                {_.isEmpty(state['requestObj']['values']) ? <div></div> :
+                {_.isEmpty(state['requestObj']) ? <div></div> :
                   <UrlDisplay
                     config={state['configObj']}
-                    request={state['requestObj']['values']}
+                    request={state['requestObj']}
                   />
                 }
               </Col>

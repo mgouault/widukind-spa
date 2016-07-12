@@ -18,7 +18,10 @@ function libBuildURL (configObj, reqObj) {
 let UrlDisplay = React.createClass({
 
   render: function () {
-    let URL = libBuildURL(this.props.config, this.props.request);
+    let URL = libBuildURL(this.props.config, {
+      'pathname': '/datasets/' + this.props.request['dataset'] +'/values',
+      'query': this.props.request['controls']
+    });
 
     return (
       <div className="urlDisplayDiv">

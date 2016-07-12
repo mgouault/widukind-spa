@@ -18,11 +18,27 @@ let globalActions = Reflux.createActions({
 		}
 	},
 	'fetchSeries': { asyncResult: true },
+	'fetchSelection': {
+		asyncResult: true,
+		shouldEmit: function (selection) {
+			return !_.isEmpty(selection);
+		}
+	},
 	'updateSelection': {}
 });
 
 globalActions.fetchSeries.listenAndPromise((requestObj) => {
-  return getData(requestObj);
+  return getData({
+		'pathname': '/datasets/' + requestObj.dataset + '/series',
+		'query': requestObj.controls
+	});
+});
+
+globalActions.fetchSelection.listenAndPromise((selection) => {
+  return getData({
+		'pathname': '/series/' + _.join(selection, '+'),
+		'query': {}
+	});
 });
 
 globalActions.connectAPIService = function () {
