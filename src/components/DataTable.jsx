@@ -43,7 +43,9 @@ let DataTable = React.createClass({
   onClickRowAll: function (data, checked) {
     let selection = []
     if (checked) {
-      selection = _.map(data, (el) => { return el['slug'] });
+      selection = _.map(data, (el) => {
+        return el['slug']
+      });
     }
     this.props.updateSelection(selection);
   },

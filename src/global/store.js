@@ -53,7 +53,11 @@ let globalStore = Reflux.createStore({
       if (_.isEmpty(selection)) {
         _state['selection'].data = [];
       } else {
-        actions.fetchSelection(selection);
+        let storedSelection = _.map(_state['selection'].data, (el) => {
+          return el['slug']
+        });
+        let wantedSelection = _.difference(selection, storedSelection);
+        actions.fetchSelection(wantedSelection);
       }
       this.refresh();
     },
@@ -92,7 +96,17 @@ let globalStore = Reflux.createStore({
           + _state['log'];
       }
       _state['selection'].loading = false;
-      _state['selection'].data = data;
+
+      let tmp = _state['selection'].data;
+      _.remove(tmp, (el) => {
+        return !_.find(_state['series'].value, (el_) => {
+          return el_ === el['slug']
+        });
+      });
+      _state['selection'].data = _.concat(
+        _.compact(tmp),
+        _.compact(data)
+      );
       this.refresh();
     },
   /**/
