@@ -1,6 +1,4 @@
 let React = require('react');
-let ReactDOM = require('react-dom');
-let TestUtils = require('react-addons-test-utils');
 let { shallow } = require('enzyme');
 
 
@@ -8,13 +6,13 @@ let { shallow } = require('enzyme');
 jest.disableAutomock();
 let UrlDisplay = require('../../src/components/UrlDisplay.jsx');
 let ClipboardButton = require('react-clipboard.js');
-let { FormControl } = require('react-bootstrap');
+import { FormControl } from 'react-bootstrap';
 
 
 
 describe('UrlDisplay', () => {
 
-	it('renders with props', () => {
+	it('renders with correct props', () => {
 		let configObj = {
       "protocol": "http",
       "hostname": "widukind-api.cepremap.org",
@@ -28,23 +26,27 @@ describe('UrlDisplay', () => {
 			'controls': {'frequency': 'Q'}
 		};
 		const wrapper = shallow(<UrlDisplay config={configObj} request={requestObj}/>);
-		const el = wrapper.find(FormControl);
-		expect(el.prop('value')).toBe('http://widukind-api.cepremap.org/api/v1/json/datasets/bis-pp-ls/values?per_page=10&frequency=Q');
+		const elForm = wrapper.find(FormControl);
+		const elButton = wrapper.find(ClipboardButton);
+		let elFormValue = elForm.prop('value');
+		let elButtonValue = elButton.prop('data-clipboard-text');
+		expect(elFormValue).toBe('http://widukind-api.cepremap.org/api/v1/json/datasets/bis-pp-ls/values?per_page=10&frequency=Q');
+		expect(elButtonValue).toBe(elFormValue);
   });
 
-	it('renders without props', () => {
+	it('renders with empty props', () => {
 		let configObj = {};
 		let requestObj = {
 			'dataset': '',
 			'controls': {}
 		};
 		const wrapper = shallow(<UrlDisplay config={configObj} request={requestObj}/>);
-		const el = wrapper.find(FormControl);
-		expect(el.prop('value')).toBe('/datasets//values');
-  });
-
-	it('simulates a click', () => {
-		// todo
+		const elForm = wrapper.find(FormControl);
+		const elButton = wrapper.find(ClipboardButton);
+		let elFormValue = elForm.prop('value');
+		let elButtonValue = elButton.prop('data-clipboard-text');
+		expect(elFormValue).toBe('/datasets//values');
+		expect(elButtonValue).toBe(elFormValue);
   });
 
 });
