@@ -2,15 +2,7 @@
   "main": "server.js",
   "version": "0.6.0",
   "scripts": {
-  },
-  "jest": {
-    "unmockedModulePathPatterns": [
-      "<rootDir>/node_modules/react/",
-      "<rootDir>/node_modules/react-dom/",
-      "<rootDir>/node_modules/react-addons-test-utils/",
-      "<rootDir>/node_modules/enzyme/",
-      "<rootDir>/node_modules/sinon/"
-    ]
+    "test": "./node_modules/karma-cli/bin/karma start"
   },
   "dependencies": {
     "axios": "^0.11.0",
@@ -51,9 +43,18 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "babel-jest": "^13.2.2",
+    "babel-preset-airbnb": "^2.0.0",
     "enzyme": "^2.4.1",
+    "fs": "0.0.2",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^1.1.1",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.1",
+    "karma-webpack": "^1.7.0",
     "react-addons-test-utils": "^15.2.1",
-    "sinon": "^1.17.4"
+    "sinon": "^1.17.4",
+    "webpack": "^1.13.1"
   }
 }

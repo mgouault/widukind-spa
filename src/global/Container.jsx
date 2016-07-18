@@ -3,6 +3,7 @@ let Reflux = require('reflux');
 let _ = require('lodash');
 import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
 let Loader = require('react-loader');
+let ReactDimensions = require('react-dimensions');
 
 let store = require('./store');
 let actions = require('./actions');
@@ -10,6 +11,7 @@ actions.connectAPIService();
 
 let ParamsContainer = require('./params/Container.jsx');
 let SeriesGraph = require('../components/SeriesGraph.jsx');
+let SeriesGraphContainer = ReactDimensions()(SeriesGraph);
 let UrlDisplay = require('../components/UrlDisplay.jsx');
 let DataTable = require('../components/DataTable.jsx');
 let LogDisplay = require('../components/LogDisplay.jsx');
@@ -57,7 +59,7 @@ let GlobalContainer = React.createClass({
                 <div className="seriesGraphDiv">
                   <Loader loaded={!state['selection'].loading}>
                     {_.isEmpty(state['selection'].data) ? <div></div> :
-                      <SeriesGraph
+                      <SeriesGraphContainer
                         series={state['selection'].data}
                       />
                     }
