@@ -2,7 +2,6 @@
   "main": "server.js",
   "version": "0.6.0",
   "scripts": {
-    "test": "jest"
   },
   "jest": {
     "unmockedModulePathPatterns": [
@@ -54,7 +53,6 @@
   "devDependencies": {
     "babel-jest": "^13.2.2",
     "enzyme": "^2.4.1",
-    "jest-cli": "^13.2.3",
     "react-addons-test-utils": "^15.2.1",
     "sinon": "^1.17.4"
   }
