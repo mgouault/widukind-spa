@@ -1,7 +1,7 @@
 let React = require('react');
 let Reflux = require('reflux');
 let _ = require('lodash');
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+let { BootstrapTable, TableHeaderColumn } = require('react-bootstrap-table');
 
 
 
@@ -60,7 +60,7 @@ let DataTable = React.createClass({
       'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },
       'bgColor': '#9ACBDB'
     };
-    
+
     return (
       <div className="dataTableDiv">
         <BootstrapTable

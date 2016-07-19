@@ -1,6 +1,6 @@
 let React = require('react');
 let ClipboardButton = require('react-clipboard.js');
-import { FormGroup, FormControl, Col } from 'react-bootstrap';
+let { FormGroup, FormControl, Col } = require('react-bootstrap');
 
 let buildURL = require('../lib/buildURL');
 

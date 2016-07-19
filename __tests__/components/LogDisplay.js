@@ -1,10 +1,8 @@
 let React = require('react');
 let { shallow } = require('enzyme');
 
-
-
 let LogDisplay = require('../../src/components/LogDisplay.jsx');
-import { Button } from 'react-bootstrap';
+let { Button } = require('react-bootstrap');
 
 
 

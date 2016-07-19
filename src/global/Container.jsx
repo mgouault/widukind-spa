@@ -1,7 +1,7 @@
 let React = require('react');
 let Reflux = require('reflux');
 let _ = require('lodash');
-import { Grid, Row, Col, Nav, Navbar, NavItem } from 'react-bootstrap';
+let { Grid, Row, Col, Nav, Navbar, NavItem } = require('react-bootstrap');
 let Loader = require('react-loader');
 let ReactDimensions = require('react-dimensions');
 

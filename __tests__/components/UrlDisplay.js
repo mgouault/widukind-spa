@@ -1,16 +1,14 @@
 let React = require('react');
 let { shallow } = require('enzyme');
 
-
-
 let UrlDisplay = require('../../src/components/UrlDisplay.jsx');
 let ClipboardButton = require('react-clipboard.js');
-import { FormControl } from 'react-bootstrap';
+let { FormControl } = require('react-bootstrap');
 
 
 
 describe('UrlDisplay', () => {
-	
+
 	it('renders with correct props', () => {
 		let configObj = {
       "protocol": "http",
