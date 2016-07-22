@@ -3,44 +3,217 @@ let { shallow } = require('enzyme');
 
 let DataTable = require('../../src/components/DataTable.jsx');
 let { BootstrapTable } = require('react-bootstrap-table');
+const mocks = getMocks();
 
 
 
-let mocks = getMocks();
-describe('DataTable', () => {
-
+describe('DataTable - render', () => {
 	it('renders with one series', () => {
-		let mockedSeries = mocks.series;
-		let mockedData = mocks.data;
-		let mockedSelection = mocks.selection;
-		const wrapper = shallow(<DataTable series={mockedSeries.one} selection={mockedSelection.empty} updateSelection={()=>{}}/>);
+		let series = _.cloneDeep(mocks.series.one);
+		let selection = _.cloneDeep(mocks.selection.empty);
+		let data = [_.cloneDeep(mocks.data.first)];
+		const wrapper = shallow(
+			<DataTable
+				series={series}
+				selection={selection}
+				updateSelection={()=>{}}
+			/>
+		);
 		const elBootstrapTable = wrapper.find(BootstrapTable);
 		let elBootstrapTableData = elBootstrapTable.prop('data');
-		let elBootstrapTableSelectRow = elBootstrapTable.prop('selectRow');
 
-		expect(elBootstrapTableData).toEqual(mockedData.one);
+		expect(elBootstrapTableData).toEqual(data);
   });
 
 	it('renders with 10 series', () => {
-		let mockedSeries = mocks.series;
-		let mockedData = mocks.data;
-		let mockedSelection = mocks.selection;
-		const wrapper = shallow(<DataTable series={mockedSeries.all} selection={mockedSelection.empty} updateSelection={()=>{}}/>);
+		let series = _.cloneDeep(mocks.series.all);
+		let selection = _.cloneDeep(mocks.selection.empty);
+		let data = _.cloneDeep(mocks.data.all);
+		const wrapper = shallow(
+			<DataTable
+				series={series}
+				selection={selection}
+				updateSelection={()=>{}}
+			/>
+		);
+		const elBootstrapTable = wrapper.find(BootstrapTable);
+		let elBootstrapTableData = elBootstrapTable.prop('data');
+
+		expect(elBootstrapTableData).toEqual(data);
+  });
+});
+
+
+
+describe('DataTable - select', () => {
+	let series;
+	let firstRow;
+	let secondRow;
+	let thirdRow;
+	let selectionEmpty;
+	let selectionFirst;
+	let selectionSecond;
+	let selectionThird;
+	let selectionAll;
+
+	beforeEach(() => {
+		series = _.cloneDeep(mocks.series.all);
+		firstRow = _.cloneDeep(mocks.data.first);
+		secondRow = _.cloneDeep(mocks.data.second);
+		thirdRow = _.cloneDeep(mocks.data.third);
+		selectionEmpty = _.cloneDeep(mocks.selection.empty);
+		selectionFirst = _.cloneDeep(mocks.selection.first);
+		selectionSecond = _.cloneDeep(mocks.selection.second);
+		selectionThird = _.cloneDeep(mocks.selection.third);
+		selectionAll = _.cloneDeep(mocks.selection.all);
+	});
+
+	let spyValue;
+	let spy = function (arg) {
+		spyValue = arg;
+	};
+	let selectRow;
+	let selectRowAll;
+
+	function render (selection) {
+		spyValue = null;
+		const wrapper = shallow(
+			<DataTable
+				series={series}
+				selection={selection}
+				updateSelection={spy}
+			/>
+		);
 		const elBootstrapTable = wrapper.find(BootstrapTable);
 		let elBootstrapTableData = elBootstrapTable.prop('data');
 		let elBootstrapTableSelectRow = elBootstrapTable.prop('selectRow');
+		selectRow = elBootstrapTableSelectRow.onSelect;
+		selectRowAll = elBootstrapTableSelectRow.onSelectAll;
+	}
 
-		expect(elBootstrapTableData).toEqual(mockedData.all);
-  });
 
-	it('simulates click event selectRow', () => {
-		//todo
+
+	it('S1', () => {
+		render(selectionEmpty);
+		selectRow(firstRow, true);
+		expect(spyValue).toEqual(selectionFirst);
 	});
 
-	it('simulates click event selectRowAll', () => {
-		//todo
+	it('(S1) D1', () => {
+		render(selectionFirst);
+		selectRow(firstRow, false);
+		expect(spyValue).toEqual(selectionEmpty);
 	});
 
+	it('(S1) S2', () => {
+		render(selectionFirst);
+		selectRow(secondRow, true);
+		expect(spyValue).toEqual(_.concat(selectionFirst, selectionSecond));
+	});
+
+	it('(S1 S2) D1', () => {
+		render(_.concat(selectionFirst, selectionSecond));
+		selectRow(firstRow, false);
+		expect(spyValue).toEqual(selectionSecond);
+	});
+
+	it('(S1 S2) D2', () => {
+		render(_.concat(selectionFirst, selectionSecond));
+		selectRow(secondRow, false);
+		expect(spyValue).toEqual(selectionFirst);
+	});
+
+	it('(S1 S2) S3', () => {
+		render(_.concat(selectionFirst, selectionSecond));
+		selectRow(thirdRow, true);
+		expect(spyValue).toEqual(_.concat(selectionFirst, selectionSecond, selectionThird));
+	});
+
+	it('(S1 S2 S3) D2', () => {
+		render(_.concat(selectionFirst, selectionSecond, selectionThird));
+		selectRow(secondRow, false);
+		expect(spyValue).toEqual(_.concat(selectionFirst, selectionThird));
+	});
+
+
+
+	it('SA', () => {
+		render(selectionEmpty);
+		selectRowAll(true);
+		expect(spyValue).toEqual(selectionAll);
+	});
+
+	it('(SA) DA', () => {
+		render(selectionAll);
+		selectRowAll(false);
+		expect(spyValue).toEqual(selectionEmpty);
+	});
+
+	it('(SA) D1', () => {
+		let tmp = _.cloneDeep(selectionAll);
+		_.remove(tmp, (el) => {
+			return (el === firstRow['slug']);
+		});
+		render(selectionAll);
+		selectRow(firstRow, false);
+		expect(spyValue).toEqual(tmp);
+	});
+
+	it('(SA D1) DA', () => {
+		let tmp = _.cloneDeep(selectionAll);
+		_.remove(tmp, (el) => {
+			return (el === firstRow['slug']);
+		});
+		render(tmp);
+		selectRowAll(false);
+		expect(spyValue).toEqual(selectionEmpty);
+	});
+
+	it('(SA D1 D2) DA', () => {
+		let tmp = _.cloneDeep(selectionAll);
+		_.remove(tmp, (el) => {
+			return (el === firstRow['slug'] || el === secondRow['slug']);
+		});
+		render(tmp);
+		selectRowAll(false);
+		expect(spyValue).toEqual(selectionEmpty);
+	});
+
+	it('(SA D1 D2) S1', () => {
+		let tmp = _.cloneDeep(selectionAll);
+		_.remove(tmp, (el) => {
+			return (el === firstRow['slug'] || el === secondRow['slug']);
+		});
+		let tmp2 = _.cloneDeep(tmp);
+		tmp2.push(firstRow['slug']);
+		render(tmp);
+		selectRow(firstRow, true);
+		expect(spyValue).toEqual(tmp2);
+	});
+
+	it('(S1) SA', () => {
+		render(selectionFirst);
+		selectRowAll(true);
+		expect(spyValue).toEqual(selectionAll);
+	});
+
+	it('(S1 S2) SA', () => {
+		render(_.concat(selectionFirst, selectionSecond));
+		selectRowAll(true);
+		expect(spyValue).toEqual(selectionAll);
+	});
+
+	it('(S1) DA', () => {
+		render(selectionFirst);
+		selectRowAll(false);
+		expect(spyValue).toEqual(selectionEmpty);
+	});
+
+	it('(S1 S2) DA', () => {
+		render(_.concat(selectionFirst, selectionSecond));
+		selectRowAll(false);
+		expect(spyValue).toEqual(selectionEmpty);
+	});
 });
 
 
@@ -49,7 +222,9 @@ function getMocks () {
 	return {
 		"selection": {
 			"empty": [],
-			"one": ["insee-ipch-2015-fr-coicop-001763155"],
+			"first": ["insee-ipch-2015-fr-coicop-001763155"],
+			"second": ["insee-ipch-2015-fr-coicop-001762548"],
+			"third": ["insee-ipch-2015-fr-coicop-001763298"],
 			"all": ["insee-ipch-2015-fr-coicop-001763155", "insee-ipch-2015-fr-coicop-001762548", "insee-ipch-2015-fr-coicop-001763298", "insee-ipch-2015-fr-coicop-001762935", "insee-ipch-2015-fr-coicop-001762227", "insee-ipch-2015-fr-coicop-001762639", "insee-ipch-2015-fr-coicop-001763067", "insee-ipch-2015-fr-coicop-001762172", "insee-ipch-2015-fr-coicop-001762244", "insee-ipch-2015-fr-coicop-001763296"]
 		},
 
@@ -912,8 +1087,7 @@ function getMocks () {
 
 
 		"data": {
-			"one": [
-				{
+			"first": {
 		    "provider": "INSEE",
 		    "dataset": "IPCH-2015-FR-COICOP",
 		    "key": "001763155",
@@ -922,8 +1096,27 @@ function getMocks () {
 		    "freq": "Monthly",
 		    "startDate": 312,
 		    "endDate": 557
-		  }
-		],
+			},
+			"second": {
+		    "provider": "INSEE",
+		    "dataset": "IPCH-2015-FR-COICOP",
+		    "key": "001762548",
+		    "slug": "insee-ipch-2015-fr-coicop-001762548",
+		    "name": "Monthly - 01.1.4.6 - Other milk products - Index",
+		    "freq": "Monthly",
+		    "startDate": 312,
+		    "endDate": 557
+		  },
+			"third": {
+		    "provider": "INSEE",
+		    "dataset": "IPCH-2015-FR-COICOP",
+		    "key": "001763298",
+		    "slug": "insee-ipch-2015-fr-coicop-001763298",
+		    "name": "Monthly - 09.1.4 - Recording media - Index",
+		    "freq": "Monthly",
+		    "startDate": 312,
+		    "endDate": 557
+		  },
 
 			"all": [
 	  {

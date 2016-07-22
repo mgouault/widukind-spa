@@ -4,10 +4,10 @@ let _ = require('lodash');
 
 let SeriesGraph = require('../../src/components/SeriesGraph.jsx');
 let Dygraph = require('react-dygraphs').Dygraph;
+const mocks = getMocks();
 
 
 
-let mocks = getMocks();
 describe('SeriesGraph', () => {
 
 	it('renders with correct props', () => {
