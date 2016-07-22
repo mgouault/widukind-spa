@@ -1,5 +1,6 @@
 let React = require('react');
 let { shallow } = require('enzyme');
+let _ = require('lodash');
 
 let DataTable = require('../../src/components/DataTable.jsx');
 let { BootstrapTable } = require('react-bootstrap-table');
@@ -8,7 +9,7 @@ const mocks = getMocks();
 
 
 describe('DataTable - render', () => {
-	it('renders with one series', () => {
+	it('with one series', () => {
 		let series = _.cloneDeep(mocks.series.one);
 		let selection = _.cloneDeep(mocks.selection.empty);
 		let data = [_.cloneDeep(mocks.data.first)];
@@ -25,7 +26,7 @@ describe('DataTable - render', () => {
 		expect(elBootstrapTableData).toEqual(data);
   });
 
-	it('renders with 10 series', () => {
+	it('with 10 series', () => {
 		let series = _.cloneDeep(mocks.series.all);
 		let selection = _.cloneDeep(mocks.selection.empty);
 		let data = _.cloneDeep(mocks.data.all);

@@ -1,5 +1,6 @@
 let React = require('react');
 let { shallow } = require('enzyme');
+let _ = require('lodash');
 
 let UrlDisplay = require('../../src/components/UrlDisplay.jsx');
 let ClipboardButton = require('react-clipboard.js');

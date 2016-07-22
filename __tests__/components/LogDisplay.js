@@ -1,5 +1,6 @@
 let React = require('react');
 let { shallow } = require('enzyme');
+let _ = require('lodash');
 
 let LogDisplay = require('../../src/components/LogDisplay.jsx');
 let { Button } = require('react-bootstrap');

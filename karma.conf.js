@@ -1,16 +1,20 @@
+var rewireWebpack = require('rewire-webpack');
+
 module.exports = function(config) {
   config.set({
     browsers: ['PhantomJS'],
     files: [
+      { pattern: 'node_modules/babel-polyfill/dist/polyfill.js', watched: false },
       { pattern: 'tests.webpack.js', watched: false },
     ],
     frameworks: ['jasmine'],
     preprocessors: {
-      'tests.webpack.js': ['webpack'],
+      'tests.webpack.js': ['webpack', 'sourcemap'],
     },
     reporters: ['dots'],
     singleRun: true,
     webpack: {
+      devtool: 'inline-source-map',
       module: {
         loaders: [
           {
@@ -30,7 +34,10 @@ module.exports = function(config) {
         'react/addons': true,
         'react/lib/ExecutionEnvironment': true,
         'react/lib/ReactContext': true
-      }
+      },
+      plugins: [
+        new rewireWebpack()
+      ]
     },
     webpackServer: {
       noInfo: true,
