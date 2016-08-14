@@ -1,12 +1,11 @@
-var React = require('react');
-var _ = require('lodash');
-var moment = require('moment');
-var Dygraph = require('react-dygraphs').Dygraph;
-var ReactDimensions = require('react-dimensions');
+let React = require('react');
+let _ = require('lodash');
+let moment = require('moment');
+let Dygraph = require('react-dygraphs').Dygraph;
 
 
 
-var SeriesGraph = React.createClass({
+let SeriesGraph = React.createClass({
 
   bar: function (data, labels) {
     let keys = Object.keys(data);
@@ -89,4 +88,4 @@ var SeriesGraph = React.createClass({
 
 });
 
-module.exports = ReactDimensions()(SeriesGraph);
+module.exports = SeriesGraph;

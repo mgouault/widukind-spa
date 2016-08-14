@@ -1,24 +1,15 @@
 let React = require('react');
-let ClipboardButton = require('react-clipboard.js')
-import { FormGroup, FormControl, Col } from 'react-bootstrap';
+let ClipboardButton = require('react-clipboard.js');
+let { FormGroup, FormControl, Col } = require('react-bootstrap');
 
-
-
-function libBuildURL (configObj, reqObj) {
-  let url = require('url');
-  let _ = require('lodash');
-  let URLObj = _.cloneDeep(configObj);
-  URLObj['pathname'] = (URLObj['pathname'] || '') + reqObj['pathname'];
-  _.assign(URLObj['query'], reqObj['query']);
-  return unescape(url.format(URLObj));
-}
+let buildURL = require('../lib/buildURL');
 
 
 
 let UrlDisplay = React.createClass({
 
   render: function () {
-    let URL = libBuildURL(this.props.config, {
+    let URL = buildURL(this.props.config, {
       'pathname': '/datasets/' + this.props.request['dataset'] +'/values',
       'query': this.props.request['controls']
     });

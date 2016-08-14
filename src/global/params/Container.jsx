@@ -1,7 +1,7 @@
 let React = require('react');
 let Reflux = require('reflux');
 let _ = require('lodash');
-import { Panel } from 'react-bootstrap';
+let { Panel } = require('react-bootstrap');
 let Loader = require('react-loader');
 let Select = require('react-select');
 

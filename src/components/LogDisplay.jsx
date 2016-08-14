@@ -1,5 +1,5 @@
 let React = require('react');
-import { Row, Col, Panel, Button } from 'react-bootstrap';
+let { Row, Col, Panel, Button } = require('react-bootstrap');
 
 
 
