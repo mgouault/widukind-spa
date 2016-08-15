@@ -1,9 +1,9 @@
-let React = require('react');
-let { Row, Col, Panel, Button } = require('react-bootstrap');
+import React from 'react';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 
 
 
-let LogDisplay = React.createClass({
+export const LogDisplay = React.createClass({
   getInitialState: function () {
     return { 'displayed': false };
   },
@@ -39,5 +39,3 @@ let LogDisplay = React.createClass({
   }
 
 });
-
-module.exports = LogDisplay;
