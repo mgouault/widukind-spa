@@ -5,7 +5,7 @@ import { Dygraph } from 'react-dygraphs';
 
 
 
-export const SeriesGraph = React.createClass({
+let SeriesGraph = React.createClass({
 
   bar: function (data, labels) {
     let keys = Object.keys(data);
@@ -85,5 +85,6 @@ export const SeriesGraph = React.createClass({
       </div>
     );
   }
-
 });
+
+module.exports = SeriesGraph;

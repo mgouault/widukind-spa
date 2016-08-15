@@ -2,14 +2,16 @@ import Reflux from 'reflux';
 import _ from 'lodash';
 
 import actions from './actions';
-import { getUrl, feedConfig, initConfig } from './getData';
+import { getUrl, getLog, feedConfig, initConfig } from './getData';
 
 
 
 function initState (value = []) {
-  'data': [],
-  'value': value,
-  'loading': false
+  return {
+    'data': [],
+    'value': value,
+    'loading': false
+  };
 }
 const _state = {
   'provider': initState(''),
@@ -36,23 +38,25 @@ function buildParams () {
   }, params);
 }
 
+let refresh = () => {};
+let trigger = () => {};
 
-
-export const store = Reflux.createStore({
+let store = Reflux.createStore({
   listenables: [actions],
   getInitialState: () => _state,
-  refresh: () => {
+  publicRefresh: function () {
     actions.fetchSeriesData(_state['dataset'].value, buildParams());
     _state.metadata['url'] = getUrl(_state['dataset'].value, buildParams());
     _state.metadata['log'] = getLog();
     this.trigger(_state);
   },
+  publicTrigger: function () {this.trigger(_state)},
   init: () => {
-    initConfig()
+    initConfig();
     actions.fetchProviderData();
   },
 
-  'onSelectProviderValue': { provider } => {
+  onSelectProviderValue: ({ provider }) => {
     _state['provider'].value = provider;
     _state['dataset'].data = [];
     _state['dataset'].value = '';
@@ -64,10 +68,10 @@ export const store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     _state.metadata['log'] = getLog();
-    this.trigger(_state);
+    trigger();
     actions.fetchDatasetData(provider);
   },
-  'onSelectDatasetValue': { dataset } => {
+  onSelectDatasetValue: ({ dataset }) => {
     _state['dataset'].value = dataset;
     _state['frequency'].data = [];
     _state['frequency'].value = [];
@@ -76,18 +80,18 @@ export const store = Reflux.createStore({
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
     actions.fetchFrequencyData(dataset);
     actions.fetchDimensionData(dataset);
   },
-  'onSelectFrequencyValue': value => {
+  onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
   },
-  'onSelectDimensionValue': value => {
+  onSelectDimensionValue: value => {
     let addedValue = _.filter(value, el => {
       return (!_.find(_state['dimension'].value, {'name':el.name}));
     });
@@ -103,9 +107,9 @@ export const store = Reflux.createStore({
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
   },
-  'onSelectDimensionsPropsValue': (value, dimensionName) => {
+  onSelectDimensionsPropsValue: (value, dimensionName) => {
     _.set(
       _.find(_state['dimension'].value, {'name': dimensionName}),
       'value',
@@ -114,31 +118,32 @@ export const store = Reflux.createStore({
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
   },
-  'onSelectSeriesValue': value => {
+  onSelectSeriesValue: value => {
     _state['series'].value = value;
     _state['values'].data = [];
     _state.metadata['log'] = getLog();
-    this.trigger(_state);
+    trigger();
     actions.fetchValuesData(value);
   },
 
-  'onFetchProviderData': () => _state['provider'].loading = true,
-  'onFetchDatasetData': () => _state['dataset'].loading = true,
-  'onFetchFrequencyData': () => _state['frequency'].loading = true,
-  'onFetchDimensionData': () => _state['dimension'].loading = true,
-  'onFetchSeriesData': () => _state['series'].loading = true,
-  'onFetchValuesData': () => _state['values'].loading = true,
+  onFetchProviderData: () => _state['provider'].loading = true,
+  onFetchDatasetData: () => _state['dataset'].loading = true,
+  onFetchFrequencyData: () => _state['frequency'].loading = true,
+  onFetchDimensionData: () => _state['dimension'].loading = true,
+  onFetchSeriesData: () => _state['series'].loading = true,
+  onFetchValuesData: () => _state['values'].loading = true,
 
-  'onFetchProviderDataFailed': console.error,
-  'onFetchDatasetDataFailed': console.error,
-  'onFetchFrequencyDataFailed': console.error,
-  'onFetchDimensionDataFailed': console.error,
-  'onFetchSeriesDataFailed': console.error,
-  'onFetchValuesDataFailed': console.error,
+  onFetchProviderDataFailed: console.error,
+  onFetchDatasetDataFailed: console.error,
+  onFetchFrequencyDataFailed: console.error,
+  onFetchDimensionDataFailed: console.error,
+  onFetchSeriesDataFailed: console.error,
+  onFetchValuesDataFailed: console.error,
 
-  'onFetchProviderDataCompleted': data => {
+  onFetchProviderDataCompleted: data => {
+console.log('done');
     _state['provider'].loading = false;
     _state['provider'].data = data;
     let defaultValue = _.head(data);
@@ -153,10 +158,10 @@ export const store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     _state.metadata['log'] = getLog();
-    this.trigger(_state);
+    trigger();
     actions.fetchDatasetData(defaultValue);
   },
-  'onFetchDatasetDataCompleted': data => {
+  onFetchDatasetDataCompleted: data => {
     _state['dataset'].loading = false;
     _state['dataset'].data = data;
     let defaultValue = _.head(data);
@@ -168,26 +173,26 @@ export const store = Reflux.createStore({
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
     actions.fetchFrequencyData(defaultValue);
     actions.fetchDimensionData(defaultValue);
   },
-  'onFetchFrequencyDataCompleted': data => {
+  onFetchFrequencyDataCompleted: data => {
     _state['frequency'].loading = false;
     _state['frequency'].data = data
     _state['frequency'].value = [_.head(data)];
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
   },
-  'onFetchDimensionDataCompleted': data => {
+  onFetchDimensionDataCompleted: data => {
     _state['dimension'].loading = false;
     let filteredKeys = _.filter(Object.keys(data), key => (key !== 'freq' && key !== 'frequency'));
-    _state['dimension'].data = _.map(filteredKeys, key => {
+    _state['dimension'].data = _.map(filteredKeys, key => { return {
       'name': key,
       'data': Object.keys(data[key]) // reminder: keys are picked instead of value
-    });
+    }});
     _state['series'].value = _.map(_state['dimension'].data, el => {
       let tmp = cloneDeep(el);
       tmp.value = [_.head(el.data)] // reminder: default is set here
@@ -195,18 +200,18 @@ export const store = Reflux.createStore({
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
-    this.refresh();
+    refresh();
   },
-  'onFetchSeriesDataCompleted': data => {
+  onFetchSeriesDataCompleted: data => {
     _state['series'].loading = false;
     _state['series'].data = data;
     let defaultValue = [_.head(data).slug];
     _state['series'].value = defaultValue;
     _state.metadata['log'] = getLog();
-    this.trigger(_state);
+    trigger();
     actions.fetchValuesData(defaultValue);
   },
-  'onFetchValuesDataCompleted': data => {
+  onFetchValuesDataCompleted: data => {
     _state['values'].loading = false;
     if (!(data instanceof Array)) {
       data = [data];
@@ -215,7 +220,12 @@ export const store = Reflux.createStore({
     _.remove(tmp, el => !_.find(_state['series'].value, foo => foo === el['slug']));
     _state['values'].data = _.concat(_.compact(tmp), _.compact(data));
     _state.metadata['log'] = getLog();
-    this.trigger(_state);
+    trigger();
   }
 
 });
+
+refresh = store.publicRefresh;
+trigger = store.publicTrigger;
+
+module.exports = store;

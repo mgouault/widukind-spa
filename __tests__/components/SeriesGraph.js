@@ -14,7 +14,7 @@ describe('SeriesGraph', () => {
 		let mockedSeries = mocks.series;
 		const mockedData = mocks.data;
 		const mockedLabels = mocks.labels;
-		const wrapper = shallow(<SeriesGraph series={mockedSeries}/>);
+		const wrapper = shallow(<SeriesGraph data={mockedSeries}/>);
 		const elDygraph = wrapper.find(Dygraph);
 		let elDygraphLabels = elDygraph.prop('labels');
 		let elDygraphData = _.map(elDygraph.prop('data'), function (tab) {

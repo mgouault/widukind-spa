@@ -14,7 +14,7 @@ import CustomSelect from './components/CustomSelect.jsx';
 import DataTable from './components/DataTable.jsx';
 import LogDisplay from './components/LogDisplay.jsx';
 import SeriesGraph from './components/SeriesGraph.jsx';
-SeriesGraph = ReactDimensions()(SeriesGraph);
+let SeriesGraphDimensions = ReactDimensions()(SeriesGraph);
 import UrlDisplay from './components/UrlDisplay.jsx';
 
 
@@ -24,7 +24,9 @@ let ComponentWrapper = React.createClass({
     return (
       <Loader loaded={!this.props.loading}>
         {_.isEmpty(this.props.data) ? <div></div> :
-          {this.props.children}
+          <div>
+            {this.props.children}
+          </div>
         }
       </Loader>
     );
@@ -33,13 +35,13 @@ let ComponentWrapper = React.createClass({
 
 
 
-const Container = React.createClass({
+let Container = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
     let state = this.state.storeState;
 
-    let dimensionsPropsBox = _.map(state['dimensions'].value, el => {
+    let dimensionsPropsBox = _.map(state['dimension'].value, el => {
       let title = _.capitalize(el.name);
       let obj = { 'data': el.data, 'value': el.value };
       let onSelectWrap = event => actions.selectDimensionsPropsValue(event, el.name);
@@ -57,8 +59,8 @@ const Container = React.createClass({
       );
     });
     let dimensionsObj = {
-      'data': state['dimensions'].data,
-      'value': _.map(state['dimensions'].value, el => el.name)
+      'data': state['dimension'].data,
+      'value': _.map(state['dimension'].value, el => el.name)
     };
 
     return (
@@ -116,7 +118,7 @@ const Container = React.createClass({
                     multiple
                   />
                 </ComponentWrapper>
-                <ComponentWrapper loading={state['dimensions'].loading} data={state['dimensions'].data}>
+                <ComponentWrapper loading={state['dimension'].loading} data={state['dimension'].data}>
                   <CustomSelect
                     key={'dimensionsSelect'}
                     title={'Dimensions'}
@@ -135,7 +137,7 @@ const Container = React.createClass({
               <Col sm={12}>
                 <div className="seriesGraphDiv">
                   <ComponentWrapper loading={state['values'].loading} data={state['values'].data}>
-                    <SeriesGraphContainer
+                    <SeriesGraphDimensions
                       series={state['values'].data}
                     />
                   </ComponentWrapper>

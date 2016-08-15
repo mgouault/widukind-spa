@@ -1,4 +1,4 @@
-let React = require('react');
+/*let React = require('react');
 let { mount } = require('enzyme');
 let _ = require('lodash');
 let Reflux = require('reflux');
@@ -98,3 +98,4 @@ describe('ParamsContainer', () => {
 		expect(elSelect.length).toBe(1);
   });
 });
+*/

@@ -3,7 +3,8 @@ import { Row, Col, Panel, Button } from 'react-bootstrap';
 
 
 
-export const LogDisplay = React.createClass({
+let LogDisplay = React.createClass({
+
   getInitialState: function () {
     return { 'displayed': false };
   },
@@ -37,5 +38,6 @@ export const LogDisplay = React.createClass({
       </div>
     );
   }
-
 });
+
+module.exports = LogDisplay;

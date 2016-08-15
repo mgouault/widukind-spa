@@ -2,7 +2,9 @@ import React from 'react';
 import _ from 'lodash';
 import Select from 'react-select';
 
-export const CustomSelect = React.createClass({
+
+
+let CustomSelect = React.createClass({
 
   render: function () {
     let { data, value } = this.props.obj;
@@ -25,3 +27,5 @@ export const CustomSelect = React.createClass({
     );
   }
 });
+
+module.exports = CustomSelect;

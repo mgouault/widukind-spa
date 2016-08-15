@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Col } from 'react-bootstrap';
 
 
 
-export const UrlDisplay = React.createClass({
+let UrlDisplay = React.createClass({
 
   render: function () {
     let URL = this.props.url;
@@ -24,3 +24,5 @@ export const UrlDisplay = React.createClass({
     );
   }
 });
+
+module.exports = UrlDisplay;

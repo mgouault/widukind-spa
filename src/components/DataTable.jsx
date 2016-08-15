@@ -4,7 +4,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
 
-export const DataTable = React.createClass({
+let DataTable = React.createClass({
 
   buildData: function () {
     return _.map(this.props.data, (el) => {
@@ -82,5 +82,6 @@ export const DataTable = React.createClass({
       </div>
     );
   }
-
 });
+
+module.exports = DataTable;

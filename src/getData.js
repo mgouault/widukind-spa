@@ -9,18 +9,17 @@ function callAPI (pathname, params = {}) {
   let URLObj = _.cloneDeep(_configObj);
   URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
   _.assign(URLObj['query'], params);
-  return unescape(url.format(URLObj))
-    .then(link => axios.get)
+  return axios.get(unescape(url.format(URLObj)))
 		.then(received => {
-      log.push(received);
+      _log.push(received);
 			received = received.data; // todo handle 404 error
 			let error = _.get(received, 'error');
 			if (error) {
 				throw new Error(error.toString());
 			}
 			return received;
-		});
-    .then((received) => received.data);
+		})
+    .then(received => received.data);
 }
 
 const getData = {

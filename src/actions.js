@@ -9,7 +9,7 @@ Reflux.use(RefluxPromise(bluebird));
 
 import { getData } from './getData';
 
-export const actions = Reflux.createActions({
+let actions = Reflux.createActions({
 	'selectProviderValue': {},
 	'selectDatasetValue': {},
 	'selectFrequencyValue': {},
@@ -45,3 +45,5 @@ actions.fetchFrequencyData.listenAndPromise(getData['frequency']);
 actions.fetchDimensionData.listenAndPromise(getData['dimensions']);
 actions.fetchSeriesData.listenAndPromise(getData['series']);
 actions.fetchValuesData.listenAndPromise(getData['values']);
+
+module.exports = actions;
