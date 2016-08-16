@@ -5,7 +5,10 @@ import actions from './actions';
 import { getUrl, getLog, feedConfig, initConfig } from './getData';
 
 
-
+let init = {
+  'provider': 'insee',
+  'dataset': 'insee-ipch-2015-fr-coicop'
+};
 function initState (value = []) {
   return {
     'data': [],
@@ -141,8 +144,13 @@ let store = Reflux.createStore({
 
   onFetchProviderDataCompleted: data => {
     _state['provider'].loading = false;
+    if (data === null) { return; }
     _state['provider'].data = data;
     let defaultValue = _.head(data);
+    if (init.provider) {
+      defaultValue = init.provider;
+      init.provider = undefined;
+    }
     _state['provider'].value = defaultValue;
     _state['dataset'].data = [];
     _state['dataset'].value = '';
@@ -159,8 +167,13 @@ let store = Reflux.createStore({
   },
   onFetchDatasetDataCompleted: data => {
     _state['dataset'].loading = false;
+    if (data === null) { return; }
     _state['dataset'].data = data;
     let defaultValue = _.head(data);
+    if (init.dataset) {
+      defaultValue = init.dataset;
+      init.dataset = undefined;
+    }
     _state['dataset'].value = defaultValue;
     _state['frequency'].data = [];
     _state['frequency'].value = [];
@@ -175,8 +188,14 @@ let store = Reflux.createStore({
   },
   onFetchFrequencyDataCompleted: data => {
     _state['frequency'].loading = false;
+    if (data === null) { return; }
     _state['frequency'].data = data
-    _state['frequency'].value = [_.head(data)];
+    let defaultValue = [_.head(data)];
+    if (init.frequency) {
+      defaultValue = init.frequency;
+      init.frequency = undefined;
+    }
+    _state['frequency'].value = defaultValue;
     _state['series'].data = [];
     _state['series'].value = [];
     _state['values'].data = [];
@@ -184,6 +203,7 @@ let store = Reflux.createStore({
   },
   onFetchDimensionDataCompleted: data => {
     _state['dimension'].loading = false;
+    if (data === null) { return; }
     let filteredKeys = _.filter(Object.keys(data), key => (key !== 'freq' && key !== 'frequency'));
     _state['dimension'].data = _.map(filteredKeys, key => { return {
       'name': key,
@@ -191,7 +211,12 @@ let store = Reflux.createStore({
     }});
     _state['dimension'].value = _.map(_state['dimension'].data, el => {
       let tmp = _.cloneDeep(el);
-      tmp.value = [_.head(el.data)] // reminder: default is set here
+      let defaultValue = [_.head(el.data)];
+      if (init.dimension) {
+        defaultValue = init.dimension;
+        init.dimension = undefined;
+      }
+      tmp.value = defaultValue;
       return tmp;
     });
     _state['series'].data = [];
@@ -201,8 +226,13 @@ let store = Reflux.createStore({
   },
   onFetchSeriesDataCompleted: data => {
     _state['series'].loading = false;
+    if (data === null) { return; }
     _state['series'].data = data;
     let defaultValue = [_.get(_.head(data), 'slug')];
+    if (init.series) {
+      defaultValue = init.series;
+      init.series = undefined;
+    }
     _state['series'].value = defaultValue;
     _state.metadata['log'] = getLog();
     trigger();
@@ -210,6 +240,7 @@ let store = Reflux.createStore({
   },
   onFetchValuesDataCompleted: data => {
     _state['values'].loading = false;
+    if (data === null) { return; }
     if (!(data instanceof Array)) {
       data = [data];
     }

@@ -4,13 +4,23 @@ import url from 'url';
 
 let _configObj = {};
 let _log = [];
+let countId = 0;
+let pendingCall;
 
 function callAPI (pathname, params = {}) {
   let URLObj = _.cloneDeep(_configObj);
   URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
   _.assign(URLObj['query'], params);
+  let ownId = _.cloneDeep(countId);
+  console.log('1', _.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
+  countId++;
+  console.log('2',_.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
+  pendingCall = ownId;
   return axios.get(unescape(url.format(URLObj)))
 		.then(received => {
+      if (pendingCall !== ownId) {
+        return { 'data': null };
+      }
 			received = received.data; // todo handle 404 error
       if (typeof received !== 'object') {
         throw new Error(received);
