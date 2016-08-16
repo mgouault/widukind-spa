@@ -1,7 +1,7 @@
-let React = require('react');
-let _ = require('lodash');
-let moment = require('moment');
-let Dygraph = require('react-dygraphs').Dygraph;
+import React from 'react';
+import _ from 'lodash';
+import moment from 'moment';
+import { Dygraph } from 'react-dygraphs';
 
 
 
@@ -85,7 +85,6 @@ let SeriesGraph = React.createClass({
       </div>
     );
   }
-
 });
 
 module.exports = SeriesGraph;

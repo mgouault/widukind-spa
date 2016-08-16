@@ -1,9 +1,11 @@
-let React = require('react');
-let { Row, Col, Panel, Button } = require('react-bootstrap');
+import React from 'react';
+import _ from 'lodash';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 
 
 
 let LogDisplay = React.createClass({
+
   getInitialState: function () {
     return { 'displayed': false };
   },
@@ -14,7 +16,7 @@ let LogDisplay = React.createClass({
 
   render: function () {
     let displayed = this.state.displayed;
-    let log = this.props.log;
+    let log = _.join(this.props.log, '\n');
     return (
       <div>
         <Panel header="Logs">
@@ -37,7 +39,6 @@ let LogDisplay = React.createClass({
       </div>
     );
   }
-
 });
 
 module.exports = LogDisplay;

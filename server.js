@@ -1,15 +1,15 @@
 'use strict'
 
-var path = require('path');
-var express = require('express');
-var bodyParser = require('body-parser');
-var rp = require('request-promise');
-var _ = require('lodash');
-var debug = require('debug')('spa');
-var config = require('config');
+let path = require('path');
+let express = require('express');
+let bodyParser = require('body-parser');
+let rp = require('request-promise');
+let _ = require('lodash');
+let debug = require('debug')('spa');
+let config = require('config');
 
-var configURLObj = config.get('api.URLObj');
-var URLObj = {
+let configURLObj = config.get('api.URLObj');
+let URLObj = {
   'protocol': process.env['WIDUKIND_API_PROTOCOL'] || configURLObj['protocol'],
   'host': process.env['WIDUKIND_API_HOST'] || configURLObj['host'],
   'hostname': process.env['WIDUKIND_API_HOSTNAME'] || configURLObj['hostname'],
@@ -20,7 +20,7 @@ var URLObj = {
   }
 };
 
-var app = express();
+let app = express();
 app.set('port', (process.env['WIDUKIND_SPA_PORT'] || config.get('app.port')));
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
