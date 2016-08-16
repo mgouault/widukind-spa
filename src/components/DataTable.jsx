@@ -1,6 +1,5 @@
-let React = require('react');
-let Reflux = require('reflux');
-let _ = require('lodash');
+import React from 'react';
+import _ from 'lodash';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 
@@ -8,7 +7,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 let DataTable = React.createClass({
 
   buildData: function () {
-    return _.map(this.props.series, (el) => {
+    return _.map(this.props.data, (el) => {
       let freq = el['frequency'];
       switch (el['frequency']) {
         case 'A':
@@ -32,13 +31,13 @@ let DataTable = React.createClass({
   },
 
   onClickRow: function (slug, checked) {
-    let selection = _.cloneDeep(this.props.selection);
+    let selection = _.cloneDeep(this.props.value);
     if (checked) {
       selection.push(slug);
     } else {
       _.remove(selection, (el) => {return el === slug});
     }
-    this.props.updateSelection(selection);
+    this.props.onChange(selection);
   },
   onClickRowAll: function (data, checked) {
     let selection = []
@@ -47,7 +46,7 @@ let DataTable = React.createClass({
         return el['slug']
       });
     }
-    this.props.updateSelection(selection);
+    this.props.onChange(selection);
   },
 
   render: function () {
@@ -55,12 +54,12 @@ let DataTable = React.createClass({
     let selectRow = {
       'mode': 'checkbox',
       'clickToSelect': true,
-      'selected': this.props.selection,
+      'selected': this.props.value,
       'onSelect': (row, checked) => { this.onClickRow(row['slug'], checked); },
       'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },
       'bgColor': '#9ACBDB'
     };
-    
+
     return (
       <div className="dataTableDiv">
         <BootstrapTable
@@ -83,7 +82,6 @@ let DataTable = React.createClass({
       </div>
     );
   }
-
 });
 
 module.exports = DataTable;
