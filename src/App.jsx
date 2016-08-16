@@ -21,9 +21,10 @@ import UrlDisplay from './components/UrlDisplay.jsx';
 
 let ComponentWrapper = React.createClass({
   render: function () {
+    let errorMessage = this.props.errorMessage || '';
     return (
       <Loader loaded={!this.props.loading}>
-        {_.isEmpty(this.props.data) ? <div></div> :
+        {_.isEmpty(this.props.data) ? <div>{errorMessage}</div> :
           <div>
             {this.props.children}
           </div>
@@ -58,11 +59,11 @@ let Container = React.createClass({
         </div>
       );
     });
-    let dimensionsObj = {
-      'data': state['dimension'].data,
+    let dimensionObj = {
+      'data': _.map(state['dimension'].data, el => el.name),
       'value': _.map(state['dimension'].value, el => el.name)
     };
-
+    
     return (
       <Grid fluid>
 
@@ -102,6 +103,7 @@ let Container = React.createClass({
                   />
                 </ComponentWrapper>
                 <ComponentWrapper loading={state['dataset'].loading} data={state['dataset'].data}>
+                  <br />
                   <CustomSelect
                     key={'datasetSelect'}
                     title={'Dataset'}
@@ -110,6 +112,7 @@ let Container = React.createClass({
                   />
                 </ComponentWrapper>
                 <ComponentWrapper loading={state['frequency'].loading} data={state['frequency'].data}>
+                  <br />
                   <CustomSelect
                     key={'frequencySelect'}
                     title={'Frequency'}
@@ -119,11 +122,12 @@ let Container = React.createClass({
                   />
                 </ComponentWrapper>
                 <ComponentWrapper loading={state['dimension'].loading} data={state['dimension'].data}>
+                  <br />
                   <CustomSelect
-                    key={'dimensionsSelect'}
+                    key={'dimensionSelect'}
                     title={'Dimensions'}
-                    obj={dimensionsObj}
-                    onChange={actions.selectDimensionsValue}
+                    obj={dimensionObj}
+                    onChange={actions.selectDimensionValue}
                     multiple
                   />
                 </ComponentWrapper>
@@ -136,7 +140,8 @@ let Container = React.createClass({
             <Row>
               <Col sm={12}>
                 <div className="seriesGraphDiv">
-                  <ComponentWrapper loading={state['values'].loading} data={state['values'].data}>
+                  <ComponentWrapper loading={state['values'].loading} data={state['values'].data}
+                    errorMessage={'No series selected'}>
                     <SeriesGraphDimensions
                       series={state['values'].data}
                     />
@@ -156,7 +161,8 @@ let Container = React.createClass({
             <Row>
               <Col sm={12}>
                 <div className="dataTableDiv">
-                  <ComponentWrapper loading={state['series'].loading} data={state['series'].data}>
+                  <ComponentWrapper loading={state['series'].loading} data={state['series'].data}
+                    errorMessage={'No match found'}>
                     <DataTable
                       data={state['series'].data}
                       value={state['series'].value}

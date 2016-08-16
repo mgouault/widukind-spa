@@ -8,11 +8,8 @@ let CustomSelect = React.createClass({
 
   render: function () {
     let { data, value } = this.props.obj;
-    let options = _.map(data, (el) => {
-      if (typeof el === 'object') {
-        return el;
-      }
-      return ({'value':el, 'label':el});
+    let options = _.map(data, el => {
+      return {'value':el, 'label':el};
     });
     return (
       <div>

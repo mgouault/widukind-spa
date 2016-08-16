@@ -42,7 +42,7 @@ let actions = Reflux.createActions({
 actions.fetchProviderData.listenAndPromise(getData['provider']);
 actions.fetchDatasetData.listenAndPromise(getData['dataset']);
 actions.fetchFrequencyData.listenAndPromise(getData['frequency']);
-actions.fetchDimensionData.listenAndPromise(getData['dimensions']);
+actions.fetchDimensionData.listenAndPromise(getData['dimension']);
 actions.fetchSeriesData.listenAndPromise(getData['series']);
 actions.fetchValuesData.listenAndPromise(getData['values']);
 

@@ -56,8 +56,8 @@ let store = Reflux.createStore({
     actions.fetchProviderData();
   },
 
-  onSelectProviderValue: ({ provider }) => {
-    _state['provider'].value = provider;
+  onSelectProviderValue: ({ value }) => {
+    _state['provider'].value = value;
     _state['dataset'].data = [];
     _state['dataset'].value = '';
     _state['frequency'].data = [];
@@ -69,10 +69,10 @@ let store = Reflux.createStore({
     _state['values'].data = [];
     _state.metadata['log'] = getLog();
     trigger();
-    actions.fetchDatasetData(provider);
+    actions.fetchDatasetData(value);
   },
-  onSelectDatasetValue: ({ dataset }) => {
-    _state['dataset'].value = dataset;
+  onSelectDatasetValue: ({ value }) => {
+    _state['dataset'].value = value;
     _state['frequency'].data = [];
     _state['frequency'].value = [];
     _state['dimension'].data = [];
@@ -81,8 +81,8 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchFrequencyData(dataset);
-    actions.fetchDimensionData(dataset);
+    actions.fetchFrequencyData(value);
+    actions.fetchDimensionData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
@@ -92,14 +92,11 @@ let store = Reflux.createStore({
     refresh();
   },
   onSelectDimensionValue: value => {
-    let addedValue = _.filter(value, el => {
-      return (!_.find(_state['dimension'].value, {'name':el.name}));
-    });
-    _.remove(_state['dimension'].value, el => {
-      return (!_.find(value, {'name': el.name}));
-    });
+    value = _.map(value, el => el.value);
+    let addedValue = _.filter(value, el => !_.find(_state['dimension'].value, {'name':el}));
+    _.remove(_state['dimension'].value, el => !_.find(value, el_ => el_ === el.name));
     _.reduce(addedValue, (acc, el) => {
-      let tmp = _.cloneDeep(_.find(_state['dimension'].data, {'name':el.name}));
+      let tmp = _.cloneDeep(_.find(_state['dimension'].data, {'name':el}));
       tmp.value = [_.head(tmp.data)] // reminder: default is set here
       acc.push(tmp);
       return acc;
@@ -128,22 +125,21 @@ let store = Reflux.createStore({
     actions.fetchValuesData(value);
   },
 
-  onFetchProviderData: () => _state['provider'].loading = true,
-  onFetchDatasetData: () => _state['dataset'].loading = true,
-  onFetchFrequencyData: () => _state['frequency'].loading = true,
-  onFetchDimensionData: () => _state['dimension'].loading = true,
-  onFetchSeriesData: () => _state['series'].loading = true,
-  onFetchValuesData: () => _state['values'].loading = true,
+  onFetchProviderData: () => {_state['provider'].loading = true; trigger();},
+  onFetchDatasetData: () => {_state['dataset'].loading = true; trigger();},
+  onFetchFrequencyData: () => {_state['frequency'].loading = true; trigger();},
+  onFetchDimensionData: () => {_state['dimension'].loading = true; trigger();},
+  onFetchSeriesData: () => {_state['series'].loading = true; trigger();},
+  onFetchValuesData: () => {_state['values'].loading = true; trigger();},
 
-  onFetchProviderDataFailed: console.error,
-  onFetchDatasetDataFailed: console.error,
-  onFetchFrequencyDataFailed: console.error,
-  onFetchDimensionDataFailed: console.error,
-  onFetchSeriesDataFailed: console.error,
-  onFetchValuesDataFailed: console.error,
+  onFetchProviderDataFailed: err => console.error(err),
+  onFetchDatasetDataFailed: err => console.error(err),
+  onFetchFrequencyDataFailed: err => console.error(err),
+  onFetchDimensionDataFailed: err => console.error(err),
+  onFetchSeriesDataFailed: err => console.error(err),
+  onFetchValuesDataFailed: err => console.error(err),
 
   onFetchProviderDataCompleted: data => {
-console.log('done');
     _state['provider'].loading = false;
     _state['provider'].data = data;
     let defaultValue = _.head(data);
@@ -193,9 +189,10 @@ console.log('done');
       'name': key,
       'data': Object.keys(data[key]) // reminder: keys are picked instead of value
     }});
-    _state['series'].value = _.map(_state['dimension'].data, el => {
-      let tmp = cloneDeep(el);
+    _state['dimension'].value = _.map(_state['dimension'].data, el => {
+      let tmp = _.cloneDeep(el);
       tmp.value = [_.head(el.data)] // reminder: default is set here
+      return tmp;
     });
     _state['series'].data = [];
     _state['series'].value = [];
@@ -205,7 +202,7 @@ console.log('done');
   onFetchSeriesDataCompleted: data => {
     _state['series'].loading = false;
     _state['series'].data = data;
-    let defaultValue = [_.head(data).slug];
+    let defaultValue = [_.get(_.head(data), 'slug')];
     _state['series'].value = defaultValue;
     _state.metadata['log'] = getLog();
     trigger();

@@ -11,8 +11,11 @@ function callAPI (pathname, params = {}) {
   _.assign(URLObj['query'], params);
   return axios.get(unescape(url.format(URLObj)))
 		.then(received => {
-      _log.push(received);
 			received = received.data; // todo handle 404 error
+      if (typeof received !== 'object') {
+        throw new Error(received);
+      }
+      _log.push(received);
 			let error = _.get(received, 'error');
 			if (error) {
 				throw new Error(error.toString());
@@ -28,7 +31,7 @@ const getData = {
 	'frequency': selectedDataset =>	callAPI('/datasets/' + selectedDataset + '/frequencies'),
 	'dimension': selectedDataset =>	callAPI('/datasets/' + selectedDataset + '/dimensions'),
 	'series': (selectedDataset, params) => callAPI('/datasets/' + selectedDataset + '/series', params),
-	'values': selectedSeries =>	callAPI('/series/' + _.join(selection, '+'))
+	'values': selectedSeries =>	callAPI('/series/' + _.join(selectedSeries, '+'))
 };
 
 function getUrl (selectedDataset, params) {
