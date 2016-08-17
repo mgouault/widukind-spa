@@ -168,7 +168,9 @@ let store = Reflux.createStore({
   onFetchDatasetDataCompleted: data => {
     _state['dataset'].loading = false;
     if (data === null) { return; }
+    // data = _.map(data, el => { return {'name':el.name, 'value':el.slug} });
     _state['dataset'].data = data;
+    // let defaultValue = _.head(data).value;
     let defaultValue = _.head(data);
     if (init.dataset) {
       defaultValue = init.dataset;

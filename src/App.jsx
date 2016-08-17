@@ -63,7 +63,7 @@ let Container = React.createClass({
       'data': _.map(state['dimension'].data, el => el.name),
       'value': _.map(state['dimension'].value, el => el.name)
     };
-    
+
     return (
       <Grid fluid>
 
