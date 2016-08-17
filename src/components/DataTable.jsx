@@ -20,6 +20,7 @@ let DataTable = React.createClass({
       return ({
         'provider': el['provider_name'],
         'dataset': el['dataset_code'],
+        // 'key': '<a href=\"http://widukind.cepremap.org/views/series/'+el['dataset_code']+'-'+el['key']+'\">'+el['key']+'</a>',
         'key': el['key'],
         'slug': el['slug'],
         'name': el['name'],
@@ -53,7 +54,6 @@ let DataTable = React.createClass({
     let data = this.buildData();
     let selectRow = {
       'mode': 'checkbox',
-      'clickToSelect': true,
       'selected': this.props.value,
       'onSelect': (row, checked) => { this.onClickRow(row['slug'], checked); },
       'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },

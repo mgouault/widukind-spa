@@ -84,7 +84,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchFrequencyData(value);
+    actions.fetchDimensionData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
@@ -92,7 +92,6 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchDimensionData(_state['dataset'].value);
   },
   onSelectDimensionValue: value => {
     value = _.map(value, el => el.value);
@@ -108,6 +107,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchFrequencyData(_state['dataset'].value);
   },
   onSelectDimensionsPropsValue: (value, dimensionName) => {
     _.set(
@@ -185,7 +185,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchFrequencyData(defaultValue);
+    actions.fetchDimensionData(defaultValue);
   },
   onFetchFrequencyDataCompleted: data => {
     _state['frequency'].loading = false;
@@ -201,7 +201,6 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchDimensionData(_state['dataset'].value);
   },
   onFetchDimensionDataCompleted: data => {
     _state['dimension'].loading = false;
@@ -226,6 +225,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchFrequencyData(_state['dataset'].value);
   },
   onFetchSeriesDataCompleted: data => {
     _state['series'].loading = false;
