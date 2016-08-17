@@ -85,7 +85,6 @@ let store = Reflux.createStore({
     _state['values'].data = [];
     refresh();
     actions.fetchFrequencyData(value);
-    actions.fetchDimensionData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
@@ -93,6 +92,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchDimensionData(_state['dataset'].value);
   },
   onSelectDimensionValue: value => {
     value = _.map(value, el => el.value);
@@ -186,7 +186,6 @@ let store = Reflux.createStore({
     _state['values'].data = [];
     refresh();
     actions.fetchFrequencyData(defaultValue);
-    actions.fetchDimensionData(defaultValue);
   },
   onFetchFrequencyDataCompleted: data => {
     _state['frequency'].loading = false;
@@ -202,6 +201,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchDimensionData(_state['dataset'].value);
   },
   onFetchDimensionDataCompleted: data => {
     _state['dimension'].loading = false;
@@ -209,11 +209,12 @@ let store = Reflux.createStore({
     let filteredKeys = _.filter(Object.keys(data), key => (key !== 'freq' && key !== 'frequency'));
     _state['dimension'].data = _.map(filteredKeys, key => { return {
       'name': key,
-      'data': Object.keys(data[key]) // reminder: keys are picked instead of value
+      // 'data': Object.keys(data[key]) // reminder: keys are picked instead of value
+      'data': _.map(Object.keys(data[key]), el => { return {'name':data[key][el], 'value':el} })
     }});
     _state['dimension'].value = _.map(_state['dimension'].data, el => {
       let tmp = _.cloneDeep(el);
-      let defaultValue = [_.head(el.data)];
+      let defaultValue = [_.head(el.data).value];
       if (init.dimension) {
         defaultValue = init.dimension;
         init.dimension = undefined;
