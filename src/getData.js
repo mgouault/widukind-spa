@@ -12,9 +12,7 @@ function callAPI (pathname, params = {}) {
   URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
   _.assign(URLObj['query'], params);
   let ownId = _.cloneDeep(countId);
-  console.log('1', _.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
   countId++;
-  console.log('2',_.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
   pendingCall = ownId;
   return axios.get(unescape(url.format(URLObj)))
 		.then(received => {
