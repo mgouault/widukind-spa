@@ -6,11 +6,7 @@ export const Prefs = new Mongo.Collection('prefs');
 
 if (Meteor.isServer) {
   Meteor.publish('prefs', function prefsPublication() {
-    return Prefs.find({
-      $or: [
-        { owner: this.userId },
-      ],
-    });
+    return Prefs.find({});
   });
 }
 

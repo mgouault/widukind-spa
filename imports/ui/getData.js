@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import axios from 'axios';
 import url from 'url';
 
 let _configObj = {};
@@ -14,12 +13,12 @@ function callAPI (pathname, params = {}) {
   let ownId = _.cloneDeep(countId);
   countId++;
   pendingCall = ownId;
-  return axios.get(unescape(url.format(URLObj)))
+  return fetch(unescape(url.format(URLObj)))
+    .then(response => response.json())
 		.then(received => {
       if (pendingCall !== ownId) {
         return { 'data': null };
       }
-			received = received.data; // todo handle 404 error
       if (typeof received !== 'object') {
         throw new Error(received);
       }
@@ -62,14 +61,15 @@ function initConfig () {
   // axios.get('/config')
   //   .then(received => received.data)
   //   .then(config => _configObj = config);
-  return Promise.resolve({
+  _configObj = {
     'protocol': "http",
     'hostname': "widukind-api.cepremap.org",
     'pathname': "/api/v1/json",
     'query': {
       'per_page': 10
     }
-  });
+  };
+  return Promise.resolve();
 }
 
 export { getData, getUrl, getLog, feedConfig, initConfig };

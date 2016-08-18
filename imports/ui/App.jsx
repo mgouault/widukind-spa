@@ -76,7 +76,7 @@ let Container = React.createClass({
               </Navbar.Header>
               <Nav>
                 <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
-                  <img src="/icons/github.png" alt="repo github" />
+                  <img src="../../client/icons/github.png" alt="repo github" />
                 </NavItem>
                 <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
                   Widukind

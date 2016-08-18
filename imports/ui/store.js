@@ -55,8 +55,9 @@ let store = Reflux.createStore({
   },
   publicTrigger: function () {this.trigger(_state)},
   init: () => {
-    initConfig();
-    actions.fetchProviderData();
+    initConfig().then(() => {
+      actions.fetchProviderData();
+    })
   },
 
   onSelectProviderValue: ({ value }) => {
