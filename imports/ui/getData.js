@@ -59,9 +59,17 @@ function feedConfig (config) {
 }
 
 function initConfig () {
-  axios.get('/config')
-    .then(received => received.data)
-    .then(config => _configObj = config);
+  // axios.get('/config')
+  //   .then(received => received.data)
+  //   .then(config => _configObj = config);
+  return Promise.resolve({
+    'protocol': "http",
+    'hostname': "widukind-api.cepremap.org",
+    'pathname': "/api/v1/json",
+    'query': {
+      'per_page': 10
+    }
+  });
 }
 
 export { getData, getUrl, getLog, feedConfig, initConfig };

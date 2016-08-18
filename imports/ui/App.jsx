@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import _ from 'lodash';
 import { Grid, Row, Col, Nav, Navbar, NavItem, Panel } from 'react-bootstrap';
@@ -77,7 +76,7 @@ let Container = React.createClass({
               </Navbar.Header>
               <Nav>
                 <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
-                  <img src="assets/github.png" alt="repo github" />
+                  <img src="/icons/github.png" alt="repo github" />
                 </NavItem>
                 <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
                   Widukind
@@ -191,7 +190,4 @@ let Container = React.createClass({
   }
 });
 
-ReactDOM.render(
-  <Container />,
-  document.getElementById('content')
-);
+module.exports = Container;
