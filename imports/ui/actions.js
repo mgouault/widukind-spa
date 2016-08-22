@@ -12,6 +12,7 @@ import { getData } from './getData';
 
 let actions = Reflux.createActions({
 	'updateConfig': {},
+	'resetConfig': {},
 	'selectProviderValue': {},
 	'selectDatasetValue': {},
 	'selectFrequencyValue': {},

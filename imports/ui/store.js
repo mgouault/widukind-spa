@@ -58,6 +58,7 @@ let store = Reflux.createStore({
   publicTrigger: function () {
     this.trigger(_state);
   },
+
   init: () => {
     Meteor.call('config.get', function (err, result) {
       if (err) {
@@ -67,7 +68,6 @@ let store = Reflux.createStore({
       actions.fetchProviderData();
     })
   },
-
   onUpdateConfig: (config) => {
     Meteor.call('config.modify', config, function (err, result) {
 			if (err) {
@@ -78,6 +78,17 @@ let store = Reflux.createStore({
       refresh();
       actions.fetchProviderData();
 		});
+  },
+  onResetConfig: () => {
+    Meteor.call('config.remove', function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		})
   },
 
   onSelectProviderValue: ({ value }) => {

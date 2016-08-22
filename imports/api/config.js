@@ -51,6 +51,13 @@ if (Meteor.isServer) {
       config.userId = this.userId;
       Config.upsert({ 'userId': this.userId }, config);
       return config;
+    },
+    'config.remove': function () {
+      if (!this.userId) {
+        throw new Meteor.Error('not-authorized');
+      }
+      Config.remove({ 'userId': this.userId });
+      return _.cloneDeep(URLObj);
     }
   });
 }

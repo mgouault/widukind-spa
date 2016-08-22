@@ -19,6 +19,11 @@ let ConfigForm = React.createClass({
 		});
 	},
 
+	handleReset: function () {
+		event.preventDefault();
+		actions.resetConfig();
+	},
+
 	render: function () {
 		return (
 			<Panel header="API's URL configuration">
@@ -40,6 +45,9 @@ let ConfigForm = React.createClass({
 					</FormGroup>
 					<Button type="submit">
 			      Submit
+			    </Button>
+					<Button onClick={this.handleReset}>
+			      Reset configuration
 			    </Button>
 				</form>
 	    </Panel>
