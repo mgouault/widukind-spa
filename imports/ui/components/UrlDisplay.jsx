@@ -17,7 +17,7 @@ let UrlDisplay = React.createClass({
         </Col>
         <Col sm={1}>
           <ClipboardButton data-clipboard-text={URL}>
-            <img src="../../../client/icons/clippy.svg" alt="Copy to clipboard" />
+            <img src="/icons/clippy.svg" alt="Copy to clipboard" />
           </ClipboardButton>
         </Col>
       </div>

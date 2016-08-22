@@ -1,3 +1,6 @@
+import { Meteor } from 'meteor/meteor';
+import { createContainer } from 'meteor/react-meteor-data';
+
 import React from 'react';
 import Reflux from 'reflux';
 import _ from 'lodash';
@@ -15,6 +18,8 @@ import LogDisplay from './components/LogDisplay.jsx';
 import SeriesGraph from './components/SeriesGraph.jsx';
 let SeriesGraphDimensions = ReactDimensions()(SeriesGraph);
 import UrlDisplay from './components/UrlDisplay.jsx';
+import ConfigForm from './components/ConfigForm.jsx';
+import AccountsUIWrapper from './components/AccountsUIWrapper.jsx';
 
 
 
@@ -35,10 +40,11 @@ let ComponentWrapper = React.createClass({
 
 
 
-let Container = React.createClass({
+let App = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
+console.log('render');
     let state = this.state.storeState;
 
     let dimensionsPropsBox = _.map(state['dimension'].value, el => {
@@ -66,6 +72,8 @@ let Container = React.createClass({
     return (
       <Grid fluid>
 
+        <AccountsUIWrapper />
+
         <Row>
           <Col sm={6} smOffset={3}>
             <Navbar>
@@ -76,7 +84,7 @@ let Container = React.createClass({
               </Navbar.Header>
               <Nav>
                 <NavItem eventKey={1} href="//github.com/mgouault/widukind-spa" target="_blank">
-                  <img src="../../client/icons/github.png" alt="repo github" />
+                  <img src="/icons/github.png" alt="repo github" />
                 </NavItem>
                 <NavItem eventKey={2} href="//widukind.cepremap.org" target="_blank">
                   Widukind
@@ -86,6 +94,12 @@ let Container = React.createClass({
                 </NavItem>
               </Nav>
             </Navbar>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col sm={6} smOffset={3}>
+            <ConfigForm />
           </Col>
         </Row>
 
@@ -190,4 +204,7 @@ let Container = React.createClass({
   }
 });
 
-module.exports = Container;
+module.exports = createContainer(() => {
+  Meteor.subscribe('config');
+  return {};
+}, App);

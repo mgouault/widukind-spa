@@ -4,4 +4,4 @@ Meteor.startup(() => {
 
 });
 
-import '../imports/api/prefs.js';
+import '../imports/api/config.js';

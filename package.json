@@ -2,7 +2,7 @@
   "name": "widukind-spa",
   "version": "0.7.0",
   "scripts": {
-    "start": "meteor run",
+    "start": "meteor --settings settings.json",
     "test": "./node_modules/karma-cli/bin/karma start"
   },
   "dependencies": {
@@ -17,8 +17,6 @@
     "babel-runtime": "^6.6.1",
     "bluebird": "^3.4.0",
     "body-parser": "^1.4.3",
-    "classnames": "^2.2.5",
-    "config": "^1.20.1",
     "debug": "^2.2.0",
     "express": "^4.4.5",
     "flux": "^2.1.1",

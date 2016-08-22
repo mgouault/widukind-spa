@@ -1,3 +1,6 @@
+import { Meteor } from 'meteor/meteor';
+import { Config } from '../api/config.js';
+
 import Reflux from 'reflux';
 import _ from 'lodash';
 
@@ -46,7 +49,10 @@ let trigger = () => {};
 
 let store = Reflux.createStore({
   listenables: [actions],
-  getInitialState: () => _state,
+  getInitialState: () => {
+// console.log('getInitialState', Meteor.user(), Config.findOne());
+    return _state;
+  },
   publicRefresh: function () {
     actions.fetchSeriesData(_state['dataset'].value, buildParams());
     _state.metadata['url'] = getUrl(_state['dataset'].value, buildParams());
