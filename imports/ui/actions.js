@@ -11,6 +11,7 @@ Reflux.use(RefluxPromise(bluebird));
 import { getData } from './getData';
 
 let actions = Reflux.createActions({
+	'updateConfig': {},
 	'selectProviderValue': {},
 	'selectDatasetValue': {},
 	'selectFrequencyValue': {},

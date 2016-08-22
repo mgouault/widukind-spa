@@ -1,11 +1,10 @@
 import { Meteor } from 'meteor/meteor';
-import { Config } from '../api/config.js';
 
 import Reflux from 'reflux';
 import _ from 'lodash';
 
 import actions from './actions';
-import { getUrl, getLog, feedConfig, initConfig } from './getData';
+import { getUrl, getLog, feedConfig } from './getData';
 
 
 let init = {
@@ -49,21 +48,36 @@ let trigger = () => {};
 
 let store = Reflux.createStore({
   listenables: [actions],
-  getInitialState: () => {
-// console.log('getInitialState', Meteor.user(), Config.findOne());
-    return _state;
-  },
+  getInitialState: () => _state,
   publicRefresh: function () {
     actions.fetchSeriesData(_state['dataset'].value, buildParams());
-    _state.metadata['url'] = getUrl(_state['dataset'].value, buildParams());
+    _state.metadata['url'] = getUrl('/datasets/'+_state['dataset'].value+'/values', buildParams());
     _state.metadata['log'] = getLog();
     this.trigger(_state);
   },
-  publicTrigger: function () {this.trigger(_state)},
+  publicTrigger: function () {
+    this.trigger(_state);
+  },
   init: () => {
-    initConfig().then(() => {
+    Meteor.call('config.get', function (err, result) {
+      if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
       actions.fetchProviderData();
     })
+  },
+
+  onUpdateConfig: (config) => {
+    Meteor.call('config.modify', config, function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		});
   },
 
   onSelectProviderValue: ({ value }) => {

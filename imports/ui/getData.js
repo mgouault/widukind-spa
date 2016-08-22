@@ -6,14 +6,11 @@ let _log = [];
 let countId = 0;
 let pendingCall;
 
-function callAPI (pathname, params = {}) {
-  let URLObj = _.cloneDeep(_configObj);
-  URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
-  _.assign(URLObj['query'], params);
+function callAPI (pathname, params) {
   let ownId = _.cloneDeep(countId);
   countId++;
   pendingCall = ownId;
-  return fetch(unescape(url.format(URLObj)))
+  return fetch(getUrl(pathname, params))
     .then(response => response.json())
 		.then(received => {
       if (pendingCall !== ownId) {
@@ -41,12 +38,11 @@ const getData = {
 	'values': selectedSeries =>	callAPI('/series/' + _.join(selectedSeries, '+'))
 };
 
-function getUrl (selectedDataset, params) {
-  let pathname = '/datasets/' + selectedDataset + '/values';
+function getUrl (pathname, params = {}) {
   let URLObj = _.cloneDeep(_configObj);
   URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
   _.assign(URLObj['query'], params);
-  return unescape(url.format(URLObj))
+  return unescape(url.format(URLObj));
 }
 
 function getLog () {
@@ -57,19 +53,4 @@ function feedConfig (config) {
   _configObj = config;
 }
 
-function initConfig () {
-  // axios.get('/config')
-  //   .then(received => received.data)
-  //   .then(config => _configObj = config);
-  _configObj = {
-    'protocol': "http",
-    'hostname': "widukind-api.cepremap.org",
-    'pathname': "/api/v1/json",
-    'query': {
-      'per_page': 10
-    }
-  };
-  return Promise.resolve();
-}
-
-export { getData, getUrl, getLog, feedConfig, initConfig };
+export { getData, getUrl, getLog, feedConfig };

@@ -6,7 +6,6 @@ import _ from 'lodash';
 export const Config = new Mongo.Collection('config');
 
 if (Meteor.isServer) {
-
   let configURLObj = Meteor.settings.URLObj;
   let URLObj = {
     'protocol': process.env['WIDUKIND_API_PROTOCOL'] || configURLObj['protocol'],
@@ -33,26 +32,25 @@ if (Meteor.isServer) {
     }))
   };
 
-  Meteor.publish('config', function () {
-    if (!this.userId) {
-      return this.ready();
-    }
-    let userConfig = Config.find({ 'userId': this.userId });
-    // if (!userConfig) {
-    //   userConfig = _.cloneDeep(URLObj);
-    // } //todo cursor
-    return userConfig;
-  });
-
   Meteor.methods({
-    'config.modify'(config) {
+    'config.get': function () {
+      if (!this.userId) {
+        throw new Meteor.Error('not-authorized');
+      }
+      let config = Config.findOne({ 'userId': this.userId });
+      if (!config) {
+        config = _.cloneDeep(URLObj);
+      }
+      return config;
+    },
+    'config.modify': function (config) {
       if (!this.userId) {
         throw new Meteor.Error('not-authorized');
       }
       check(config, configPattern);
       config.userId = this.userId;
       Config.upsert({ 'userId': this.userId }, config);
+      return config;
     }
   });
-
 }

@@ -1,6 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-
 import React from 'react';
 import Reflux from 'reflux';
 import _ from 'lodash';
@@ -44,7 +41,6 @@ let App = React.createClass({
   mixins: [Reflux.connect(store, 'storeState')],
 
   render: function () {
-console.log('render');
     let state = this.state.storeState;
 
     let dimensionsPropsBox = _.map(state['dimension'].value, el => {
@@ -204,7 +200,4 @@ console.log('render');
   }
 });
 
-module.exports = createContainer(() => {
-  Meteor.subscribe('config');
-  return {};
-}, App);
+module.exports = App;
