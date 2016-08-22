@@ -7,10 +7,11 @@ import actions from './actions';
 import { getUrl, getLog, feedConfig } from './getData';
 
 
-let init = {
+const initValues = {
   'provider': 'insee',
   'dataset': 'insee-ipch-2015-fr-coicop'
 };
+let init = _.cloneDeep(initValues);
 function initState (value = []) {
   return {
     'data': [],
@@ -74,6 +75,7 @@ let store = Reflux.createStore({
         return console.error(err);
       }
       feedConfig(result);
+      init = _.cloneDeep(initValues);
       actions.selectProviderValue({});
       refresh();
       actions.fetchProviderData();
@@ -85,6 +87,7 @@ let store = Reflux.createStore({
         return console.error(err);
       }
       feedConfig(result);
+      init = _.cloneDeep(initValues);
       actions.selectProviderValue({});
       refresh();
       actions.fetchProviderData();

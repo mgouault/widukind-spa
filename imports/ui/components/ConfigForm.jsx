@@ -4,19 +4,28 @@ import { Panel, FormGroup, FormControl, ControlLabel, Button } from 'react-boots
 
 import actions from '../actions';
 
+// todo
+// - reflux router config panel
+// - print config values
+// - pre-fill values
+// - make value optional to erase
 
 
 let ConfigForm = React.createClass({
 
 	handleSubmit: function (event) {
 		event.preventDefault();
-		actions.updateConfig({
-			'protocol': _.get(event, 'target.formConfigProtocol.value'),
-			'host': _.get(event, 'target.formConfigHost.value'),
-			'hostname': _.get(event, 'target.formConfigHostname.value'),
-			'port': _.get(event, 'target.formConfigPort.value'),
-			'pathname': _.get(event, 'target.formConfigPathname.value')
-		});
+		let protocol = _.get(event, 'target.formConfigProtocol.value');
+		let host = _.get(event, 'target.formConfigHost.value');
+		let hostname = _.get(event, 'target.formConfigHostname.value');
+		let port = _.get(event, 'target.formConfigPort.value');
+		let pathname = _.get(event, 'target.formConfigPathname.value');
+		actions.updateConfig(_.cloneDeep({ protocol, host, hostname, port, pathname }));
+		_.set(event, 'target.formConfigProtocol.value', null);
+		_.set(event, 'target.formConfigHost.value', null);
+		_.set(event, 'target.formConfigHostname.value', null);
+		_.set(event, 'target.formConfigPort.value', null);
+		_.set(event, 'target.formConfigPathname.value', null);
 	},
 
 	handleReset: function () {
