@@ -6,11 +6,9 @@ https://tree.taiga.io/project/mgouault-widukind-spa/kanban
 #### Getting started
 
 1. Install all dependencies
-  * `npm install`
-2. Pack the JS bundle
-  * `webpack`
+  * `meteor npm install`
 3. Start the server
-  * `npm start`
+  * `meteor npm start`
 
 #### Docker
 

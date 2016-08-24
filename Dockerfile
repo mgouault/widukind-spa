@@ -6,10 +6,8 @@ WORKDIR /src
 
 ADD . /src/
 
-RUN npm install -g webpack \
-    && npm install \
-    && webpack
+RUN npm install
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
