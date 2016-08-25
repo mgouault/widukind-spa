@@ -1,14 +1,17 @@
+import { Meteor } from 'meteor/meteor';
+
 import Reflux from 'reflux';
 import _ from 'lodash';
 
 import actions from './actions';
-import { getUrl, getLog, feedConfig, initConfig } from './getData';
+import { getUrl, getLog, feedConfig } from './getData';
 
 
-let init = {
+const initValues = {
   'provider': 'insee',
   'dataset': 'insee-ipch-2015-fr-coicop'
 };
+let init = _.cloneDeep(initValues);
 function initState (value = []) {
   return {
     'data': [],
@@ -49,14 +52,46 @@ let store = Reflux.createStore({
   getInitialState: () => _state,
   publicRefresh: function () {
     actions.fetchSeriesData(_state['dataset'].value, buildParams());
-    _state.metadata['url'] = getUrl(_state['dataset'].value, buildParams());
+    _state.metadata['url'] = getUrl('/datasets/'+_state['dataset'].value+'/values', buildParams());
     _state.metadata['log'] = getLog();
     this.trigger(_state);
   },
-  publicTrigger: function () {this.trigger(_state)},
+  publicTrigger: function () {
+    this.trigger(_state);
+  },
+
   init: () => {
-    initConfig();
-    actions.fetchProviderData();
+    Meteor.call('config.get', function (err, result) {
+      if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      actions.fetchProviderData();
+    })
+  },
+  onUpdateConfig: (config) => {
+    Meteor.call('config.modify', config, function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      init = _.cloneDeep(initValues);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		});
+  },
+  onResetConfig: () => {
+    Meteor.call('config.remove', function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      init = _.cloneDeep(initValues);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		})
   },
 
   onSelectProviderValue: ({ value }) => {
@@ -84,7 +119,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchDimensionData(value);
+    actions.fetchFrequencyData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
@@ -99,7 +134,7 @@ let store = Reflux.createStore({
     _.remove(_state['dimension'].value, el => !_.find(value, el_ => el_ === el.name));
     _.reduce(addedValue, (acc, el) => {
       let tmp = _.cloneDeep(_.find(_state['dimension'].data, {'name':el}));
-      tmp.value = [_.head(tmp.data)] // reminder: default is set here
+      tmp.value = [_.head(tmp.data).value] // reminder: default is set here
       acc.push(tmp);
       return acc;
     }, _state['dimension'].value);
@@ -107,7 +142,6 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchFrequencyData(_state['dataset'].value);
   },
   onSelectDimensionsPropsValue: (value, dimensionName) => {
     _.set(
@@ -185,7 +219,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchDimensionData(defaultValue);
+    actions.fetchFrequencyData(defaultValue);
   },
   onFetchFrequencyDataCompleted: data => {
     _state['frequency'].loading = false;
@@ -201,6 +235,7 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchDimensionData(_state['dataset'].value);
   },
   onFetchDimensionDataCompleted: data => {
     _state['dimension'].loading = false;
@@ -225,7 +260,6 @@ let store = Reflux.createStore({
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
-    actions.fetchFrequencyData(_state['dataset'].value);
   },
   onFetchSeriesDataCompleted: data => {
     _state['series'].loading = false;
