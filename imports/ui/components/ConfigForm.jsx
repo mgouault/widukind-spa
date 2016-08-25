@@ -4,10 +4,7 @@ import { Panel, FormGroup, FormControl, ControlLabel, Button } from 'react-boots
 
 import actions from '../actions';
 
-// todo:
-// - reflux router config panel
-// - pre-fill values
-
+// todo: pre-fill values
 
 let ConfigForm = React.createClass({
 

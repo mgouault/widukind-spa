@@ -6,8 +6,12 @@ WORKDIR /src
 
 ADD . /src/
 
-RUN npm install
+RUN curl https://install.meteor.com/ | sh \
+	&& meteor lint
+	&& meteor npm install
+	&& export LC_ALL=C.UTF-8
+	&& export LANG=C
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["meteor", "npm", "start"]
