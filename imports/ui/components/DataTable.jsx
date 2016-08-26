@@ -1,12 +1,14 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+
+import BootstrapTableWrapper from './BootstrapTableWrapper.jsx';
 
 
 
 let DataTable = React.createClass({
 
-  buildData: function () {
+  getData: function () {
     return _.map(this.props.data, (el) => {
       let freq = el['frequency'];
       switch (el['frequency']) {
@@ -31,57 +33,99 @@ let DataTable = React.createClass({
     });
   },
 
-  onClickRow: function (slug, checked) {
+  // getColumns: function () {
+  //   return [
+  //     {
+  //       field: 'provider',
+  //       title: 'Provider',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'dataset',
+  //       title: 'Dataset',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'key',
+  //       title: 'Key',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'slug',
+  //       title: 'Slug',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'name',
+  //       title: 'Name',
+  //       width: '30%'
+  //     },
+  //     {
+  //       field: 'freq',
+  //       title: 'Freq',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'startDate',
+  //       title: 'Start date',
+  //       sortable: true
+  //     },
+  //     {
+  //       field: 'endDate',
+  //       title: 'End date',
+  //       sortable: true
+  //     }
+  //   ];
+  // },
+
+  onSelect: function ({ slug }) {
     let selection = _.cloneDeep(this.props.value);
-    if (checked) {
-      selection.push(slug);
-    } else {
-      _.remove(selection, (el) => {return el === slug});
-    }
+    selection.push(slug);
     this.props.onChange(selection);
   },
-  onClickRowAll: function (data, checked) {
-    let selection = []
-    if (checked) {
-      selection = _.map(data, (el) => {
-        return el['slug']
-      });
-    }
+  onUnselect: function ({ slug }) {
+    let selection = _.cloneDeep(this.props.value);
+    _.remove(selection, el => el === slug);
     this.props.onChange(selection);
+  },
+  onSelectAll: function (data) {
+    this.props.onChange(_.map(data, el => el['slug']));
+  },
+  onUnselectAll: function () {
+    this.props.onChange([]);
   },
 
   render: function () {
-    let data = this.buildData();
-    let selectRow = {
-      'mode': 'checkbox',
-      'selected': this.props.value,
-      'onSelect': (row, checked) => { this.onClickRow(row['slug'], checked); },
-      'onSelectAll': (checked) => { this.onClickRowAll(data, checked); },
-      'bgColor': '#9ACBDB'
-    };
-
-    return (
+    // todo show/hide column buttons
+    let data = this.getData();
+    return  (
       <div className="dataTableDiv">
-        <BootstrapTable
+        <BootstrapTableWrapper
           data={data}
-          bordered={true}
-          striped={true}
-          hover={true}
-          condensed={true}
-          selectRow={selectRow}
+          values={this.props.value}
+          classes="table table-hover table-bordered"
+          striped="true"
+          onSelect={this.onSelect}
+          onUnselect={this.onUnselect}
+          onSelectAll={function () { this.onSelectAll(data); }.bind(this)}
+          onUnselectAll={this.onUnselectAll}
         >
-          <TableHeaderColumn dataField="provider" dataSort>Provider</TableHeaderColumn>
-          <TableHeaderColumn dataField="dataset" dataSort>Dataset</TableHeaderColumn>
-          <TableHeaderColumn dataField="key" dataSort>Key</TableHeaderColumn>
-          <TableHeaderColumn isKey={true} dataField="slug" dataSort>Slug</TableHeaderColumn>
-          <TableHeaderColumn dataField="name">Name</TableHeaderColumn>
-          <TableHeaderColumn dataField="freq" dataSort>Freq</TableHeaderColumn>
-          <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
-          <TableHeaderColumn dataField="endDate" dataSort>End date</TableHeaderColumn>
-        </BootstrapTable>
+          <th data-field="state" data-checkbox></th>
+          <th data-field="provider" data-sortable>Provider</th>
+          <th data-field="dataset" data-sortable>Dataset</th>
+          <th data-field="key" data-sortable>Key</th>
+          <th data-field="slug" data-sortable>Slug</th>
+          <th data-field="name" data-width="500px">Name</th>
+          <th data-field="freq" data-sortable>Freq</th>
+          <th data-field="startDate" data-sortable>Start date</th>
+          <th data-field="endDate" data-sortable>End date</th>
+        </BootstrapTableWrapper>
       </div>
     );
   }
 });
+
+// Select
+
 
 module.exports = DataTable;
