@@ -34,10 +34,10 @@ if (Meteor.isServer) {
 
   Meteor.methods({
     'config.get': function () {
-      if (!this.userId) {
-        throw new Meteor.Error('not-authorized');
+      let config;
+      if (this.userId) {
+        config = Config.findOne({ 'userId': this.userId });
       }
-      let config = Config.findOne({ 'userId': this.userId });
       if (!config) {
         config = _.cloneDeep(URLObj);
       }

@@ -8,6 +8,14 @@ import BootstrapTableWrapper from './BootstrapTableWrapper.jsx';
 
 let DataTable = React.createClass({
 
+  formatKeyLink: function (el) {
+    return '<a href=\"//widukind.cepremap.org/views/series/'
+      + el['provider_name'].toLowerCase() + '-'
+      + el['dataset_code'].toLowerCase() + '-'
+      + el['key'].toLowerCase() + '\" target=\"_blank\">'
+      + el['key'].toLowerCase() + '</a>';
+  },
+
   getData: function () {
     return _.map(this.props.data, (el) => {
       let freq = el['frequency'];
@@ -22,8 +30,7 @@ let DataTable = React.createClass({
       return ({
         'provider': el['provider_name'],
         'dataset': el['dataset_code'],
-        // 'key': '<a href=\"http://widukind.cepremap.org/views/series/'+el['dataset_code']+'-'+el['key']+'\">'+el['key']+'</a>',
-        'key': el['key'],
+        'key': this.formatKeyLink(el),
         'slug': el['slug'],
         'name': el['name'],
         'freq': freq,
@@ -32,51 +39,6 @@ let DataTable = React.createClass({
       });
     });
   },
-
-  // getColumns: function () {
-  //   return [
-  //     {
-  //       field: 'provider',
-  //       title: 'Provider',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'dataset',
-  //       title: 'Dataset',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'key',
-  //       title: 'Key',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'slug',
-  //       title: 'Slug',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'name',
-  //       title: 'Name',
-  //       width: '30%'
-  //     },
-  //     {
-  //       field: 'freq',
-  //       title: 'Freq',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'startDate',
-  //       title: 'Start date',
-  //       sortable: true
-  //     },
-  //     {
-  //       field: 'endDate',
-  //       title: 'End date',
-  //       sortable: true
-  //     }
-  //   ];
-  // },
 
   onSelect: function ({ slug }) {
     let selection = _.cloneDeep(this.props.value);
@@ -96,7 +58,6 @@ let DataTable = React.createClass({
   },
 
   render: function () {
-    // todo show/hide column buttons
     let data = this.getData();
     return  (
       <div className="dataTableDiv">

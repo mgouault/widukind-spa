@@ -19,7 +19,7 @@ function callAPI (pathname, params) {
       if (typeof received !== 'object') {
         throw new Error(received);
       }
-      _log.push(received);
+      _log.push(JSON.stringify(received, null, 2));
 			let error = _.get(received, 'error');
 			if (error) {
 				throw new Error(error.toString());

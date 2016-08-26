@@ -19,7 +19,10 @@ let ConfigPage = React.createClass({
 		return (
 			<Row>
 				<Col sm={6} smOffset={3}>
-					<ConfigForm />
+					<ConfigForm
+						updateConfig={actions.updateConfig}
+						resetConfig={actions.resetConfig}
+					/>
 				</Col>
 			</Row>
 		);

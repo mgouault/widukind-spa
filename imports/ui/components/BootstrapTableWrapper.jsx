@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import _ from 'lodash';
 
 
 
@@ -10,7 +11,9 @@ let BootstrapTableWrapper = React.createClass({
       data, values, classes, striped,
       onSelect, onUnselect, onSelectAll, onUnselectAll
     } = this.props;
-		$(ReactDOM.findDOMNode(this)).bootstrapTable({ data, classes, striped })
+		$(ReactDOM.findDOMNode(this)).bootstrapTable({
+      data, classes, striped, showColumns: true
+    })
     .bootstrapTable('hideLoading')
     .bootstrapTable('checkBy', { field: 'slug', values })
     .on('check.bs.table', (e, row) => onSelect(row))
@@ -21,14 +24,6 @@ let BootstrapTableWrapper = React.createClass({
 
   componentWillUnmount: function () {
     $(ReactDOM.findDOMNode(this)).bootstrapTable('destroy');
-  },
-
-  showColumn: function (field) {
-    $(ReactDOM.findDOMNode(this)).bootstrapTable('showColumn', field);
-  },
-
-  hideColumn: function (field) {
-    $(ReactDOM.findDOMNode(this)).bootstrapTable('hideColumn', field);
   },
 
   render: function () {
