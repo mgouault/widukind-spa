@@ -16,7 +16,10 @@ let LogDisplay = React.createClass({
 
   render: function () {
     let displayed = this.state.displayed;
-    let log = _.join(this.props.log, '\n');
+    let log = _.reduceRight(this.props.log, (acc, entry, index) => {
+      acc += '----- request ['+index+'] -----' + '\n' + entry + '\n\n';
+      return acc;
+    }, '');
     return (
       <div>
         <Panel header="Logs">

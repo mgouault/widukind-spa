@@ -2,8 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import { Panel, FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
-import actions from '../actions';
-
 // todo: pre-fill values
 
 let ConfigForm = React.createClass({
@@ -15,7 +13,7 @@ let ConfigForm = React.createClass({
 		let hostname = _.get(event, 'target.formConfigHostname.value');
 		let port = _.get(event, 'target.formConfigPort.value');
 		let pathname = _.get(event, 'target.formConfigPathname.value');
-		actions.updateConfig(_.cloneDeep({ protocol, host, hostname, port, pathname }));
+		this.props.updateConfig(_.cloneDeep({ protocol, host, hostname, port, pathname }));
 		_.set(event, 'target.formConfigProtocol.value', null);
 		_.set(event, 'target.formConfigHost.value', null);
 		_.set(event, 'target.formConfigHostname.value', null);
@@ -25,7 +23,7 @@ let ConfigForm = React.createClass({
 
 	handleReset: function () {
 		event.preventDefault();
-		actions.resetConfig();
+		this.props.resetConfig();
 	},
 
 	render: function () {
