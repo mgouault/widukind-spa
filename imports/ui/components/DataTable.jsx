@@ -2,7 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
+import { Pagination } from 'react-bootstrap';
 import BootstrapTableWrapper from './BootstrapTableWrapper.jsx';
+
+import CustomSelect from './CustomSelect.jsx';
 
 
 
@@ -61,11 +64,31 @@ let DataTable = React.createClass({
     let data = this.getData();
     return  (
       <div className="dataTableDiv">
+        <CustomSelect
+          key={'perPageSelect'}
+          title={'Per page'}
+          obj={{'data':[10, 25, 50, 100], 'value': this.props.paginationPerPage}}
+          onChange={this.props.paginationSelectPerPage}
+        />
+        <strong>Total results: {this.props.paginationTotalResults}</strong>
+        <Pagination
+          prev
+          next
+          first
+          last
+          ellipsis
+          boundaryLinks
+          items={this.props.paginationPagesNb}
+          maxButtons={5}
+          activePage={this.props.paginationActivePage}
+          onSelect={this.props.paginationSelectActivePage}
+        />
         <BootstrapTableWrapper
           data={data}
           values={this.props.value}
           classes="table table-hover table-bordered"
           striped="true"
+          showColumns="true"
           onSelect={this.onSelect}
           onUnselect={this.onUnselect}
           onSelectAll={function () { this.onSelectAll(data); }.bind(this)}

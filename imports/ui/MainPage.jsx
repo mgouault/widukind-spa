@@ -139,8 +139,14 @@ let MainPage = React.createClass({
 										data={state['series'].data}
 										value={state['series'].value}
 										onChange={actions.selectSeriesValue}
+                    paginationSelectPerPage={actions.paginationSelectPerPage}
+                    paginationActivePage={state.metadata['paginationActivePage']}
+                    paginationPagesNb={state.metadata['paginationPagesNb']}
+                    paginationPerPage={state.metadata['paginationPerPage']}
+                    paginationTotalResults={state.metadata['paginationTotalResults']}
+                    paginationSelectActivePage={actions.paginationSelectActivePage}
 									/>
-								</ComponentWrapper>
+                </ComponentWrapper>
 							</div>
 						</Col>
 					</Row>

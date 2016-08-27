@@ -8,11 +8,11 @@ let BootstrapTableWrapper = React.createClass({
 
   componentDidMount: function () {
     let {
-      data, values, classes, striped,
+      data, values, classes, striped, showColumns,
       onSelect, onUnselect, onSelectAll, onUnselectAll
     } = this.props;
 		$(ReactDOM.findDOMNode(this)).bootstrapTable({
-      data, classes, striped, showColumns: true
+      data, classes, striped, showColumns
     })
     .bootstrapTable('hideLoading')
     .bootstrapTable('checkBy', { field: 'slug', values })
@@ -27,7 +27,6 @@ let BootstrapTableWrapper = React.createClass({
   },
 
   render: function () {
-    // todo show/hide column buttons
     return  (
       <table>
         <thead>

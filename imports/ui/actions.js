@@ -13,6 +13,8 @@ import { getData } from './getData';
 let actions = Reflux.createActions({
 	'updateConfig': {},
 	'resetConfig': {},
+	'paginationSelectPerPage': {},
+	'paginationSelectActivePage': {},
 	'selectProviderValue': {},
 	'selectDatasetValue': {},
 	'selectFrequencyValue': {},

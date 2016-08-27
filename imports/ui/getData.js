@@ -25,8 +25,7 @@ function callAPI (pathname, params) {
 				throw new Error(error.toString());
 			}
 			return received;
-		})
-    .then(received => received.data);
+		});
 }
 
 const getData = {
