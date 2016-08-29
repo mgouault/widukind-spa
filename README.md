@@ -3,24 +3,17 @@
 Taiga project - kanban board:
 https://tree.taiga.io/project/mgouault-widukind-spa/kanban
 
-#### Getting started
+#### Run in Docker
 
-1. Install all dependencies
-  * `meteor npm install`
-3. Start the server
-  * `meteor npm start`
+1. Run a container
 
-#### Docker
+```bash
+$ docker run -d --name widukind-spa \
+  -p YOUR_PUBLIC_IP:3000:80 \
+  -e ROOT_URL=http://YOUR_PUBLIC_IP:3000 \
+  -e MONGO_URL=mongodb://mongodb/widukind \
+  mgouault/widukind-spa
+```
 
-1. Clone this project
-  * `git clone https://github.com/mgouault/widukind-spa.git`
-  * `cd widukind-spa`
-
-1. Build image
-  * `docker build -t widukind-spa .`
-
-2. Run a container
-  * `docker run -d --name spa -p 3000:3000 widukind-spa`
-
-3. Open browser
+2. Open browser
   * `http://YOUR_PUBLIC_IP:3000`
