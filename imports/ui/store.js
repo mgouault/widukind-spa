@@ -25,9 +25,10 @@ const _state = {
   'frequency': initState(''),
   'dimension': initState(),
   'series': initState(),
-  'values': initState(null),
+  'seriesFrequency': null,
+  'seriesValues': initState(null),
   'metadata': {
-    'paginationActivePage': 1, // todo? fill from series request
+    'paginationActivePage': 1,
     'paginationPagesNb': 0,
     'paginationPerPage': 10,
     'paginationTotalResults': 0,
@@ -58,7 +59,7 @@ let store = Reflux.createStore({
   listenables: [actions],
   getInitialState: () => _state,
   publicRefresh: function () {
-    actions.fetchSeriesData(_state['dataset'].value, buildParams());
+    actions.fetchSeries(_state['dataset'].value, buildParams());
     _state.metadata['url'] = getUrl('/datasets/'+_state['dataset'].value+'/values', buildParams());
     _state.metadata['log'] = getLog();
     this.trigger(_state);
@@ -126,12 +127,8 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     trigger();
     actions.fetchDatasetData(value);
   },
@@ -142,24 +139,16 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
     actions.fetchFrequencyData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
   },
   onSelectDimensionValue: value => {
@@ -173,12 +162,8 @@ let store = Reflux.createStore({
       return acc;
     }, _state['dimension'].value);
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
   },
   onSelectDimensionsPropsValue: (value, dimensionName) => {
@@ -188,34 +173,67 @@ let store = Reflux.createStore({
       _.map(value, el => el.value)
     );
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
   },
-  onSelectSeriesValue: value => {
-    _state['series'].value = value;
-    _state['values'].data = [];
+
+  onSelectSeries: ({ slug, frequency }) => {
+    if (_state['seriesFrequency'] && frequency !== _state['seriesFrequency']) {
+      _state['series'].loading = true;
+      trigger(); //todo error message
+      _state['series'].loading = false;
+      return trigger();
+    }
+    _state['series'].value.push(slug);
+    _state['seriesFrequency'] = frequency;
+    _state['seriesValues'].data = [];
     trigger();
-    actions.fetchValuesData(value);
+    actions.fetchSeriesValues(_state['series'].value);
+  },
+  onUnselectSeries: ({ slug, frequency }) => {
+    _.remove(_state['series'].value, el => el === slug);
+    if (_.isEmpty(_state['series'].value)) {
+      _state['seriesFrequency'] = null;
+    }
+    _state['seriesValues'].data = [];
+    trigger();
+    actions.fetchSeriesValues(_state['series'].value);
+  },
+  onSelectAllSeries: () => {
+    let frequency = _state['/seriesFrequency'] || _.head(_state['series'].data).frequency;
+    if (!_.every(_state['series'].data, el => el.frequency === frequency)) {
+      _state['series'].loading = true;
+      trigger(); //todo error message
+      _state['series'].loading = false;
+      return trigger();
+    }
+    _state['series'].value = _.map(_state['series'].data, el => el.slug);
+    _state['seriesFrequency'] = frequency;
+    _state['seriesValues'].data = [];
+    trigger();
+    actions.fetchSeriesValues(_state['series'].value);
+  },
+  onUnselectAllSeries: () => {
+    _state['series'].value = [];
+    _state['seriesFrequency'] = null;
+    _state['seriesValues'].data = [];
+    trigger();
   },
 
   onFetchProviderData: () => {_state['provider'].loading = true; trigger();},
   onFetchDatasetData: () => {_state['dataset'].loading = true; trigger();},
   onFetchFrequencyData: () => {_state['frequency'].loading = true; trigger();},
   onFetchDimensionData: () => {_state['dimension'].loading = true; trigger();},
-  onFetchSeriesData: () => {_state['series'].loading = true; trigger();},
-  onFetchValuesData: () => {_state['values'].loading = true; trigger();},
+  onFetchSeries: () => {_state['series'].loading = true; trigger();},
+  onFetchSeriesValues: () => {_state['seriesValues'].loading = true; trigger();},
 
   onFetchProviderDataFailed: err => console.error(err),
   onFetchDatasetDataFailed: err => console.error(err),
   onFetchFrequencyDataFailed: err => console.error(err),
   onFetchDimensionDataFailed: err => console.error(err),
-  onFetchSeriesDataFailed: err => console.error(err),
-  onFetchValuesDataFailed: err => console.error(err),
+  onFetchSeriesFailed: err => console.error(err),
+  onFetchSeriesValuesFailed: err => console.error(err),
 
   onFetchProviderDataCompleted: ({ data }) => {
     _state['provider'].loading = false;
@@ -234,12 +252,8 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     _state.metadata['log'] = getLog();
     trigger();
     actions.fetchDatasetData(defaultValue);
@@ -261,12 +275,8 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
     actions.fetchFrequencyData(defaultValue);
   },
@@ -281,12 +291,8 @@ let store = Reflux.createStore({
     }
     _state['frequency'].value = defaultValue;
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
     actions.fetchDimensionData(_state['dataset'].value);
   },
@@ -310,41 +316,42 @@ let store = Reflux.createStore({
       return tmp;
     });
     _state['series'].data = [];
-    _state.metadata['paginationActivePage'] = 1;
-    _state.metadata['paginationPagesNb'] = 0;
-    _state.metadata['paginationPerPage'] = 10;
-    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
-    _state['values'].data = [];
+    _state['seriesValues'].data = [];
     refresh();
   },
-  onFetchSeriesDataCompleted: ({ data, meta }) => {
+  onFetchSeriesCompleted: ({ data, meta }) => {
     _state['series'].loading = false;
     if (data === null) { return; }
+    data = _.map(data, el => {
+      switch (el['frequency']) {
+        case 'A':
+          el.frequency = 'Annually'; break;
+        case 'Q':
+          el.frequency = 'Quarterly'; break;
+        case 'M':
+          el.frequency = 'Monthly'; break;
+      }
+      return el;
+    });
     _state['series'].data = data;
+    _state['seriesFrequency'] = null;
     _state.metadata['paginationActivePage'] = meta.page;
     _state.metadata['paginationPagesNb'] = meta.pages;
     _state.metadata['paginationPerPage'] = meta.per_page;
     _state.metadata['paginationTotalResults'] = meta.total;
-    // let defaultValue = [_.get(_.head(data), 'slug')];
-    // if (init.series) {
-    //   defaultValue = init.series;
-    //   init.series = undefined;
-    // }
-    // _state['series'].value = defaultValue;
     _state.metadata['log'] = getLog();
     trigger();
-    // actions.fetchValuesData(defaultValue);
   },
-  onFetchValuesDataCompleted: ({ data }) => {
-    _state['values'].loading = false;
+  onFetchSeriesValuesCompleted: ({ data }) => {
+    _state['seriesValues'].loading = false;
     if (data === null) { return; }
     if (!(data instanceof Array)) {
       data = [data];
     }
-    let tmp = _state['values'].data;
+    let tmp = _state['seriesValues'].data;
     _.remove(tmp, el => !_.find(_state['series'].value, foo => foo === el['slug']));
-    _state['values'].data = _.concat(_.compact(tmp), _.compact(data));
+    _state['seriesValues'].data = _.concat(_.compact(tmp), _.compact(data));
     _state.metadata['log'] = getLog();
     trigger();
   }

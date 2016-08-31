@@ -112,10 +112,10 @@ let MainPage = React.createClass({
 					<Row>
 						<Col sm={12}>
 							<div className="seriesGraphDiv">
-								<ComponentWrapper loading={state['values'].loading} data={state['values'].data}
+								<ComponentWrapper loading={state['seriesValues'].loading} data={state['seriesValues'].data}
 									errorMessage={'No series selected'}>
 									<SeriesGraphDimensions
-										series={state['values'].data}
+										series={state['seriesValues'].data}
 									/>
 								</ComponentWrapper>
 							</div>
@@ -138,7 +138,10 @@ let MainPage = React.createClass({
 									<DataTable
 										data={state['series'].data}
 										value={state['series'].value}
-										onChange={actions.selectSeriesValue}
+										onSelect={actions.selectSeries}
+                    onUnselect={actions.unselectSeries}
+                    onSelectAll={actions.selectAllSeries}
+                    onUnselectAll={actions.unselectAllSeries}
                     paginationSelectPerPage={actions.paginationSelectPerPage}
                     paginationActivePage={state.metadata['paginationActivePage']}
                     paginationPagesNb={state.metadata['paginationPagesNb']}

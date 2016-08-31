@@ -20,7 +20,10 @@ let actions = Reflux.createActions({
 	'selectFrequencyValue': {},
 	'selectDimensionValue': {},
   'selectDimensionsPropsValue': {},
-	'selectSeriesValue': {},
+	'selectSeries': {},
+	'unselectSeries': {},
+	'selectAllSeries': {},
+	'unselectAllSeries': {},
 	'fetchProviderData': { asyncResult: true },
 	'fetchDatasetData': {
 		asyncResult: true,
@@ -34,11 +37,11 @@ let actions = Reflux.createActions({
 		asyncResult: true,
 		shouldEmit: selectedDataset => selectedDataset && !_.isEmpty(selectedDataset)
 	},
-	'fetchSeriesData': {
+	'fetchSeries': {
 		asyncResult: true,
 		shouldEmit: (selectedDataset, params) => selectedDataset && !_.isEmpty(selectedDataset)
 	},
-	'fetchValuesData': {
+	'fetchSeriesValues': {
 		asyncResult: true,
 		shouldEmit: selectedSeries => selectedSeries && !_.isEmpty(selectedSeries)
 	}
@@ -48,7 +51,7 @@ actions.fetchProviderData.listenAndPromise(getData['provider']);
 actions.fetchDatasetData.listenAndPromise(getData['dataset']);
 actions.fetchFrequencyData.listenAndPromise(getData['frequency']);
 actions.fetchDimensionData.listenAndPromise(getData['dimension']);
-actions.fetchSeriesData.listenAndPromise(getData['series']);
-actions.fetchValuesData.listenAndPromise(getData['values']);
+actions.fetchSeries.listenAndPromise(getData['series']);
+actions.fetchSeriesValues.listenAndPromise(getData['seriesValues']);
 
 module.exports = actions;

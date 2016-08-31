@@ -34,7 +34,7 @@ const getData = {
 	'frequency': selectedDataset =>	callAPI('/datasets/' + selectedDataset + '/frequencies'),
 	'dimension': selectedDataset =>	callAPI('/datasets/' + selectedDataset + '/dimensions'),
 	'series': (selectedDataset, params) => callAPI('/datasets/' + selectedDataset + '/series', params),
-	'values': selectedSeries =>	callAPI('/series/' + _.join(selectedSeries, '+'))
+	'seriesValues': selectedSeries =>	callAPI('/series/' + _.join(selectedSeries, '+'))
 };
 
 function getUrl (pathname, params = {}) {
