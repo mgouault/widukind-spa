@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import axios from 'axios';
 import url from 'url';
 
 let _configObj = {};
@@ -7,32 +6,26 @@ let _log = [];
 let countId = 0;
 let pendingCall;
 
-function callAPI (pathname, params = {}) {
-  let URLObj = _.cloneDeep(_configObj);
-  URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
-  _.assign(URLObj['query'], params);
+function callAPI (pathname, params) {
   let ownId = _.cloneDeep(countId);
-  console.log('1', _.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
   countId++;
-  console.log('2',_.cloneDeep(ownId), _.cloneDeep(URLObj['pathname']));
   pendingCall = ownId;
-  return axios.get(unescape(url.format(URLObj)))
+  return fetch(getUrl(pathname, params))
+    .then(response => response.json())
 		.then(received => {
       if (pendingCall !== ownId) {
         return { 'data': null };
       }
-			received = received.data; // todo handle 404 error
       if (typeof received !== 'object') {
         throw new Error(received);
       }
-      _log.push(received);
+      _log.push(JSON.stringify(received, null, 2));
 			let error = _.get(received, 'error');
 			if (error) {
 				throw new Error(error.toString());
 			}
 			return received;
-		})
-    .then(received => received.data);
+		});
 }
 
 const getData = {
@@ -44,12 +37,11 @@ const getData = {
 	'values': selectedSeries =>	callAPI('/series/' + _.join(selectedSeries, '+'))
 };
 
-function getUrl (selectedDataset, params) {
-  let pathname = '/datasets/' + selectedDataset + '/values';
+function getUrl (pathname, params = {}) {
   let URLObj = _.cloneDeep(_configObj);
   URLObj['pathname'] = (URLObj['pathname'] || '') + pathname;
   _.assign(URLObj['query'], params);
-  return unescape(url.format(URLObj))
+  return unescape(url.format(URLObj));
 }
 
 function getLog () {
@@ -60,10 +52,4 @@ function feedConfig (config) {
   _configObj = config;
 }
 
-function initConfig () {
-  axios.get('/config')
-    .then(received => received.data)
-    .then(config => _configObj = config);
-}
-
-export { getData, getUrl, getLog, feedConfig, initConfig };
+export { getData, getUrl, getLog, feedConfig };

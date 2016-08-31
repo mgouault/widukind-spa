@@ -1,14 +1,17 @@
+import { Meteor } from 'meteor/meteor';
+
 import Reflux from 'reflux';
 import _ from 'lodash';
 
 import actions from './actions';
-import { getUrl, getLog, feedConfig, initConfig } from './getData';
+import { getUrl, getLog, feedConfig } from './getData';
 
 
-let init = {
+const initValues = {
   'provider': 'insee',
   'dataset': 'insee-ipch-2015-fr-coicop'
 };
+let init = _.cloneDeep(initValues);
 function initState (value = []) {
   return {
     'data': [],
@@ -24,12 +27,19 @@ const _state = {
   'series': initState(),
   'values': initState(null),
   'metadata': {
+    'paginationActivePage': 1, // todo? fill from series request
+    'paginationPagesNb': 0,
+    'paginationPerPage': 10,
+    'paginationTotalResults': 0,
     'url': '',
     'log': []
   }
 };
 function buildParams () {
-  let params = {};
+  let params = {
+    'page': _state.metadata['paginationActivePage'],
+    'per_page': _state.metadata['paginationPerPage']
+  };
   if (!_.isEmpty(_state['frequency'].value)) {
     params['frequency'] = _.join(_state['frequency'].value, '+');
   }
@@ -49,14 +59,62 @@ let store = Reflux.createStore({
   getInitialState: () => _state,
   publicRefresh: function () {
     actions.fetchSeriesData(_state['dataset'].value, buildParams());
-    _state.metadata['url'] = getUrl(_state['dataset'].value, buildParams());
+    _state.metadata['url'] = getUrl('/datasets/'+_state['dataset'].value+'/values', buildParams());
     _state.metadata['log'] = getLog();
     this.trigger(_state);
   },
-  publicTrigger: function () {this.trigger(_state)},
+  publicTrigger: function () {
+    this.trigger(_state);
+  },
+
   init: () => {
-    initConfig();
-    actions.fetchProviderData();
+    Meteor.call('config.get', function (err, result) {
+      if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      actions.fetchProviderData();
+    })
+  },
+  onUpdateConfig: (config) => {
+    Meteor.call('config.modify', config, function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      init = _.cloneDeep(initValues);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		});
+  },
+  onResetConfig: () => {
+    Meteor.call('config.remove', function (err, result) {
+			if (err) {
+        return console.error(err);
+      }
+      feedConfig(result);
+      init = _.cloneDeep(initValues);
+      actions.selectProviderValue({});
+      refresh();
+      actions.fetchProviderData();
+		})
+  },
+
+  onPaginationSelectPerPage: ({ value }) => {
+    if (value === _state.metadata['paginationPerPage']) {
+      return;
+    }
+    _state.metadata['paginationPerPage'] = value;
+    _state.metadata['paginationActivePage'] = 1;
+    refresh();
+  },
+  onPaginationSelectActivePage: (activePage) => {
+    if (activePage === _state.metadata['paginationActivePage']) {
+      return;
+    }
+    _state.metadata['paginationActivePage'] = activePage;
+    refresh();
   },
 
   onSelectProviderValue: ({ value }) => {
@@ -68,9 +126,12 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
-    _state.metadata['log'] = getLog();
     trigger();
     actions.fetchDatasetData(value);
   },
@@ -81,15 +142,22 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
     actions.fetchFrequencyData(value);
-    actions.fetchDimensionData(value);
   },
   onSelectFrequencyValue: value => {
     _state['frequency'].value = _.map(value, el => el.value);
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
@@ -100,11 +168,15 @@ let store = Reflux.createStore({
     _.remove(_state['dimension'].value, el => !_.find(value, el_ => el_ === el.name));
     _.reduce(addedValue, (acc, el) => {
       let tmp = _.cloneDeep(_.find(_state['dimension'].data, {'name':el}));
-      tmp.value = [_.head(tmp.data)] // reminder: default is set here
+      tmp.value = [_.head(tmp.data).value] // reminder: default is set here
       acc.push(tmp);
       return acc;
     }, _state['dimension'].value);
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
@@ -116,6 +188,10 @@ let store = Reflux.createStore({
       _.map(value, el => el.value)
     );
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
@@ -123,7 +199,6 @@ let store = Reflux.createStore({
   onSelectSeriesValue: value => {
     _state['series'].value = value;
     _state['values'].data = [];
-    _state.metadata['log'] = getLog();
     trigger();
     actions.fetchValuesData(value);
   },
@@ -142,7 +217,7 @@ let store = Reflux.createStore({
   onFetchSeriesDataFailed: err => console.error(err),
   onFetchValuesDataFailed: err => console.error(err),
 
-  onFetchProviderDataCompleted: data => {
+  onFetchProviderDataCompleted: ({ data }) => {
     _state['provider'].loading = false;
     if (data === null) { return; }
     _state['provider'].data = data;
@@ -159,16 +234,22 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     _state.metadata['log'] = getLog();
     trigger();
     actions.fetchDatasetData(defaultValue);
   },
-  onFetchDatasetDataCompleted: data => {
+  onFetchDatasetDataCompleted: ({ data }) => {
     _state['dataset'].loading = false;
     if (data === null) { return; }
+    // data = _.map(data, el => { return {'name':el.name, 'value':el.slug} });
     _state['dataset'].data = data;
+    // let defaultValue = _.head(data).value;
     let defaultValue = _.head(data);
     if (init.dataset) {
       defaultValue = init.dataset;
@@ -180,13 +261,16 @@ let store = Reflux.createStore({
     _state['dimension'].data = [];
     _state['dimension'].value = [];
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
     actions.fetchFrequencyData(defaultValue);
-    actions.fetchDimensionData(defaultValue);
   },
-  onFetchFrequencyDataCompleted: data => {
+  onFetchFrequencyDataCompleted: ({ data }) => {
     _state['frequency'].loading = false;
     if (data === null) { return; }
     _state['frequency'].data = data
@@ -197,21 +281,27 @@ let store = Reflux.createStore({
     }
     _state['frequency'].value = defaultValue;
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
+    actions.fetchDimensionData(_state['dataset'].value);
   },
-  onFetchDimensionDataCompleted: data => {
+  onFetchDimensionDataCompleted: ({ data }) => {
     _state['dimension'].loading = false;
     if (data === null) { return; }
     let filteredKeys = _.filter(Object.keys(data), key => (key !== 'freq' && key !== 'frequency'));
     _state['dimension'].data = _.map(filteredKeys, key => { return {
       'name': key,
-      'data': Object.keys(data[key]) // reminder: keys are picked instead of value
+      // 'data': Object.keys(data[key]) // reminder: keys are picked instead of value
+      'data': _.map(Object.keys(data[key]), el => { return {'name':data[key][el], 'value':el} })
     }});
     _state['dimension'].value = _.map(_state['dimension'].data, el => {
       let tmp = _.cloneDeep(el);
-      let defaultValue = [_.head(el.data)];
+      let defaultValue = [_.head(el.data).value];
       if (init.dimension) {
         defaultValue = init.dimension;
         init.dimension = undefined;
@@ -220,25 +310,33 @@ let store = Reflux.createStore({
       return tmp;
     });
     _state['series'].data = [];
+    _state.metadata['paginationActivePage'] = 1;
+    _state.metadata['paginationPagesNb'] = 0;
+    _state.metadata['paginationPerPage'] = 10;
+    _state.metadata['paginationTotalResults'] = 0;
     _state['series'].value = [];
     _state['values'].data = [];
     refresh();
   },
-  onFetchSeriesDataCompleted: data => {
+  onFetchSeriesDataCompleted: ({ data, meta }) => {
     _state['series'].loading = false;
     if (data === null) { return; }
     _state['series'].data = data;
-    let defaultValue = [_.get(_.head(data), 'slug')];
-    if (init.series) {
-      defaultValue = init.series;
-      init.series = undefined;
-    }
-    _state['series'].value = defaultValue;
+    _state.metadata['paginationActivePage'] = meta.page;
+    _state.metadata['paginationPagesNb'] = meta.pages;
+    _state.metadata['paginationPerPage'] = meta.per_page;
+    _state.metadata['paginationTotalResults'] = meta.total;
+    // let defaultValue = [_.get(_.head(data), 'slug')];
+    // if (init.series) {
+    //   defaultValue = init.series;
+    //   init.series = undefined;
+    // }
+    // _state['series'].value = defaultValue;
     _state.metadata['log'] = getLog();
     trigger();
-    actions.fetchValuesData(defaultValue);
+    // actions.fetchValuesData(defaultValue);
   },
-  onFetchValuesDataCompleted: data => {
+  onFetchValuesDataCompleted: ({ data }) => {
     _state['values'].loading = false;
     if (data === null) { return; }
     if (!(data instanceof Array)) {
