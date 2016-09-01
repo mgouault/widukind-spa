@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import _ from 'lodash';
 
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, Alert } from 'react-bootstrap';
 import Loader from 'react-loader';
 import ReactDimensions from 'react-dimensions';
 
@@ -133,6 +133,11 @@ let MainPage = React.createClass({
 					<Row>
 						<Col sm={12}>
 							<div className="dataTableDiv">
+                {_.isEmpty(state.metadata['errorMessage']) ? null :
+                  <Alert bsStyle="error">
+                    <strong>{state.metadata['errorMessage']}</strong>
+                  </Alert>
+                }
 								<ComponentWrapper loading={state['series'].loading} data={state['series'].data}
 									errorMessage={'No match found'}>
 									<DataTable

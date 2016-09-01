@@ -28,6 +28,7 @@ const _state = {
   'seriesFrequency': null,
   'seriesValues': initState(null),
   'metadata': {
+    'errorMessage': null,
     'paginationActivePage': 1,
     'paginationPagesNb': 0,
     'paginationPerPage': 10,
@@ -59,6 +60,7 @@ let store = Reflux.createStore({
   listenables: [actions],
   getInitialState: () => _state,
   publicRefresh: function () {
+    _state.metadata['errorMessage'] = null;
     actions.fetchSeries(_state['dataset'].value, buildParams());
     _state.metadata['url'] = getUrl('/datasets/'+_state['dataset'].value+'/values', buildParams());
     _state.metadata['log'] = getLog();
@@ -181,7 +183,8 @@ let store = Reflux.createStore({
   onSelectSeries: ({ slug, frequency }) => {
     if (_state['seriesFrequency'] && frequency !== _state['seriesFrequency']) {
       _state['series'].loading = true;
-      trigger(); //todo error message
+      _state.metadata['errorMessage'] = 'Can\'t add series with different frequencies.';
+      trigger();
       _state['series'].loading = false;
       return trigger();
     }
@@ -204,7 +207,8 @@ let store = Reflux.createStore({
     let frequency = _state['/seriesFrequency'] || _.head(_state['series'].data).frequency;
     if (!_.every(_state['series'].data, el => el.frequency === frequency)) {
       _state['series'].loading = true;
-      trigger(); //todo error message
+      _state.metadata['errorMessage'] = 'Can\'t add series with different frequencies.';
+      trigger();
       _state['series'].loading = false;
       return trigger();
     }
