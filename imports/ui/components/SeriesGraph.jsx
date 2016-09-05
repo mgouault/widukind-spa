@@ -20,7 +20,7 @@ let SeriesGraph = React.createClass({
         })
       );
       if (result.length !== labels.length) {
-        let tmp = _.fill(Array(labels.length), 0, 1);
+        let tmp = _.fill(Array(labels.length), null);
         tmp[0] = moment(key).toDate();
         return tmp;
       } else {

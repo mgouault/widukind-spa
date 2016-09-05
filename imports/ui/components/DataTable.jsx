@@ -3,9 +3,45 @@ import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
 import { Pagination } from 'react-bootstrap';
-import BootstrapTableWrapper from './BootstrapTableWrapper.jsx';
 
 import CustomSelect from './CustomSelect.jsx';
+
+
+
+let BootstrapTableWrapper = React.createClass({
+
+  componentDidMount: function () {
+    let {
+      data, values, classes, striped, showColumns,
+      onSelect, onUnselect, onSelectAll, onUnselectAll
+    } = this.props;
+		$(ReactDOM.findDOMNode(this)).bootstrapTable({
+      data, classes, striped, showColumns
+    })
+    .bootstrapTable('hideLoading')
+    .bootstrapTable('checkBy', { field: 'slug', values })
+    .on('check.bs.table', (e, row) => onSelect(row))
+    .on('uncheck.bs.table', (e, row) =>  onUnselect(row))
+    .on('check-all.bs.table', e => onSelectAll())
+    .on('uncheck-all.bs.table', e => onUnselectAll());
+	},
+
+  componentWillUnmount: function () {
+    $(ReactDOM.findDOMNode(this)).bootstrapTable('destroy');
+  },
+
+  render: function () {
+    return  (
+      <table>
+        <thead>
+          <tr>
+            {this.props.children}
+          </tr>
+        </thead>
+      </table>
+    );
+  }
+});
 
 
 
@@ -20,44 +56,17 @@ let DataTable = React.createClass({
   },
 
   getData: function () {
-    return _.map(this.props.data, (el) => {
-      let freq = el['frequency'];
-      switch (el['frequency']) {
-        case 'A':
-          freq = 'Annually'; break;
-        case 'Q':
-          freq = 'Quarterly'; break;
-        case 'M':
-          freq = 'Monthly'; break;
-      }
-      return ({
+    return _.map(this.props.data, (el) => ({
         'provider': el['provider_name'],
         'dataset': el['dataset_code'],
         'key': this.formatKeyLink(el),
         'slug': el['slug'],
         'name': el['name'],
-        'freq': freq,
+        'frequency': el['frequency'],
         'startDate': el['start_date'],
         'endDate': el['end_date']
-      });
-    });
-  },
-
-  onSelect: function ({ slug }) {
-    let selection = _.cloneDeep(this.props.value);
-    selection.push(slug);
-    this.props.onChange(selection);
-  },
-  onUnselect: function ({ slug }) {
-    let selection = _.cloneDeep(this.props.value);
-    _.remove(selection, el => el === slug);
-    this.props.onChange(selection);
-  },
-  onSelectAll: function (data) {
-    this.props.onChange(_.map(data, el => el['slug']));
-  },
-  onUnselectAll: function () {
-    this.props.onChange([]);
+      })
+    );
   },
 
   render: function () {
@@ -89,10 +98,10 @@ let DataTable = React.createClass({
           classes="table table-hover table-bordered"
           striped="true"
           showColumns="true"
-          onSelect={this.onSelect}
-          onUnselect={this.onUnselect}
-          onSelectAll={function () { this.onSelectAll(data); }.bind(this)}
-          onUnselectAll={this.onUnselectAll}
+          onSelect={this.props.onSelect}
+          onUnselect={this.props.onUnselect}
+          onSelectAll={this.props.onSelectAll}
+          onUnselectAll={this.props.onUnselectAll}
         >
           <th data-field="state" data-checkbox></th>
           <th data-field="provider" data-sortable>Provider</th>
@@ -100,7 +109,7 @@ let DataTable = React.createClass({
           <th data-field="key" data-sortable>Key</th>
           <th data-field="slug" data-sortable>Slug</th>
           <th data-field="name" data-width="500px">Name</th>
-          <th data-field="freq" data-sortable>Freq</th>
+          <th data-field="frequency" data-sortable>Frequency</th>
           <th data-field="startDate" data-sortable>Start date</th>
           <th data-field="endDate" data-sortable>End date</th>
         </BootstrapTableWrapper>
@@ -109,7 +118,6 @@ let DataTable = React.createClass({
   }
 });
 
-// Select
 
 
 module.exports = DataTable;
